@@ -123,3 +123,60 @@ export async function evaluateRisk(riskInput) {
     return null;
   }
 }
+
+/**
+ * Ocean Analytics & Observations Time-Series from Supabase
+ */
+export async function getAnalytics(period = '7') {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/analytics?period=${encodeURIComponent(period)}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] getAnalytics failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Active Marine Hazard Advisories from Supabase
+ */
+export async function getAllAlerts() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/alerts`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] getAllAlerts failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Past Multi-Agent Decision Records from Supabase
+ */
+export async function getAnalysisHistory(limit = 10) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/history?limit=${limit}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] getAnalysisHistory failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Trigger Live Coastal Ingestion into Supabase
+ */
+export async function triggerSync() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/sync`, { method: 'POST' });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] triggerSync failed:', err);
+    return null;
+  }
+}
+

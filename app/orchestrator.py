@@ -89,6 +89,10 @@ class Orchestrator:
             hazards=res.get("hazards", [])
         )
 
+        # Step 6: Persist analysis and route decision into Supabase database
+        from app.database.data_pipeline import data_pipeline
+        data_pipeline.persist_decision_output(final_output, text, res.get("origin_coords"))
+
         return final_output
 
 orchestrator = Orchestrator()

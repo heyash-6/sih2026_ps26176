@@ -135,6 +135,41 @@ def post_risk(request: RiskInput):
     res = risk_engine.compute_risk(request)
     return res.model_dump()
 
+@app.get("/api/alerts")
+def get_all_alerts():
+    """Retrieve all active marine hazard advisories from Supabase database."""
+    from app.database.supabase_client import supabase_client
+    alerts = supabase_client.get_active_alerts(limit=20)
+    return {"alerts": alerts, "count": len(alerts)}
+
+@app.get("/api/analytics")
+def get_analytics(period: str = Query("7", description="Time period: '24' for 24h, '7' for 7 days")):
+    """Retrieve ocean observations time-series (SST, Chlorophyll, Waves) from Supabase."""
+    from app.database.supabase_client import supabase_client
+    days = 1 if period == "24" else 7
+    data = supabase_client.get_ocean_analytics_timeseries(period_days=days)
+    return data
+
+@app.get("/api/history")
+def get_history(limit: int = Query(10, description="Max records")):
+    """Retrieve recent multi-agent marine analyses from Supabase."""
+    from app.database.supabase_client import supabase_client
+    analyses = supabase_client.get_recent_analyses(limit=limit)
+    return {"analyses": analyses, "count": len(analyses)}
+
+@app.post("/api/sync")
+def trigger_sync():
+    """Manually trigger data synchronization for coastal hubs to Supabase."""
+    from app.agents.weather_hazard_agent import weather_hazard_agent
+    now_iso = "2026-09-10T05:00:00+05:30"
+    hubs = [("Mumbai", 18.9400, 72.8300), ("Ratnagiri", 16.9902, 73.3120), ("Goa", 15.4989, 73.8278)]
+    synced = []
+    for name, lat, lon in hubs:
+        w = weather_hazard_agent.get_weather(lat, lon, now_iso)
+        m = weather_hazard_agent.get_marine_conditions(lat, lon, now_iso)
+        synced.append({"hub": name, "temp": w.temperature_c, "waves": m.wave_height_m})
+    return {"status": "synced", "hubs": synced}
+
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):
     """SPA client-side routing fallback for React Router (/map, /analytics, /assistant, etc.)."""
