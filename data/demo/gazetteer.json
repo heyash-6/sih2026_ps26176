@@ -1,0 +1,7 @@
+{
+  "ratnagiri": {"lat": 16.9902, "lon": 73.3120, "resolved_from": "Ratnagiri", "method": "gazetteer"},
+  "mangalore": {"lat": 12.9141, "lon": 74.8560, "resolved_from": "Mangalore", "method": "gazetteer"},
+  "kochi": {"lat": 9.9312, "lon": 76.2673, "resolved_from": "Kochi", "method": "gazetteer"},
+  "veraval": {"lat": 20.9000, "lon": 70.3700, "resolved_from": "Veraval", "method": "gazetteer"},
+  "visakhapatnam": {"lat": 17.6868, "lon": 83.2185, "resolved_from": "Visakhapatnam", "method": "gazetteer"}
+}

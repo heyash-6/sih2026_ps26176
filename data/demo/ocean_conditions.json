@@ -1,0 +1,23 @@
+{
+  "16.99,73.31": {
+    "lat": 16.99, "lon": 73.31, "date": "2026-09-09",
+    "sst_celsius": 28.2,
+    "chlorophyll_mg_m3": 1.4,
+    "tide": {"high": ["04:12", "16:40"], "low": ["10:05", "22:30"]},
+    "source": "INCOIS Ocean State Advisory"
+  },
+  "12.91,74.85": {
+    "lat": 12.91, "lon": 74.85, "date": "2026-09-09",
+    "sst_celsius": 28.5,
+    "chlorophyll_mg_m3": 1.6,
+    "tide": {"high": ["03:50", "16:15"], "low": ["09:40", "22:00"]},
+    "source": "INCOIS Ocean State Advisory"
+  },
+  "9.93,76.26": {
+    "lat": 9.93, "lon": 76.26, "date": "2026-09-09",
+    "sst_celsius": 28.0,
+    "chlorophyll_mg_m3": 1.9,
+    "tide": {"high": ["04:30", "17:00"], "low": ["10:20", "22:50"]},
+    "source": "INCOIS Ocean State Advisory"
+  }
+}

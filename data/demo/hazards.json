@@ -1,0 +1,13 @@
+[
+  {
+    "hazard_type": "lightning",
+    "severity": "moderate",
+    "active_window": {
+      "start": "2026-09-09T04:00:00+05:30",
+      "end": "2026-09-09T14:00:00+05:30"
+    },
+    "area_description": "Offshore Ratnagiri northern waters near lat 17.05, lon 73.08 (PFZ-RAT-03)",
+    "source": "IMD Nowcast Bulletin (demo snapshot)",
+    "advisory_text_raw": "Active convective cloud development with elevated risk of lightning strikes."
+  }
+]

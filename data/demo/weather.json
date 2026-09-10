@@ -1,0 +1,32 @@
+{
+  "PFZ-RAT-01": {
+    "lat": 16.99, "lon": 73.15, "datetime": "2026-09-09T05:00:00+05:30",
+    "wind_speed_kmh": 14.2, "wind_direction_deg": 240, "rain_probability_pct": 15, "air_temp_celsius": 27.5,
+    "wave_height_m": 0.9, "swell_period_s": 6.0, "sea_state": "slight",
+    "source": "Open-Meteo & INCOIS (demo snapshot)"
+  },
+  "PFZ-RAT-02": {
+    "lat": 16.98, "lon": 73.12, "datetime": "2026-09-09T05:00:00+05:30",
+    "wind_speed_kmh": 12.4, "wind_direction_deg": 245, "rain_probability_pct": 20, "air_temp_celsius": 27.1,
+    "wave_height_m": 0.8, "swell_period_s": 6.2, "sea_state": "slight",
+    "source": "Open-Meteo & INCOIS (demo snapshot)"
+  },
+  "PFZ-RAT-03": {
+    "lat": 17.05, "lon": 73.08, "datetime": "2026-09-09T05:00:00+05:30",
+    "wind_speed_kmh": 22.1, "wind_direction_deg": 260, "rain_probability_pct": 55, "air_temp_celsius": 26.8,
+    "wave_height_m": 1.8, "swell_period_s": 7.5, "sea_state": "moderate",
+    "source": "Open-Meteo & INCOIS (demo snapshot)"
+  },
+  "PFZ-RAT-04 (Restricted Area)": {
+    "lat": 16.85, "lon": 73.10, "datetime": "2026-09-09T05:00:00+05:30",
+    "wind_speed_kmh": 18.0, "wind_direction_deg": 250, "rain_probability_pct": 30, "air_temp_celsius": 27.0,
+    "wave_height_m": 1.1, "swell_period_s": 6.5, "sea_state": "slight",
+    "source": "Open-Meteo & INCOIS (demo snapshot)"
+  },
+  "default": {
+    "lat": 16.99, "lon": 73.31, "datetime": "2026-09-09T05:00:00+05:30",
+    "wind_speed_kmh": 12.0, "wind_direction_deg": 240, "rain_probability_pct": 10, "air_temp_celsius": 27.0,
+    "wave_height_m": 0.7, "swell_period_s": 6.0, "sea_state": "slight",
+    "source": "Open-Meteo & INCOIS (demo snapshot)"
+  }
+}
