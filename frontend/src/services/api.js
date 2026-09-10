@@ -200,3 +200,31 @@ export async function triggerSync() {
   }
 }
 
+/**
+ * Get List of All Supabase Database Tables & Live Row Counts
+ */
+export async function getDatabaseTables() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/database/tables`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] getDatabaseTables failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Get Raw Live Rows for any Supabase Table
+ */
+export async function getTableData(tableName, limit = 50) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/database/table/${encodeURIComponent(tableName)}?limit=${limit}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn(`[ORCA API] getTableData(${tableName}) failed:`, err);
+    return null;
+  }
+}
+

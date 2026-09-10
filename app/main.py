@@ -189,6 +189,70 @@ def get_history(limit: int = Query(10, description="Max records")):
     analyses = supabase_client.get_recent_analyses(limit=limit)
     return {"analyses": analyses, "count": len(analyses)}
 
+@app.get("/api/database/tables")
+def get_database_tables():
+    """Retrieve all public database tables, live row counts, and metadata from Supabase."""
+    from app.database.supabase_client import supabase_client
+    import httpx
+    
+    tables_meta = [
+        {"name": "pfz_zones", "title": "Potential Fishing Zones", "icon": "🐟", "desc": "Real-time PFZs with live SST, chlorophyll, and bearings for 20 Indian coastal hubs"},
+        {"name": "weather_observations", "title": "Weather Observations", "icon": "🌦️", "desc": "Live meteorological telemetry (air temp, wind, pressure, rain)"},
+        {"name": "wave_observations", "title": "Wave Observations", "icon": "🌊", "desc": "Live wave height, swell period, and sea state conditions"},
+        {"name": "ocean_observations", "title": "Ocean Observations", "icon": "🛰️", "desc": "Satellite GHRSST sea surface temperatures and chlorophyll-a concentrations"},
+        {"name": "marine_analyses", "title": "Marine Analyses", "icon": "🤖", "desc": "Autonomous multi-agent voyage evaluations and reasoning logs"},
+        {"name": "alerts", "title": "Hazard Alerts", "icon": "⚠️", "desc": "Active marine weather advisories, high swells, and restricted passages"},
+        {"name": "current_observations", "title": "Current Observations", "icon": "⚓", "desc": "Coastal sea surface current velocity and flow directions"},
+        {"name": "tide_observations", "title": "Tide Observations", "icon": "🌊", "desc": "Tidal gauges and tidal schedule predictions"},
+        {"name": "users", "title": "Users & Auth Profiles", "icon": "👤", "desc": "Registered maritime captains and verified vessel operator accounts"}
+    ]
+    
+    result = []
+    with httpx.Client(timeout=5.0) as client:
+        for t in tables_meta:
+            count = 0
+            try:
+                r = client.get(
+                    f"{supabase_client.rest_url}/{t['name']}?select=count",
+                    headers={**supabase_client.headers, "Range": "0-0", "Prefer": "count=exact"}
+                )
+                if r.status_code in [200, 206]:
+                    cr = r.headers.get("content-range", "")
+                    if "/" in cr:
+                        count = int(cr.split("/")[-1])
+            except Exception:
+                pass
+            result.append({**t, "row_count": count})
+            
+    return {"tables": result, "project": "byikekhtwiewlpxbuwgo.supabase.co"}
+
+@app.get("/api/database/table/{table_name}")
+def get_table_data(table_name: str, limit: int = Query(50, description="Max rows")):
+    """Retrieve raw rows from any public table in Supabase."""
+    from app.database.supabase_client import supabase_client
+    import httpx
+    
+    allowed = [
+        "pfz_zones", "weather_observations", "wave_observations", 
+        "ocean_observations", "marine_analyses", "alerts", 
+        "current_observations", "tide_observations", "users"
+    ]
+    if table_name not in allowed:
+        raise HTTPException(status_code=400, detail="Invalid table name")
+        
+    try:
+        with httpx.Client(timeout=8.0) as client:
+            res = client.get(
+                f"{supabase_client.rest_url}/{table_name}?limit={limit}",
+                headers=supabase_client.headers
+            )
+            if res.status_code == 200:
+                rows = res.json()
+                return {"table": table_name, "count": len(rows), "rows": rows}
+            return {"table": table_name, "count": 0, "rows": [], "error": res.text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 class RegisterRequest(BaseModel):
     email: str
     password: str
