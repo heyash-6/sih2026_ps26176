@@ -9,8 +9,15 @@ class PFZCandidate(BaseModel):
     date: str
     sst_celsius: float
     chlorophyll_mg_m3: float
-    source: str = "INCOIS PFZ Advisory (demo snapshot)"
+    source: str = "INCOIS PFZ Advisory"
     confidence: str = "advisory"
+    confidence_score: Optional[float] = None
+    name: Optional[str] = None
+    sector: Optional[str] = None
+    port_id: Optional[str] = None
+    port_name: Optional[str] = None
+    bearing_deg: Optional[float] = None
+    depth_m: Optional[float] = None
 
 class TideSchedule(BaseModel):
     high: List[str] = []

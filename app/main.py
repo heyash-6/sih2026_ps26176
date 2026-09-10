@@ -85,15 +85,47 @@ def post_query(request: QueryRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Query execution error: {str(e)}")
 
+@app.get("/api/ports")
+def get_ports():
+    """Retrieve catalog of all 20 Indian coastal hubs and their metadata."""
+    from app.database.indian_coastal_registry import INDIAN_COASTAL_PORTS
+    ports_summary = []
+    for p in INDIAN_COASTAL_PORTS:
+        ports_summary.append({
+            "id": p["id"],
+            "name": p["name"],
+            "state": p["state"],
+            "sector": p["sector"],
+            "lat": p["lat"],
+            "lon": p["lon"],
+            "pfz_count": len(p["pfz_candidates"])
+        })
+    return {"ports": ports_summary, "count": len(ports_summary)}
+
 @app.get("/api/pfz")
 def get_pfz(
-    lat: float = Query(16.99, description="Latitude"),
-    lon: float = Query(73.31, description="Longitude"),
+    lat: Optional[float] = Query(None, description="Latitude"),
+    lon: Optional[float] = Query(None, description="Longitude"),
+    port: Optional[str] = Query(None, description="Port ID or 'all'"),
     date: str = Query("2026-09-09", description="Date YYYY-MM-DD")
 ):
-    """Direct PFZ lookup tool endpoint."""
-    candidates = marine_agent.get_pfz_candidates(lat, lon, date)
-    return {"lat": lat, "lon": lon, "date": date, "candidates": [c.model_dump() for c in candidates]}
+    """Direct PFZ lookup tool endpoint supporting port ID, coordinates, or all Indian coast."""
+    candidates = marine_agent.get_pfz_candidates(lat=lat, lon=lon, date=date, port_id=port)
+    return {
+        "port": port,
+        "lat": lat,
+        "lon": lon,
+        "date": date,
+        "candidates": [c.model_dump() for c in candidates],
+        "count": len(candidates)
+    }
+
+@app.post("/api/sync")
+def trigger_coastal_sync():
+    """Trigger synchronization of real-time marine data across the Indian coastline to Supabase."""
+    from app.database.data_pipeline import data_pipeline
+    result = data_pipeline.sync_all_indian_coastal_hubs()
+    return result
 
 @app.get("/api/weather")
 def get_weather(

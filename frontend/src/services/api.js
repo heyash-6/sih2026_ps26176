@@ -49,13 +49,33 @@ export async function askOrca(queryText, sessionId = 'web_session_' + Date.now()
 /**
  * Direct Potential Fishing Zone (PFZ) Lookup
  */
-export async function getPfzCandidates(lat = 16.99, lon = 73.31, date = '2026-09-09') {
+export async function getPfzCandidates(lat = null, lon = null, port = null, date = '2026-09-09') {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/pfz?lat=${lat}&lon=${lon}&date=${date}`);
+    const params = new URLSearchParams();
+    if (port) params.append('port', port);
+    if (lat !== null && lat !== undefined) params.append('lat', lat);
+    if (lon !== null && lon !== undefined) params.append('lon', lon);
+    if (date) params.append('date', date);
+
+    const res = await fetch(`${API_BASE_URL}/api/pfz?${params.toString()}`);
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
     console.warn('[ORCA API] getPfzCandidates failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Get all 20 Indian coastal ports catalog
+ */
+export async function getCoastalPorts() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/ports`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] getCoastalPorts failed:', err);
     return null;
   }
 }

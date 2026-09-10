@@ -113,6 +113,22 @@ class SupabaseClient:
             logger.warning(f"Supabase insert_weather_observation exception: {e}")
         return None
 
+    def insert_weather_observations_batch(self, obs_list: List[Dict[str, Any]]) -> bool:
+        """Batch record weather observations in Supabase."""
+        if not self._is_configured or not obs_list:
+            return False
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                res = client.post(
+                    f"{self.rest_url}/weather_observations",
+                    headers={**self.headers, "Prefer": "return=minimal"},
+                    json=obs_list
+                )
+                return res.status_code in [200, 201, 204]
+        except Exception as e:
+            logger.warning(f"Supabase batch weather insert exception: {e}")
+            return False
+
     # -------------------------------------------------------------------------
     # 3. Wave & Sea State Observations
     # -------------------------------------------------------------------------
@@ -157,6 +173,22 @@ class SupabaseClient:
             logger.warning(f"Supabase insert_wave_observation exception: {e}")
         return None
 
+    def insert_wave_observations_batch(self, obs_list: List[Dict[str, Any]]) -> bool:
+        """Batch record wave observations in Supabase."""
+        if not self._is_configured or not obs_list:
+            return False
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                res = client.post(
+                    f"{self.rest_url}/wave_observations",
+                    headers={**self.headers, "Prefer": "return=minimal"},
+                    json=obs_list
+                )
+                return res.status_code in [200, 201, 204]
+        except Exception as e:
+            logger.warning(f"Supabase batch wave insert exception: {e}")
+            return False
+
     # -------------------------------------------------------------------------
     # 4. Ocean Observations (SST & Chlorophyll)
     # -------------------------------------------------------------------------
@@ -200,6 +232,22 @@ class SupabaseClient:
         except Exception as e:
             logger.warning(f"Supabase insert_ocean_observation exception: {e}")
         return None
+
+    def insert_ocean_observations_batch(self, obs_list: List[Dict[str, Any]]) -> bool:
+        """Batch record ocean observations in Supabase."""
+        if not self._is_configured or not obs_list:
+            return False
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                res = client.post(
+                    f"{self.rest_url}/ocean_observations",
+                    headers={**self.headers, "Prefer": "return=minimal"},
+                    json=obs_list
+                )
+                return res.status_code in [200, 201, 204]
+        except Exception as e:
+            logger.warning(f"Supabase batch ocean insert exception: {e}")
+            return False
 
     # -------------------------------------------------------------------------
     # 5. Ocean Analytics Time-Series
@@ -321,5 +369,68 @@ class SupabaseClient:
         except Exception as e:
             logger.warning(f"Supabase get_recent_analyses error: {e}")
         return []
+
+    # -------------------------------------------------------------------------
+    # 7. Potential Fishing Zones (PFZ)
+    # -------------------------------------------------------------------------
+    def get_pfz_zones(
+        self,
+        port_id: Optional[str] = None,
+        lat: Optional[float] = None,
+        lon: Optional[float] = None,
+        limit: int = 50
+    ) -> List[Dict[str, Any]]:
+        """
+        Query Potential Fishing Zones from public.pfz_zones in Supabase.
+        Filters by port_id (or all ports) or proximity to lat/lon.
+        """
+        if not self._is_configured:
+            return []
+        try:
+            with httpx.Client(timeout=6.0) as client:
+                query_params = ["is_active=eq.true", f"limit={limit}"]
+                if port_id and port_id.lower() not in ["all", "any"]:
+                    query_params.append(f"port_id=eq.{port_id.lower()}")
+                elif lat is not None and lon is not None:
+                    query_params.append(f"latitude=gte.{lat - 1.5}&latitude=lte.{lat + 1.5}")
+                    query_params.append(f"longitude=gte.{lon - 1.5}&longitude=lte.{lon + 1.5}")
+                
+                query_str = "&".join(query_params)
+                res = client.get(
+                    f"{self.rest_url}/pfz_zones?{query_str}&order=confidence_score.desc",
+                    headers=self.headers
+                )
+                if res.status_code == 200:
+                    rows = res.json()
+                    if rows:
+                        return rows
+                logger.warning(f"Supabase get_pfz_zones returned status {res.status_code}: {res.text}")
+        except Exception as e:
+            logger.warning(f"Supabase get_pfz_zones error: {e}")
+        return []
+
+    def upsert_pfz_zones(self, zones: List[Dict[str, Any]]) -> bool:
+        """
+        Upsert a batch of PFZ zones into public.pfz_zones in Supabase.
+        """
+        if not self._is_configured or not zones:
+            return False
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                res = client.post(
+                    f"{self.rest_url}/pfz_zones",
+                    headers={
+                        **self.headers,
+                        "Prefer": "resolution=merge-duplicates,return=minimal"
+                    },
+                    json=zones
+                )
+                if res.status_code in [200, 201, 204]:
+                    logger.info(f"Successfully upserted {len(zones)} PFZ zones to Supabase")
+                    return True
+                logger.warning(f"Supabase upsert_pfz_zones returned {res.status_code}: {res.text}")
+        except Exception as e:
+            logger.warning(f"Supabase upsert_pfz_zones error: {e}")
+        return False
 
 supabase_client = SupabaseClient()

@@ -56,12 +56,43 @@ const keyFor = u => ({
 }[u])
 
 const PORTS = [
-  { id: 'mumbai', name: 'Mumbai Harbour (Sassoon Docks)', lat: 18.9400, lon: 72.8300 },
-  { id: 'ratnagiri', name: 'Ratnagiri Fishery Port (Mirkarwada)', lat: 16.9902, lon: 73.3120 },
-  { id: 'goa', name: 'Goa Mormugao Port', lat: 15.4989, lon: 73.8278 },
-  { id: 'alibaug', name: 'Alibaug Port', lat: 18.6414, lon: 72.8722 },
-  { id: 'malvan', name: 'Malvan Port', lat: 16.0594, lon: 73.4686 },
-  { id: 'porbandar', name: 'Porbandar Marine Port', lat: 21.6417, lon: 69.6293 }
+  // Gujarat (North-West)
+  { id: 'veraval', name: 'Veraval Fishery Port (Gujarat)', state: 'Gujarat', sector: 'North-West (Gujarat)', lat: 20.9000, lon: 70.3667 },
+  { id: 'porbandar', name: 'Porbandar Marine Port (Gujarat)', state: 'Gujarat', sector: 'North-West (Gujarat)', lat: 21.6417, lon: 69.6293 },
+  { id: 'okha', name: 'Okha Fishery Port (Gujarat)', state: 'Gujarat', sector: 'North-West (Gujarat)', lat: 22.4667, lon: 69.0667 },
+
+  // Maharashtra (West Coast)
+  { id: 'mumbai', name: 'Mumbai Harbour (Sassoon Docks)', state: 'Maharashtra', sector: 'West Coast (Maharashtra)', lat: 18.9400, lon: 72.8300 },
+  { id: 'alibaug', name: 'Alibaug Port (Maharashtra)', state: 'Maharashtra', sector: 'West Coast (Maharashtra)', lat: 18.6414, lon: 72.8722 },
+  { id: 'ratnagiri', name: 'Ratnagiri Fishery Port (Mirkarwada)', state: 'Maharashtra', sector: 'West Coast (Maharashtra)', lat: 16.9902, lon: 73.3120 },
+  { id: 'malvan', name: 'Malvan Port (Sindhudurg)', state: 'Maharashtra', sector: 'West Coast (Maharashtra)', lat: 16.0594, lon: 73.4686 },
+
+  // Goa (South-West)
+  { id: 'goa', name: 'Goa Mormugao Port', state: 'Goa', sector: 'South-West (Goa)', lat: 15.4989, lon: 73.8278 },
+
+  // Karnataka (South-West)
+  { id: 'karwar', name: 'Karwar Fishery Port (Karnataka)', state: 'Karnataka', sector: 'South-West (Karnataka)', lat: 14.8050, lon: 74.1240 },
+  { id: 'mangalore', name: 'Mangalore Fishery Port (Bunder)', state: 'Karnataka', sector: 'South-West (Karnataka)', lat: 12.8580, lon: 74.8360 },
+
+  // Kerala (South-West)
+  { id: 'kochi', name: 'Cochin Fishery Harbour (Kerala)', state: 'Kerala', sector: 'South-West (Kerala)', lat: 9.9650, lon: 76.2620 },
+  { id: 'kollam', name: 'Kollam Neendakara Harbour (Kerala)', state: 'Kerala', sector: 'South-West (Kerala)', lat: 8.9440, lon: 76.5360 },
+
+  // Tamil Nadu (South Coast & Coromandel)
+  { id: 'kanyakumari', name: 'Kanyakumari Cape Port (Tamil Nadu)', state: 'Tamil Nadu', sector: 'South Coast (Tamil Nadu)', lat: 8.0883, lon: 77.5385 },
+  { id: 'tuticorin', name: 'Tuticorin V.O.C. Port (Tamil Nadu)', state: 'Tamil Nadu', sector: 'South-East (Gulf of Mannar)', lat: 8.7642, lon: 78.1348 },
+  { id: 'nagapattinam', name: 'Nagapattinam Harbour (Tamil Nadu)', state: 'Tamil Nadu', sector: 'South-East (Coromandel)', lat: 10.7656, lon: 79.8424 },
+  { id: 'chennai', name: 'Chennai Kasimedu Harbour (Tamil Nadu)', state: 'Tamil Nadu', sector: 'South-East (Coromandel)', lat: 13.1250, lon: 80.2980 },
+
+  // Andhra Pradesh (East Coast)
+  { id: 'kakinada', name: 'Kakinada Deepwater Port (Andhra)', state: 'Andhra Pradesh', sector: 'East Coast (Andhra Pradesh)', lat: 16.9891, lon: 82.2475 },
+  { id: 'visakhapatnam', name: 'Visakhapatnam Fishing Harbour (Andhra)', state: 'Andhra Pradesh', sector: 'East Coast (Andhra Pradesh)', lat: 17.6868, lon: 83.2185 },
+
+  // Odisha (East Coast)
+  { id: 'paradip', name: 'Paradip Fishery Port (Odisha)', state: 'Odisha', sector: 'East Coast (Odisha)', lat: 20.2644, lon: 86.6715 },
+
+  // West Bengal (North-East)
+  { id: 'haldia', name: 'Haldia / Diamond Harbour (West Bengal)', state: 'West Bengal', sector: 'North-East (Bengal Bay)', lat: 22.0667, lon: 88.0667 }
 ]
 
 function Card({ title, children, action }) {
@@ -76,19 +107,31 @@ function Card({ title, children, action }) {
   )
 }
 
-function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, oceanStats }) {
+function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, oceanStats, selectedPort, setSelectedPort }) {
   const t = k => tr(lang, k)
+  const currentPort = PORTS.find(p => p.id === selectedPort) || PORTS[3]
   const chosen = pfzList[0] || staticPfz[0]
 
   return (
     <>
       <div className="welcome">
         <div>
-          <span className="eyebrow">{t('marine')}</span>
-          <h2>{t('glance')}</h2>
-          <p>{t('location')}</p>
+          <span className="eyebrow">{t('marine')} • {currentPort.sector}</span>
+          <h2>{currentPort.name}</h2>
+          <p>Real-time marine intelligence synced with Supabase & INCOIS-ISRO satellite radars.</p>
         </div>
-        <button className="primary" onClick={() => navigate('/map')}>{t('openMap')} →</button>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <select 
+            value={selectedPort} 
+            onChange={e => setSelectedPort && setSelectedPort(e.target.value)}
+            style={{ padding: '9px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--text)', fontWeight: 600, fontSize: '0.9rem' }}
+          >
+            {PORTS.map(p => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+          <button className="primary" onClick={() => navigate('/map')}>{t('openMap')} →</button>
+        </div>
       </div>
 
       <div className="stats">
@@ -104,13 +147,13 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
         </div>
         <div className="stat">
           <span>{t('sst')}</span>
-          <strong>{oceanStats?.sea_surface_temp?.current ? `${oceanStats.sea_surface_temp.current}°C` : '27.8°C'}</strong>
+          <strong>{chosen?.sst ? `${chosen.sst}°C` : (oceanStats?.sea_surface_temp?.current ? `${oceanStats.sea_surface_temp.current}°C` : '28.1°C')}</strong>
           <small>{t('favourable')}</small>
         </div>
         <div className="stat">
           <span>{t('activePFZ')}</span>
           <strong>{pfzList.length}</strong>
-          <small>{t('high')}</small>
+          <small>{currentPort.name.split(' ')[0]} Sector</small>
         </div>
       </div>
 
@@ -173,22 +216,24 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
   )
 }
 
-function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfzList, alertList }) {
+function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfzList, allIndiaPfzList = [], alertList, selectedPort, setSelectedPort }) {
   const t = k => tr(lang, k)
   const ref = useRef(null)
   const mapRef = useRef(null)
-  const [base, setBase] = useState('street')
+  const [base, setBase] = useState('satellite')
   const [showPFZ, setShowPFZ] = useState(true)
   const [showAlerts, setShowAlerts] = useState(true)
   const [showVessels, setShowVessels] = useState(true)
   const [showRoute, setShowRoute] = useState(true)
+  const [mapScope, setMapScope] = useState('all') // 'all' or 'port'
   const [mapError, setMapError] = useState(false)
 
+  const currentPort = PORTS.find(p => p.id === selectedPort) || PORTS[3]
   const zone = pfzList.find(z => z.id === selected) || pfzList[0] || staticPfz[0]
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return
-    const map = L.map(ref.current, { zoomControl: false }).setView([18.8, 73.2], 7)
+    const map = L.map(ref.current, { zoomControl: false }).setView([currentPort.lat, currentPort.lon], 7)
     L.control.zoom({ position: 'bottomright' }).addTo(map)
 
     const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -280,19 +325,26 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
       obj.map.fitBounds(L.latLngBounds(latlngs), { padding: [60, 60] })
     }
 
-    // 2. Draw PFZ Fishing Zones
+    // 2. Draw PFZ Fishing Zones across Indian Coast
     if (showPFZ) {
-      pfzList.forEach(z => {
+      const zonesToDraw = (mapScope === 'all' && allIndiaPfzList.length > 0) ? allIndiaPfzList : pfzList
+      zonesToDraw.forEach(z => {
         const isSel = z.id === selected
+        const isCurrentPort = z.port_id === selectedPort
         const m = L.circleMarker([z.lat, z.lng || z.lon], {
-          radius: isSel ? 12 : 8,
+          radius: isSel ? 13 : (isCurrentPort ? 10 : 7),
           weight: isSel ? 3 : 2,
-          color: isSel ? '#00d2ff' : '#18a98d',
-          fillColor: isSel ? '#0088cc' : '#20b486',
-          fillOpacity: 0.85
+          color: isSel ? '#00d2ff' : (isCurrentPort ? '#00e5ff' : '#18a98d'),
+          fillColor: isSel ? '#0088cc' : (isCurrentPort ? '#00b4d8' : '#20b486'),
+          fillOpacity: isSel ? 0.95 : (isCurrentPort ? 0.85 : 0.65)
         })
-        m.bindPopup(`<b>${z.id} · ${z.name}</b><br/>Confidence: ${z.confidence}%<br/>SST: ${z.sst || 27.8}°C<br/>Chlorophyll: ${z.chlorophyll || 0.62} mg/m³`)
-        m.on('click', () => setSelected(z.id))
+        m.bindPopup(`<b>${z.id} · ${z.name}</b><br/><b>Sector:</b> ${z.sector || 'Indian Coast'}<br/><b>Port:</b> ${z.port_name || z.port_id || ''}<br/><b>Confidence:</b> ${z.confidence}%<br/><b>SST:</b> ${z.sst || 28.0}°C<br/><b>Chlorophyll:</b> ${z.chlorophyll || 1.4} mg/m³<br/><b>Distance:</b> ${z.distance || ''}`)
+        m.on('click', () => {
+          setSelected(z.id)
+          if (z.port_id && setSelectedPort) {
+            setSelectedPort(z.port_id)
+          }
+        })
         m.addTo(obj.map)
         layers.push(m)
       })
@@ -329,19 +381,21 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
       })
     }
 
-    // 4. City Labels
-    const cityNames = {
-      en: [['Mumbai', 18.94, 72.83], ['Ratnagiri', 16.99, 73.31], ['Goa', 15.50, 73.83], ['Alibaug', 18.64, 72.87], ['Malvan', 16.06, 73.47]],
-      hi: [['मुंबई', 18.94, 72.83], ['रत्नागिरी', 16.99, 73.31], ['गोवा', 15.50, 73.83], ['अलीबाग', 18.64, 72.87], ['मालवण', 16.06, 73.47]],
-      mr: [['मुंबई', 18.94, 72.83], ['रत्नागिरी', 16.99, 73.31], ['गोवा', 15.50, 73.83], ['अलिबाग', 18.64, 72.87], ['मालवण', 16.06, 73.47]]
-    }
-    cityNames[lang].forEach(([name, lat, lng]) => {
-      const m = L.marker([lat, lng], {
+    // 4. Coastal Port Hub Markers across India
+    PORTS.forEach(p => {
+      const shortName = p.name.split(' ')[0]
+      const isSelected = p.id === selectedPort
+      const m = L.marker([p.lat, p.lon], {
         icon: L.divIcon({
           className: 'orca-map-label',
-          html: `<span>${name}</span>`,
+          html: `<span style="${isSelected ? 'background:#00d2ff;color:#000;font-weight:bold;border:2px solid #fff;' : ''}">⚓ ${shortName}</span>`,
           iconSize: null
         })
+      })
+      m.bindPopup(`<b>⚓ ${p.name}</b><br/><b>State:</b> ${p.state}<br/><b>Sector:</b> ${p.sector}<br/>Lat: ${p.lat}, Lon: ${p.lon}`)
+      m.on('click', () => {
+        if (setSelectedPort) setSelectedPort(p.id)
+        if (mapRef.current?.map) mapRef.current.map.setView([p.lat, p.lon], 8)
       })
       m.addTo(obj.map)
       layers.push(m)
@@ -349,9 +403,16 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
 
     obj.layers = layers
     return () => layers.forEach(l => l.remove())
-  }, [selected, showPFZ, showAlerts, showVessels, showRoute, activeRoute, lang, pfzList, alertList])
+  }, [selected, showPFZ, showAlerts, showVessels, showRoute, activeRoute, lang, pfzList, allIndiaPfzList, alertList, mapScope, selectedPort])
 
-  const recenter = () => mapRef.current?.map.setView([18.8, 73.2], 7)
+  const focusPort = () => {
+    const pt = PORTS.find(p => p.id === selectedPort) || PORTS[3]
+    mapRef.current?.map.setView([pt.lat, pt.lon], 8)
+  }
+  const viewAllIndia = () => {
+    setMapScope('all')
+    mapRef.current?.map.setView([16.5, 78.5], 5)
+  }
   const focus = () => mapRef.current?.map.setView([zone.lat, zone.lng || zone.lon], 9)
 
   return (
@@ -360,10 +421,27 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
         <div>
           <span className="eyebrow">GEOSPATIAL & SATELLITE RADAR</span>
           <h2>{t('map')}</h2>
-          <p>{t('mapLabels')}</p>
+          <p>Real-time marine intelligence radar across the Indian Coastline (Arabian Sea & Bay of Bengal).</p>
         </div>
-        <div className="toolbar">
-          <button onClick={recenter}>{t('reset')}</button>
+        <div className="toolbar" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <select 
+            value={selectedPort} 
+            onChange={e => {
+              const pId = e.target.value
+              if (setSelectedPort) setSelectedPort(pId)
+              const pt = PORTS.find(p => p.id === pId)
+              if (pt && mapRef.current?.map) {
+                mapRef.current.map.setView([pt.lat, pt.lon], 8)
+              }
+            }}
+            style={{ padding: '7px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--text)', fontWeight: 600, fontSize: '0.85rem' }}
+          >
+            {PORTS.map(p => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
+          <button onClick={focusPort}>📍 Focus Port</button>
+          <button onClick={viewAllIndia}>🇮🇳 Whole Coast</button>
           <button className={base === 'street' ? 'active' : ''} onClick={() => setBase('street')}>{t('street')}</button>
           <button className={base === 'satellite' ? 'active' : ''} onClick={() => setBase('satellite')}>{t('satellite')}</button>
         </div>
@@ -550,28 +628,59 @@ function Analytics({ lang, oceanStats, setOceanPeriod }) {
   )
 }
 
-function Fishing({ lang, navigate, setSelected, pfzList }) {
+function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], selectedPort, setSelectedPort }) {
   const t = k => tr(lang, k)
+  const [filterPort, setFilterPort] = useState(selectedPort || 'mumbai')
+
+  useEffect(() => {
+    if (selectedPort) setFilterPort(selectedPort)
+  }, [selectedPort])
+
+  const displayedPfzs = filterPort === 'all' 
+    ? (allIndiaPfzList.length > 0 ? allIndiaPfzList : pfzList) 
+    : pfzList
+
+  const handleFilterChange = (p) => {
+    setFilterPort(p)
+    if (p !== 'all' && setSelectedPort) {
+      setSelectedPort(p)
+    }
+  }
+
   return (
     <>
       <div className="pageIntro">
         <div>
           <span className="eyebrow">ORCA / {t('fishing')}</span>
           <h2>{t('findZones')}</h2>
+          <p>Real-time Potential Fishing Zones (PFZs) identified via thermal fronts and satellite chlorophyll-a.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Port Sector:</label>
+          <select 
+            value={filterPort} 
+            onChange={e => handleFilterChange(e.target.value)}
+            style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--text)', fontWeight: 600, fontSize: '0.85rem' }}
+          >
+            <option value="all">🇮🇳 All Indian Coast (32 PFZs)</option>
+            {PORTS.map(p => (
+              <option key={p.id} value={p.id}>{p.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 
       <div className="pfzGrid">
-        {pfzList.map(z => (
+        {displayedPfzs.map(z => (
           <Card key={z.id} title={`${z.id} · ${z.name}`} action={<span className="pill">{z.confidence}%</span>}>
             <div className="signal">
               <b>{t('signal')}</b>
-              <span>{z.reason?.[lang] || 'High pelagic productivity and thermal gradient'}</span>
+              <span>{z.reason?.[lang] || z.sector || 'High pelagic productivity and thermal gradient'}</span>
             </div>
             <div className="zoneStats">
               <span>SST <b>{z.sst || 27.8}°C</b></span>
               <span>Chl <b>{z.chlorophyll || 0.62} mg/m³</b></span>
-              <span>{t('waves')} <b>{z.waves || 1.2} m</b></span>
+              <span>Distance <b>{z.distance || '28 km'}</b></span>
             </div>
             <button className="primary full" onClick={() => { setSelected(z.id); navigate('/map') }}>
               {t('viewZone')} →
@@ -592,11 +701,32 @@ function Fishing({ lang, navigate, setSelected, pfzList }) {
   )
 }
 
-function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList }) {
+function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selectedPort, setSelectedPort, onPortChange }) {
   const t = k => tr(lang, k)
-  const [originId, setOriginId] = useState('mumbai')
-  const [destZoneId, setDestZoneId] = useState(pfzList[0]?.id || 'PFZ-MUM-01')
+  const [originId, setOriginId] = useState(selectedPort || 'mumbai')
+  const [destZoneId, setDestZoneId] = useState(pfzList[0]?.id || '')
   const [calculating, setCalculating] = useState(false)
+
+  useEffect(() => {
+    if (selectedPort) {
+      setOriginId(selectedPort)
+    }
+  }, [selectedPort])
+
+  useEffect(() => {
+    if (pfzList && pfzList.length > 0) {
+      const match = pfzList.find(z => z.id === destZoneId)
+      if (!match) {
+        setDestZoneId(pfzList[0].id)
+      }
+    }
+  }, [pfzList, destZoneId])
+
+  const handlePortChange = (newPortId) => {
+    setOriginId(newPortId)
+    if (setSelectedPort) setSelectedPort(newPortId)
+    if (onPortChange) onPortChange(newPortId)
+  }
 
   const handleCalculateRoute = async () => {
     setCalculating(true)
@@ -638,7 +768,7 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList }) {
           <div className="plannerForm">
             <div className="plannerRow">
               <label>{t('originPort')}</label>
-              <select value={originId} onChange={e => setOriginId(e.target.value)}>
+              <select value={originId} onChange={e => handlePortChange(e.target.value)}>
                 {PORTS.map(p => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
@@ -649,7 +779,7 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList }) {
               <label>{t('destZone')}</label>
               <select value={destZoneId} onChange={e => setDestZoneId(e.target.value)}>
                 {pfzList.map(z => (
-                  <option key={z.id} value={z.id}>{z.id} — {z.name} ({z.confidence}%)</option>
+                  <option key={z.id} value={z.id}>{z.id} — {z.name} ({z.confidence}%) · {z.distance}</option>
                 ))}
               </select>
             </div>
@@ -986,6 +1116,8 @@ function App() {
   const [authModalOpen, setAuthModalOpen] = useState(false)
 
   // Dynamic Data & Route State
+  const [selectedPort, setSelectedPort] = useState('mumbai')
+  const [allIndiaPfzList, setAllIndiaPfzList] = useState([])
   const [pfzList, setPfzList] = useState(staticPfz)
   const [alertList, setAlertList] = useState(staticAlerts)
   const [oceanStats, setOceanStats] = useState(null)
@@ -1040,6 +1172,59 @@ function App() {
     return () => clearInterval(timer)
   }, [])
 
+  const loadPfzs = (portId = selectedPort) => {
+    // 1. Port-specific live PFZs from Supabase / Backend
+    getPfzCandidates(null, null, portId).then(res => {
+      if (res && res.candidates && res.candidates.length > 0) {
+        const mapped = res.candidates.map(c => ({
+          id: c.zone_id,
+          name: c.name || `${c.zone_id} Coastal Front`,
+          sector: c.sector || 'Indian Coastal Shelf',
+          port_id: c.port_id || portId,
+          port_name: c.port_name || portId,
+          lat: c.lat,
+          lng: c.lon,
+          lon: c.lon,
+          confidence: Math.round((c.confidence_score || 0.90) * 100),
+          sst: c.sst_celsius || 28.0,
+          chlorophyll: c.chlorophyll_mg_m3 || 1.4,
+          waves: 1.2,
+          wind: 16,
+          bearing: c.bearing_deg || 250,
+          depth: c.depth_m || 45,
+          distance: `${c.distance_km || 30} km`,
+          reason: {
+            en: `Real-time satellite SST (${c.sst_celsius}°C) & chlorophyll front along ${c.name || c.zone_id}`,
+            hi: `सैटेलाइट SST (${c.sst_celsius}°C) और क्लोरोफिल फ्रंट ${c.name || c.zone_id}`,
+            mr: `सॅटेलाइट SST (${c.sst_celsius}°C) आणि क्लोरोफिल फ्रंट ${c.name || c.zone_id}`
+          }
+        }))
+        setPfzList(mapped)
+      }
+    })
+
+    // 2. All-India PFZs overview
+    getPfzCandidates(null, null, 'all').then(res => {
+      if (res && res.candidates && res.candidates.length > 0) {
+        const mappedAll = res.candidates.map(c => ({
+          id: c.zone_id,
+          name: c.name || `${c.zone_id} Front`,
+          sector: c.sector || 'Indian Coast',
+          port_id: c.port_id,
+          port_name: c.port_name,
+          lat: c.lat,
+          lng: c.lon,
+          lon: c.lon,
+          confidence: Math.round((c.confidence_score || 0.90) * 100),
+          sst: c.sst_celsius || 28.0,
+          chlorophyll: c.chlorophyll_mg_m3 || 1.4,
+          distance: `${c.distance_km || 30} km`
+        }))
+        setAllIndiaPfzList(mappedAll)
+      }
+    })
+  }
+
   // Fetch live Alerts, Analytics, and PFZ from backend/Supabase
   useEffect(() => {
     getAllAlerts().then(res => {
@@ -1050,29 +1235,8 @@ function App() {
     getAnalytics(oceanPeriod).then(res => {
       if (res) setOceanStats(res)
     })
-    getPfzCandidates(18.94, 72.83).then(res => {
-      if (res && res.candidates && res.candidates.length > 0) {
-        const mapped = res.candidates.map(c => ({
-          id: c.zone_id,
-          name: `${c.zone_id} Coastal Front`,
-          lat: c.lat,
-          lng: c.lon,
-          confidence: Math.round((c.confidence_score || 0.88) * 100),
-          sst: c.sst_celsius || 27.8,
-          chlorophyll: c.chlorophyll_mg_m3 || 0.62,
-          waves: 1.2,
-          wind: 16,
-          distance: `${c.distance_km || 35} km`,
-          reason: {
-            en: 'High chlorophyll and thermal front detected via satellite SST',
-            hi: 'सैटेलाइट SST द्वारा उच्च क्लोरोफिल और थर्मल फ्रंट देखा गया',
-            mr: 'सॅटेलाइट SST द्वारे उच्च क्लोरोफिल आणि थर्मल फ्रंट आढळले'
-          }
-        }))
-        setPfzList(mapped)
-      }
-    })
-  }, [oceanPeriod])
+    loadPfzs(selectedPort)
+  }, [selectedPort, oceanPeriod])
 
   const handleSignOut = async () => {
     await signOutUser()
@@ -1103,6 +1267,11 @@ function App() {
         pfzList={pfzList}
         alertList={alertList}
         oceanStats={oceanStats}
+        selectedPort={selectedPort}
+        setSelectedPort={p => {
+          setSelectedPort(p)
+          loadPfzs(p)
+        }}
       />
     )
   }
@@ -1115,7 +1284,13 @@ function App() {
         activeRoute={activeRoute}
         setActiveRoute={setActiveRoute}
         pfzList={pfzList}
+        allIndiaPfzList={allIndiaPfzList}
         alertList={alertList}
+        selectedPort={selectedPort}
+        setSelectedPort={p => {
+          setSelectedPort(p)
+          loadPfzs(p)
+        }}
       />
     )
   }
@@ -1135,6 +1310,12 @@ function App() {
         navigate={navigate}
         setSelected={setSelected}
         pfzList={pfzList}
+        allIndiaPfzList={allIndiaPfzList}
+        selectedPort={selectedPort}
+        setSelectedPort={p => {
+          setSelectedPort(p)
+          loadPfzs(p)
+        }}
       />
     )
   }
@@ -1146,6 +1327,12 @@ function App() {
         activeRoute={activeRoute}
         setActiveRoute={setActiveRoute}
         pfzList={pfzList}
+        selectedPort={selectedPort}
+        setSelectedPort={setSelectedPort}
+        onPortChange={p => {
+          setSelectedPort(p)
+          loadPfzs(p)
+        }}
       />
     )
   }
