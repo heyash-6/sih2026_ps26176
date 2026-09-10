@@ -6,38 +6,128 @@ from app.schemas.common import LatLon, TimeWindow
 from app.agents.llm_client import llm_client
 
 COASTAL_LOCATIONS = {
+    # Maharashtra - Konkan
+    "sindhudurg": "Malvan",
+    "सिंधुदुर्ग": "Malvan",
+    "malvan": "Malvan",
+    "मालवण": "Malvan",
+    "vengurla": "Malvan",
+    "वेंगुर्ला": "Malvan",
+    "devgad": "Malvan",
+    "देवगड": "Malvan",
+    "vijaydurg": "Malvan",
+    "विजयदुर्ग": "Malvan",
     "ratnagiri": "Ratnagiri",
     "रत्नागिरी": "Ratnagiri",
+    "mirya": "Ratnagiri",
+    "jaigad": "Ratnagiri",
+    "जयगड": "Ratnagiri",
+    "guhagar": "Ratnagiri",
+    "गुहागर": "Ratnagiri",
+    "harnai": "Ratnagiri",
+    "हर्णे": "Ratnagiri",
+    "dapoli": "Ratnagiri",
+    "दापोली": "Ratnagiri",
+    "alibaug": "Alibaug",
+    "अलिबाग": "Alibaug",
+    "raigad": "Alibaug",
+    "रायगड": "Alibaug",
+    "murud": "Alibaug",
+    "मुरुड": "Alibaug",
     "mumbai": "Mumbai",
     "मुंबई": "Mumbai",
     "bombay": "Mumbai",
+    "sassoon": "Mumbai",
+    "versova": "Mumbai",
+    "वर्सोवा": "Mumbai",
+    "thane": "Mumbai",
+    "ठाणे": "Mumbai",
+    "palghar": "Mumbai",
+    "पालघर": "Mumbai",
+    "dahanu": "Mumbai",
+    "डहाणू": "Mumbai",
+    "vasai": "Mumbai",
+    "वसई": "Mumbai",
+
+    # Goa
     "goa": "Goa",
     "गोवा": "Goa",
     "panaji": "Goa",
     "पणजी": "Goa",
     "mormugao": "Goa",
+    "vasco": "Goa",
+
+    # Karnataka
+    "karwar": "Karwar",
+    "कारवार": "Karwar",
     "mangalore": "Mangalore",
     "मंगलौर": "Mangalore",
+    "udupi": "Mangalore",
+    "मंगळूर": "Mangalore",
+    "malpe": "Mangalore",
+    "bhatkal": "Karwar",
+
+    # Kerala
     "kochi": "Kochi",
     "कोच्चि": "Kochi",
     "cochin": "Kochi",
-    "veraval": "Veraval",
-    "वेरावळ": "Veraval",
+    "kollam": "Kollam",
+    "कोल्लम": "Kollam",
+    "neendakara": "Kollam",
+    "alappuzha": "Kochi",
+    "alleppey": "Kochi",
+    "kozhikode": "Kochi",
+    "calicut": "Kochi",
+    "kannur": "Kochi",
+
+    # Tamil Nadu
+    "kanyakumari": "Kanyakumari",
+    "कन्याकुमारी": "Kanyakumari",
+    "tuticorin": "Tuticorin",
+    "thoothukudi": "Tuticorin",
+    "தூத்துக்குடி": "Tuticorin",
+    "nagapattinam": "Nagapattinam",
+    "नागपट्टिनम": "Nagapattinam",
+    "rameswaram": "Nagapattinam",
+    "chennai": "Chennai",
+    "चेन्नई": "Chennai",
+    "madras": "Chennai",
+    "kasimedu": "Chennai",
+
+    # Andhra Pradesh
     "visakhapatnam": "Visakhapatnam",
     "vizag": "Visakhapatnam",
     "विशाखापट्टनम": "Visakhapatnam",
-    "chennai": "Chennai",
-    "चेन्नई": "Chennai",
-    "malvan": "Malvan",
-    "मालवण": "Malvan",
-    "alibaug": "Alibaug",
-    "अलिबाग": "Alibaug",
-    "karwar": "Karwar",
-    "कारवार": "Karwar",
+    "kakinada": "Kakinada",
+    "काकीनाडा": "Kakinada",
+    "machilipatnam": "Kakinada",
+
+    # Odisha
+    "paradip": "Paradip",
+    "पारादीप": "Paradip",
+    "puri": "Paradip",
+    "पुरी": "Paradip",
+    "gopalpur": "Paradip",
+
+    # West Bengal
+    "haldia": "Haldia",
+    "हल्दिया": "Haldia",
+    "kolkata": "Haldia",
+    "digha": "Haldia",
+    "दीघा": "Haldia",
+    "diamond harbour": "Haldia",
+
+    # Gujarat
+    "veraval": "Veraval",
+    "वेरावळ": "Veraval",
     "porbandar": "Porbandar",
     "पोरबंदर": "Porbandar",
-    "kanyakumari": "Kanyakumari",
-    "कन्याकुमारी": "Kanyakumari",
+    "okha": "Okha",
+    "ओखा": "Okha",
+    "dwarka": "Okha",
+    "द्वारका": "Okha",
+    "kandla": "Okha",
+    "mandvi": "Okha",
 }
 
 class NLULanguageAgent:
@@ -126,6 +216,13 @@ class NLULanguageAgent:
                 print(f"[NLU Agent] Failed to parse LLM output: {e}")
         return None
 
+    def extract_location(self, text: str) -> Optional[str]:
+        text_lower = text.lower().strip()
+        for loc_key, loc_val in COASTAL_LOCATIONS.items():
+            if loc_key in text_lower:
+                return loc_val
+        return None
+
     def _rule_based_nlu(self, text: str, ref_time_str: str, prior_context: Optional[Dict[str, Any]]) -> NLUOutput:
         text_lower = text.lower()
         
@@ -143,7 +240,7 @@ class NLULanguageAgent:
             intent = IntentEnum.FISHING_TRIP_PLANNING
         elif any(kw in text_lower for kw in ["hazard", "storm", "cyclone", "warning", "lightning", "alert", "धोका", "खतरा", "तूफान"]):
             intent = IntentEnum.HAZARD_ALERT_CHECK
-        elif any(kw in text_lower for kw in ["safe", "safety", "सुरक्षित", "सुरक्षा"]):
+        elif any(kw in text_lower for kw in ["safe", "safety", "सुरक्षित", "सुरक्षा", "leave"]):
             intent = IntentEnum.SAFETY_CHECK
         elif any(kw in text_lower for kw in ["pfz", "nearest zone", "fishing zone"]):
             intent = IntentEnum.PFZ_LOOKUP
@@ -193,12 +290,31 @@ class NLULanguageAgent:
         if dur_match:
             duration_hours = float(dur_match.group(1))
 
-        # Prior context merge
+        # Prior context merge & Multi-turn follow-up resolution
         if prior_context:
             if not location_text and prior_context.get("location"):
                 location_text = prior_context["location"]
             if prior_context.get("date") and "tomorrow" not in text_lower and "कल" not in text_lower and "उद्या" not in text_lower:
                 target_date = prior_context["date"]
+            if prior_context.get("time_window") and not time_match:
+                try:
+                    time_window = TimeWindow(**prior_context["time_window"])
+                except Exception:
+                    pass
+
+            # If user just responded with a location (e.g. "ratnagiri") after a clarification
+            if intent == IntentEnum.OTHER and location_text:
+                if prior_context.get("pending_intent"):
+                    try:
+                        intent = IntentEnum(prior_context["pending_intent"])
+                    except Exception:
+                        intent = IntentEnum.FISHING_TRIP_PLANNING
+                elif prior_context.get("history"):
+                    hist = prior_context["history"]
+                    for h in reversed(hist):
+                        if h.get("role") == "user" and any(k in h.get("text", "").lower() for k in ["fish", "trip", "leave", "depart", "safe", "5am", "weather"]):
+                            intent = IntentEnum.FISHING_TRIP_PLANNING
+                            break
 
         entities = EntityBundle(
             location_text=location_text,

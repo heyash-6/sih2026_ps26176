@@ -10,6 +10,8 @@ from app.agents.nlu_agent import nlu_agent
 from app.agents.planner_agent import planner_agent
 from app.agents.decision_agent import decision_agent
 
+_ORCA_SESSION_MEMORY: Dict[str, Dict[str, Any]] = {}
+
 class Orchestrator:
     """
     ORCA Master Pipeline Orchestrator.
@@ -17,16 +19,40 @@ class Orchestrator:
     """
 
     def process_query(self, session_id: str, text: str, prior_context: Optional[Dict[str, Any]] = None) -> FinalDecisionOutput:
+        context = dict(prior_context or {})
+
+        # Merge backend session memory if exists
+        mem = _ORCA_SESSION_MEMORY.get(session_id, {})
+        for k, v in mem.items():
+            if k not in context:
+                context[k] = v
+
+        # If previous turn had a pending query (waiting for location), and user now supplied a location/answer:
+        effective_text = text
+        if mem.get("pending_query"):
+            extracted_loc = nlu_agent.extract_location(text)
+            if extracted_loc or len(text.split()) <= 4:
+                loc = extracted_loc or text.strip().title()
+                effective_text = f"{mem['pending_query']} from {loc}"
+                context["location"] = loc
+
         # Step 1: Run NLU Agent
         nlu_in = NLUInput(
             session_id=session_id,
-            text=text,
-            prior_context=prior_context
+            text=effective_text,
+            prior_context=context
         )
         nlu_out: NLUOutput = nlu_agent.process(nlu_in)
 
         # Step 2: Check for clarification short-circuit
         if nlu_out.needs_clarification:
+            _ORCA_SESSION_MEMORY[session_id] = {
+                "pending_query": effective_text,
+                "pending_intent": nlu_out.intent.value,
+                "time_window": nlu_out.entities.time_window.model_dump() if nlu_out.entities.time_window else None,
+                "date": nlu_out.entities.date,
+                "duration_hours": nlu_out.entities.duration_hours
+            }
             return FinalDecisionOutput(
                 session_id=session_id,
                 language=nlu_out.language,
@@ -35,6 +61,13 @@ class Orchestrator:
                 explanation_text=nlu_out.clarification_question or "Please provide your departure location.",
                 disclaimer=settings.disclaimer_text
             )
+
+        # Clarification satisfied - clear pending
+        if session_id in _ORCA_SESSION_MEMORY and "pending_query" in _ORCA_SESSION_MEMORY[session_id]:
+            del _ORCA_SESSION_MEMORY[session_id]["pending_query"]
+
+        _ORCA_SESSION_MEMORY.setdefault(session_id, {})["location"] = nlu_out.entities.location_text
+        _ORCA_SESSION_MEMORY[session_id]["date"] = nlu_out.entities.date
 
         # Step 3: Run Planner Agent (Decomposes, calls specialist tools, evaluates risk)
         plan_out = planner_agent.plan_and_execute(nlu_out)

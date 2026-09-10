@@ -836,6 +836,7 @@ function Assistant({ lang, navigate, setActiveRoute, setSelectedZone }) {
   const [messages, setMessages] = useState([{ role: 'orca', text: t('demoAnswer') }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [sessionId] = useState(() => 'orca_sess_' + Math.random().toString(36).substring(2, 10))
 
   useEffect(() => {
     setMessages([{ role: 'orca', text: t('demoAnswer') }])
@@ -844,12 +845,13 @@ function Assistant({ lang, navigate, setActiveRoute, setSelectedZone }) {
   const send = async (q) => {
     if (!q.trim() || loading) return
     const userText = q.trim()
+    const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }))
     setMessages(m => [...m, { role: 'user', text: userText }])
     setInput('')
     setLoading(true)
 
     try {
-      const data = await askOrca(userText, 'sess_' + Date.now(), { language: lang })
+      const data = await askOrca(userText, sessionId, { language: lang, history })
       if (data && (data.explanation_text || data.recommendation)) {
         let reply = data.explanation_text || ''
 

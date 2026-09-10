@@ -47,7 +47,20 @@ class GISAgent:
             self.gis_ds: BaseGISDataSource = DemoGISDataSource()
 
     def geocode(self, location_text: str) -> Optional[LatLon]:
-        return self.gis_ds.geocode(location_text)
+        res = self.gis_ds.geocode(location_text)
+        if res:
+            return res
+
+        clean = (location_text or "").lower().strip()
+        if "sindhudurg" in clean or "malvan" in clean or "vengurla" in clean:
+            return LatLon(lat=16.0600, lon=73.4600, resolved_from="Sindhudurg (Malvan Coast)", method="indian_coastal_registry")
+
+        from app.database.indian_coastal_registry import INDIAN_COASTAL_PORTS
+        for p in INDIAN_COASTAL_PORTS:
+            if clean in p["id"] or p["id"] in clean or clean in p["name"].lower():
+                return LatLon(lat=p["lat"], lon=p["lon"], resolved_from=p["name"], method="indian_coastal_registry")
+
+        return None
 
     def distance_km(self, origin: LatLon, destination: LatLon) -> float:
         return haversine_distance(origin.lat, origin.lon, destination.lat, destination.lon)
