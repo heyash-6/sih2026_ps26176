@@ -1,5 +1,8 @@
+import os
 from fastapi import FastAPI, Query, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from typing import Optional, Dict, Any
 from pydantic import BaseModel, Field
 
@@ -27,6 +30,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Resolve paths to compiled frontend
+FRONTEND_DIST = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "dist")
+FRONTEND_ASSETS = os.path.join(FRONTEND_DIST, "assets")
+
+if os.path.isdir(FRONTEND_ASSETS):
+    app.mount("/assets", StaticFiles(directory=FRONTEND_ASSETS), name="assets")
+
 class QueryRequest(BaseModel):
     session_id: str = Field(..., example="sess_123")
     text: str = Field(..., example="I am at Ratnagiri. I want to go fishing tomorrow at 5 AM for 6 hours. Which fishing zone should I choose?")
@@ -39,12 +49,16 @@ class RouteRequest(BaseModel):
 
 @app.get("/")
 def read_root():
+    index_file = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.isfile(index_file):
+        return FileResponse(index_file)
     return {
         "service": "ORCA Marine Intelligence Agent Platform",
         "version": "1.0.0",
         "mode": settings.orca_mode,
         "status": "online"
     }
+
 
 @app.get("/api/health")
 def get_health():
@@ -121,6 +135,17 @@ def post_risk(request: RiskInput):
     res = risk_engine.compute_risk(request)
     return res.model_dump()
 
+@app.get("/{full_path:path}")
+def catch_all(full_path: str):
+    """SPA client-side routing fallback for React Router (/map, /analytics, /assistant, etc.)."""
+    if full_path.startswith("api"):
+        raise HTTPException(status_code=404, detail="API endpoint not found")
+    index_file = os.path.join(FRONTEND_DIST, "index.html")
+    if os.path.isfile(index_file):
+        return FileResponse(index_file)
+    raise HTTPException(status_code=404, detail="Page not found")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+

@@ -1,0 +1,6 @@
+{
+  "name":"orca-sih-final","private":true,"version":"3.0.0","type":"module",
+  "scripts":{"dev":"vite","build":"vite build","preview":"vite preview"},
+  "dependencies":{"leaflet":"^1.9.4","react":"^19.1.1","react-dom":"^19.1.1","react-router-dom":"^7.8.2"},
+  "devDependencies":{"@vitejs/plugin-react":"^5.0.4","vite":"^7.1.7"}
+}

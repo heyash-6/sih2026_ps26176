@@ -1,11 +1,38 @@
 import math
 from typing import List, Optional
-from shapely.geometry import Point, Polygon, shape
+
+try:
+    from shapely.geometry import Point, Polygon, shape
+    HAS_SHAPELY = True
+except Exception:
+    HAS_SHAPELY = False
+
 from app.config import settings
 from app.schemas.gis import LatLon, Route, Waypoint, GeofenceResult, GeofenceStatusEnum, GeofenceIntersection
 from app.datasources.base import BaseGISDataSource
 from app.datasources.demo_datasources import DemoGISDataSource, haversine_distance
 from app.datasources.live_datasources import LiveGISDataSource
+
+
+def point_in_polygon(x: float, y: float, polygon_coords: list) -> bool:
+    """Pure-Python ray-casting algorithm for 2D point-in-polygon checking without C dependencies."""
+    inside = False
+    n = len(polygon_coords)
+    if n < 3:
+        return False
+    p1x, p1y = polygon_coords[0]
+    for i in range(1, n + 1):
+        p2x, p2y = polygon_coords[i % n]
+        if y > min(p1y, p2y):
+            if y <= max(p1y, p2y):
+                if x <= max(p1x, p2x):
+                    if p1y != p2y:
+                        xinters = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+                    if p1x == p2x or x <= xinters:
+                        inside = not inside
+        p1x, p1y = p2x, p2y
+    return inside
+
 
 class GISAgent:
     """
@@ -60,25 +87,36 @@ class GISAgent:
         intersections: List[GeofenceIntersection] = []
         status = GeofenceStatusEnum.CLEAR
 
-        # Create Shapely Point objects for waypoints
-        route_points = [Point(wp.lon, wp.lat) for wp in route.waypoints]
-
         for feat in features:
             try:
-                poly = shape(feat["geometry"])
+                geom = feat.get("geometry", {})
                 props = feat.get("properties", {})
                 zone_type = props.get("zone_type", "restricted_zone")
                 zone_name = props.get("zone_name", "Restricted Maritime Zone")
 
-                for pt in route_points:
-                    if poly.contains(pt):
-                        status = GeofenceStatusEnum.INTERSECTS
-                        intersections.append(GeofenceIntersection(
-                            zone_type=zone_type,
-                            zone_name=zone_name,
-                            distance_into_zone_km=1.5
-                        ))
-                        break
+                hit = False
+                if HAS_SHAPELY:
+                    poly = shape(geom)
+                    for wp in route.waypoints:
+                        if poly.contains(Point(wp.lon, wp.lat)):
+                            hit = True
+                            break
+                else:
+                    coords = geom.get("coordinates", [])
+                    # GeoJSON Polygon outer ring
+                    outer_ring = coords[0] if coords and isinstance(coords[0], list) and isinstance(coords[0][0], list) else coords
+                    for wp in route.waypoints:
+                        if point_in_polygon(wp.lon, wp.lat, outer_ring):
+                            hit = True
+                            break
+
+                if hit:
+                    status = GeofenceStatusEnum.INTERSECTS
+                    intersections.append(GeofenceIntersection(
+                        zone_type=zone_type,
+                        zone_name=zone_name,
+                        distance_into_zone_km=1.5
+                    ))
             except Exception as e:
                 print(f"[GIS Agent] Error evaluating polygon: {e}")
 
@@ -89,3 +127,4 @@ class GISAgent:
         )
 
 gis_agent = GISAgent()
+

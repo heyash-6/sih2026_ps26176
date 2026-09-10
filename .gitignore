@@ -17,10 +17,6 @@ ENV/
 .coverage
 htmlcov/
 
-# Editor & OS files
-.vscode/
-.idea/
-*.swp
-*.swo
-.DS_Store
-Thumbs.db
+# Frontend dependencies & caches
+node_modules/
+.vite/
