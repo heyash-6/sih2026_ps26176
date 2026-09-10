@@ -16,6 +16,34 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
  */
 export async function signUpWithEmail(email, password, fullName = '', role = 'user') {
   try {
+    // 1. Attempt registration via backend admin endpoint which creates & pre-confirms the user,
+    // completely bypassing Supabase's 3-emails/hour default SMTP rate limit.
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email.trim(),
+        password: password,
+        full_name: fullName.trim(),
+        role: role
+      })
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      if (data.success) {
+        // User created and pre-confirmed! Now sign in directly to get session & tokens
+        const loginRes = await signInWithEmail(email, password)
+        if (loginRes.success) {
+          return { success: true, user: loginRes.user, session: loginRes.session }
+        }
+        return { success: true, user: data.user, session: null }
+      } else {
+        return { success: false, error: data.error || 'Failed to register.' }
+      }
+    }
+
+    // 2. Direct client fallback if backend endpoint returned non-200
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -26,11 +54,16 @@ export async function signUpWithEmail(email, password, fullName = '', role = 'us
         }
       }
     })
-    if (error) throw error
+    if (error) {
+      if (error.message?.toLowerCase().includes('rate limit')) {
+        throw new Error('Supabase email rate limit exceeded. Please wait or use the Quick Demo access below.')
+      }
+      throw error
+    }
     return { success: true, user: data.user, session: data.session }
   } catch (err) {
     console.error('[Supabase Auth] Sign up error:', err)
-    return { success: false, error: err.message }
+    return { success: false, error: err.message || 'Registration failed.' }
   }
 }
 

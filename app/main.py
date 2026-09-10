@@ -157,6 +157,52 @@ def get_history(limit: int = Query(10, description="Max records")):
     analyses = supabase_client.get_recent_analyses(limit=limit)
     return {"analyses": analyses, "count": len(analyses)}
 
+class RegisterRequest(BaseModel):
+    email: str
+    password: str
+    full_name: Optional[str] = ""
+    role: Optional[str] = "user"
+
+@app.post("/api/auth/register")
+def register_user(req: RegisterRequest):
+    """
+    Direct user registration bypassing Supabase default SMTP email rate limit.
+    Uses Service Role key to create and pre-confirm user in auth.users.
+    """
+    import httpx
+    url = settings.supabase_url.rstrip("/")
+    key = settings.supabase_service_role_key or settings.supabase_anon_key
+
+    headers = {
+        "apikey": key,
+        "Authorization": f"Bearer {key}",
+        "Content-Type": "application/json"
+    }
+
+    # Map role
+    role_clean = req.role if req.role in ["user", "researcher", "admin"] else "user"
+
+    payload = {
+        "email": req.email.strip(),
+        "password": req.password,
+        "email_confirm": True,
+        "user_metadata": {
+            "full_name": req.full_name or req.email.split("@")[0],
+            "role": role_clean
+        }
+    }
+
+    try:
+        with httpx.Client(timeout=10.0) as client:
+            res = client.post(f"{url}/auth/v1/admin/users", headers=headers, json=payload)
+            if res.status_code in [200, 201]:
+                return {"success": True, "user": res.json()}
+            # If user already registered
+            err_data = res.json() if res.headers.get("content-type", "").startswith("application/json") else {"msg": res.text}
+            return {"success": False, "error": err_data.get("msg") or err_data.get("message") or "Registration failed."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/sync")
 def trigger_sync():
     """Manually trigger data synchronization for coastal hubs to Supabase."""
