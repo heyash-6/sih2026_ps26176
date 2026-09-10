@@ -39,11 +39,12 @@ class WeatherHazardAgent:
         
         # Merge alerts, prioritizing live Supabase alerts
         combined = []
-        seen_ids = set()
+        seen = set()
         for a in (db_alerts + local_alerts):
-            if a.alert_id not in seen_ids:
+            aid = getattr(a, "alert_id", None) or f"{a.hazard_type}_{a.area_description}"
+            if aid not in seen:
                 combined.append(a)
-                seen_ids.add(a.alert_id)
+                seen.add(aid)
         return combined
 
 weather_hazard_agent = WeatherHazardAgent()

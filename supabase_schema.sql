@@ -46,26 +46,45 @@ CREATE TABLE IF NOT EXISTS public.users (
 -- Trigger to sync auth.users inserts into public.users automatically on Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+    user_role_val public.user_role;
+    full_name_val text;
 BEGIN
+    -- Safely parse role, falling back to 'user' on any type casting error
+    BEGIN
+        user_role_val := (NEW.raw_user_meta_data->>'role')::public.user_role;
+    EXCEPTION WHEN OTHERS THEN
+        user_role_val := 'user'::public.user_role;
+    END;
+    
+    IF user_role_val IS NULL THEN
+        user_role_val := 'user'::public.user_role;
+    END IF;
+
+    full_name_val := COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(COALESCE(NEW.email, ''), '@', 1));
+
     INSERT INTO public.users (id, email, role, is_active, full_name)
     VALUES (
         NEW.id,
-        NEW.email,
-        COALESCE((NEW.raw_user_meta_data->>'role')::user_role, 'user'::user_role),
+        COALESCE(NEW.email, ''),
+        user_role_val,
         true,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', '')
+        full_name_val
     )
     ON CONFLICT (id) DO UPDATE SET
         email = EXCLUDED.email,
+        full_name = EXCLUDED.full_name,
+        role = EXCLUDED.role,
         updated_at = NOW();
+
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, auth, pg_temp;
 
 -- Bind trigger to Supabase auth.users
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
-    AFTER INSERT OR UPDATE ON auth.users
+    AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 DROP TRIGGER IF EXISTS tr_users_updated_at ON public.users;
@@ -308,6 +327,11 @@ CREATE POLICY "Users can update own profile"
     ON public.users FOR UPDATE 
     TO authenticated 
     USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Enable insert for users and service" ON public.users;
+CREATE POLICY "Enable insert for users and service" 
+    ON public.users FOR INSERT 
+    WITH CHECK (true);
 
 -- Public / Authenticated read policies for Marine Observations & Alerts
 DROP POLICY IF EXISTS "Public read active alerts" ON public.alerts;

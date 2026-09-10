@@ -37,6 +37,7 @@ class MarineConditions(BaseModel):
     source: str = "INCOIS forecast"
 
 class HazardAlert(BaseModel):
+    alert_id: Optional[str] = None
     hazard_type: HazardTypeEnum
     severity: SeverityEnum
     active_window: TimeWindow
