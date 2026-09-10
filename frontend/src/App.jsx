@@ -358,7 +358,7 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
     <>
       <div className="pageIntro">
         <div>
-          <span className="eyebrow">ORCA / {t('map')}</span>
+          <span className="eyebrow">GEOSPATIAL & SATELLITE RADAR</span>
           <h2>{t('map')}</h2>
           <p>{t('mapLabels')}</p>
         </div>
