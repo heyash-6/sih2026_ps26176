@@ -23,10 +23,34 @@
     "wave_height_m": 1.1, "swell_period_s": 6.5, "sea_state": "slight",
     "source": "Open-Meteo & INCOIS (demo snapshot)"
   },
+  "PFZ-GOA-01": {
+    "lat": 15.52, "lon": 73.65, "datetime": "2026-09-09T05:00:00+05:30",
+    "wind_speed_kmh": 13.5, "wind_direction_deg": 230, "rain_probability_pct": 10, "air_temp_celsius": 28.0,
+    "wave_height_m": 0.9, "swell_period_s": 6.1, "sea_state": "slight",
+    "source": "Open-Meteo & INCOIS (Goa)"
+  },
+  "PFZ-GOA-02": {
+    "lat": 15.42, "lon": 73.68, "datetime": "2026-09-09T05:00:00+05:30",
+    "wind_speed_kmh": 14.8, "wind_direction_deg": 235, "rain_probability_pct": 15, "air_temp_celsius": 28.2,
+    "wave_height_m": 1.0, "swell_period_s": 6.3, "sea_state": "slight",
+    "source": "Open-Meteo & INCOIS (Goa)"
+  },
+  "PFZ-MUM-01": {
+    "lat": 18.98, "lon": 72.65, "datetime": "2026-09-09T05:00:00+05:30",
+    "wind_speed_kmh": 15.0, "wind_direction_deg": 250, "rain_probability_pct": 20, "air_temp_celsius": 28.5,
+    "wave_height_m": 1.1, "swell_period_s": 6.8, "sea_state": "slight",
+    "source": "Open-Meteo & INCOIS (Mumbai)"
+  },
+  "PFZ-MUM-02": {
+    "lat": 18.90, "lon": 72.62, "datetime": "2026-09-09T05:00:00+05:30",
+    "wind_speed_kmh": 16.5, "wind_direction_deg": 255, "rain_probability_pct": 25, "air_temp_celsius": 28.3,
+    "wave_height_m": 1.2, "swell_period_s": 7.0, "sea_state": "slight",
+    "source": "Open-Meteo & INCOIS (Mumbai)"
+  },
   "default": {
     "lat": 16.99, "lon": 73.31, "datetime": "2026-09-09T05:00:00+05:30",
-    "wind_speed_kmh": 12.0, "wind_direction_deg": 240, "rain_probability_pct": 10, "air_temp_celsius": 27.0,
-    "wave_height_m": 0.7, "swell_period_s": 6.0, "sea_state": "slight",
+    "wind_speed_kmh": 13.0, "wind_direction_deg": 240, "rain_probability_pct": 15, "air_temp_celsius": 27.5,
+    "wave_height_m": 0.8, "swell_period_s": 6.2, "sea_state": "slight",
     "source": "Open-Meteo & INCOIS (demo snapshot)"
   }
 }

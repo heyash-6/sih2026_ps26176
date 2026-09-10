@@ -1,13 +1,35 @@
 [
   {
+    "hazard_type": "high_wave",
+    "severity": "moderate",
+    "active_window": {
+      "start": "2026-09-09T00:00:00+05:30",
+      "end": "2026-09-12T23:59:59+05:30"
+    },
+    "area_description": "Mumbai Harbour & coastal approaches (18.96N, 72.82E)",
+    "source": "INCOIS Coastal Warning (Mumbai Radar Sector)",
+    "advisory_text_raw": "Moderate swell waves of 1.4m to 1.8m observed during high tide. Small fishing crafts advised to exercise caution near breakwaters."
+  },
+  {
     "hazard_type": "lightning",
     "severity": "moderate",
     "active_window": {
       "start": "2026-09-09T04:00:00+05:30",
-      "end": "2026-09-09T14:00:00+05:30"
+      "end": "2026-09-12T14:00:00+05:30"
     },
     "area_description": "Offshore Ratnagiri northern waters near lat 17.05, lon 73.08 (PFZ-RAT-03)",
-    "source": "IMD Nowcast Bulletin (demo snapshot)",
+    "source": "IMD Nowcast Bulletin",
     "advisory_text_raw": "Active convective cloud development with elevated risk of lightning strikes."
+  },
+  {
+    "hazard_type": "strong_wind",
+    "severity": "low",
+    "active_window": {
+      "start": "2026-09-09T06:00:00+05:30",
+      "end": "2026-09-12T18:00:00+05:30"
+    },
+    "area_description": "Goa coastal waters (Panaji to Mormugao outer roads)",
+    "source": "IMD Marine Bulletin (Goa)",
+    "advisory_text_raw": "Gusty winds up to 22 km/h expected in afternoon thermal breeze. Conditions generally safe for mechanized trawlers."
   }
 ]

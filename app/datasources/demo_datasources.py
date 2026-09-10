@@ -130,10 +130,22 @@ class DemoHazardDataSource(BaseHazardDataSource):
     def get_hazards(self, lat: float, lon: float, datetime_str: str, window_hours: int = 24) -> List[HazardAlert]:
         alerts = []
         for item in self.hazard_data:
-            # Check if requested point is near the hazard location description or coordinates
+            # Safely resolve hazard_type and severity
+            raw_type = str(item.get("hazard_type", "other")).lower()
+            try:
+                h_type = HazardTypeEnum(raw_type)
+            except Exception:
+                h_type = HazardTypeEnum.HIGH_WAVE if "wave" in raw_type else HazardTypeEnum.OTHER
+
+            raw_sev = str(item.get("severity", "moderate")).lower()
+            try:
+                h_sev = SeverityEnum(raw_sev)
+            except Exception:
+                h_sev = SeverityEnum.MODERATE
+
             alert = HazardAlert(
-                hazard_type=HazardTypeEnum(item["hazard_type"]),
-                severity=SeverityEnum(item["severity"]),
+                hazard_type=h_type,
+                severity=h_sev,
                 active_window=TimeWindow(**item["active_window"]),
                 area_description=item["area_description"],
                 source=item.get("source", "IMD bulletin (demo snapshot)"),

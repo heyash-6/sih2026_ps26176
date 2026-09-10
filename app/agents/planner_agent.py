@@ -96,16 +96,20 @@ class PlannerAgent:
         results["marine_by_candidate"] = marine_by_candidate
         step_counter += 1
 
-        # Step 4: Fetch Active Hazard Alerts
+        # Step 4: Fetch Active Hazard Alerts & Regional Sea State
         t0 = time.time()
         plan.append(PlanStepItem(step=step_counter, tool="get_hazards", params={"datetime": datetime_str}))
         hazards = weather_hazard_agent.get_hazards(coords.lat, coords.lon, datetime_str)
+        origin_weather = weather_hazard_agent.get_weather(coords.lat, coords.lon, datetime_str)
+        origin_marine = weather_hazard_agent.get_marine_conditions(coords.lat, coords.lon, datetime_str)
         duration_ms = int((time.time() - t0) * 1000)
         execution_trace.append(ExecutionTraceStep(
             step=step_counter, tool="get_hazards", status="done", duration_ms=duration_ms,
-            details=f"Found {len(hazards)} active hazard bulletins"
+            details=f"Found {len(hazards)} active hazard bulletins for ({coords.lat}, {coords.lon})"
         ))
         results["hazards"] = [h.model_dump() for h in hazards]
+        results["origin_weather"] = origin_weather.model_dump()
+        results["origin_marine"] = origin_marine.model_dump()
         step_counter += 1
 
         # Step 5: Route Calculation & Geofence Checks per candidate

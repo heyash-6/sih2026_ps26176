@@ -79,7 +79,14 @@ class Orchestrator:
             session_id=session_id,
             language=nlu_out.language,
             candidates=candidate_packages,
-            execution_trace=trace_dicts
+            execution_trace=trace_dicts,
+            user_query=text,
+            intent=nlu_out.intent.value,
+            location_text=nlu_out.entities.location_text,
+            origin_coords=res.get("origin_coords"),
+            origin_weather=res.get("origin_weather"),
+            origin_marine=res.get("origin_marine"),
+            hazards=res.get("hazards", [])
         )
 
         return final_output

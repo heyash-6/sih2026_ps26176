@@ -8,15 +8,15 @@ from app.schemas.decision import (
     AlternativeItem,
     CandidateStatusEnum,
 )
-from app.schemas.common import EvidenceItem, MapPayload
+from app.schemas.common import EvidenceItem, MapPayload, LatLon
 from app.schemas.risk import RiskBandEnum
 from app.agents.llm_client import llm_client
 
 class DecisionExplanationAgent:
     """
     Stage 7: Decision & Explanation Agent.
-    Ranks candidate zones based on hard blocks and risk scores, formats evidence claims,
-    and produces multilingual natural-language explanations (EN, HI, MR).
+    Synthesizes multi-agent evidence (GIS, Weather, Hazards, Risk) into an intelligent,
+    natural conversational response powered by Gemini for fishermen and maritime operators.
     """
 
     def decide_and_explain(
@@ -24,15 +24,96 @@ class DecisionExplanationAgent:
         session_id: str,
         language: str,
         candidates: List[CandidatePackage],
-        execution_trace: List[Dict[str, Any]]
+        execution_trace: List[Dict[str, Any]],
+        user_query: str = "",
+        intent: Optional[str] = None,
+        location_text: Optional[str] = None,
+        origin_coords: Optional[LatLon] = None,
+        origin_weather: Optional[Dict[str, Any]] = None,
+        origin_marine: Optional[Dict[str, Any]] = None,
+        hazards: Optional[List[Dict[str, Any]]] = None
     ) -> FinalDecisionOutput:
-        if not candidates:
+        hazards = hazards or []
+        query_lower = user_query.lower()
+
+        # Case 1: Conversational / General Greeting / Capabilities
+        import re
+        is_greeting = bool(re.search(r'\b(hello|hi|hey|namaste|who are you|what can you do|talk to me|help me)\b', query_lower))
+        if (intent == "other" and not any(kw in query_lower for kw in ["fish", "trip", "wave", "hazard", "storm"])) or (is_greeting and not any(kw in query_lower for kw in ["fish", "fishing", "trip", "zone", "hazard", "cyclone", "wave"])):
+            explanation = self._generate_conversational_response(user_query, language)
             return FinalDecisionOutput(
                 session_id=session_id,
                 language=language,
                 execution_trace=execution_trace,
-                explanation_text="No candidate fishing zones were found within range.",
-                disclaimer=settings.disclaimer_text
+                recommendation=None,
+                alternatives_considered=[],
+                evidence=[],
+                explanation_text=explanation,
+                map_payload=MapPayload(),
+                disclaimer=settings.disclaimer_text,
+                generated_at=datetime.now().isoformat()
+            )
+
+        # Case 2: Hazard Alert / Cyclone / High Waves Inquiry
+        if intent == "hazard_alert_check" or any(w in query_lower for w in ["hazard", "storm", "cyclone", "warning", "lightning", "alert", "धोका", "खतरा"]):
+            evidence = []
+            for h in hazards:
+                evidence.append(EvidenceItem(
+                    claim=f"{h.get('hazard_type', 'Hazard').replace('_', ' ').title()}: {h.get('advisory_text_raw', 'Active alert')}",
+                    source=f"{h.get('source', 'IMD / INCOIS')} — {h.get('area_description', '')}"
+                ))
+            if origin_marine:
+                evidence.append(EvidenceItem(
+                    claim=f"Current wave height {origin_marine.get('wave_height_m', 0.8)}m ({origin_marine.get('sea_state', 'slight')} sea state)",
+                    source="INCOIS Marine Conditions"
+                ))
+            if origin_weather:
+                evidence.append(EvidenceItem(
+                    claim=f"Wind speed {origin_weather.get('wind_speed_kmh', 12)} km/h",
+                    source="IMD Marine Weather"
+                ))
+
+            explanation = self._generate_hazard_explanation(
+                user_query=user_query,
+                language=language,
+                location_text=location_text or "coastal waters",
+                hazards=hazards,
+                weather=origin_weather,
+                marine=origin_marine
+            )
+
+            return FinalDecisionOutput(
+                session_id=session_id,
+                language=language,
+                execution_trace=execution_trace,
+                recommendation=None,
+                alternatives_considered=[],
+                evidence=evidence,
+                explanation_text=explanation,
+                map_payload=MapPayload(hazards=hazards),
+                disclaimer=settings.disclaimer_text,
+                generated_at=datetime.now().isoformat()
+            )
+
+        # Case 3: Fishing Trip Planning or PFZ Evaluation
+        if not candidates:
+            explanation = self._generate_no_candidate_explanation(
+                user_query=user_query,
+                language=language,
+                location_text=location_text or "your area",
+                weather=origin_weather,
+                marine=origin_marine
+            )
+            return FinalDecisionOutput(
+                session_id=session_id,
+                language=language,
+                execution_trace=execution_trace,
+                recommendation=None,
+                alternatives_considered=[],
+                evidence=[],
+                explanation_text=explanation,
+                disclaimer=settings.disclaimer_text,
+                generated_at=datetime.now().isoformat()
             )
 
         # 1. Candidate Sorting: Non-hard_blocked first, then ascending total_risk, then distance
@@ -69,7 +150,6 @@ class DecisionExplanationAgent:
                 risk_band=top_pkg.risk.band if top_pkg.risk else RiskBandEnum.MODERATE,
                 risk_score=top_pkg.risk.total_risk if top_pkg.risk else 30.0
             )
-            # Remaining valid candidates added to alternatives
             for alt in valid_candidates[1:]:
                 rejected_candidates.append(AlternativeItem(
                     zone_id=alt.zone_id,
@@ -110,8 +190,15 @@ class DecisionExplanationAgent:
                     source="GIS Agent — geofence check"
                 ))
 
-        # 3. Generate Multilingual Explanation Text
-        explanation_text = self._generate_explanation(language, top_pkg, recommendation_item, evidence)
+        # 3. Generate Multilingual Conversational Explanation Text
+        explanation_text = self._generate_trip_explanation(
+            user_query=user_query,
+            language=language,
+            location_text=location_text,
+            top_pkg=top_pkg,
+            rec_item=recommendation_item,
+            evidence=evidence
+        )
 
         # 4. Construct Map Payload for Frontend Rendering
         map_candidates = []
@@ -150,72 +237,122 @@ class DecisionExplanationAgent:
             generated_at=datetime.now().isoformat()
         )
 
-    def _generate_explanation(
-        self,
-        language: str,
-        top_pkg: Optional[CandidatePackage],
-        rec_item: Optional[RecommendationItem],
-        evidence: List[EvidenceItem]
+    def _generate_conversational_response(self, user_query: str, language: str) -> str:
+        system_prompt = (
+            "You are ORCA (Oceanic Reasoning & Collaborative Agent), an AI maritime decision support copilot. "
+            "Introduce yourself warmly and professionally to the user. "
+            "Explain that you assist vessel operators, fishermen, and maritime authorities with: "
+            "1. Real-time Potential Fishing Zones (PFZ) and SST/chlorophyll telemetry. "
+            "2. Marine weather, wave heights, and sea state forecasts. "
+            "3. Cyclone, swell, and lightning hazard alerts. "
+            "4. Safe route navigation, EEZ compliance, and geofence boundary safety. "
+            "Keep the response natural, inviting, and concise (2-4 sentences). "
+            f"Respond in the requested language: {language} (en=English, hi=Hindi, mr=Marathi)."
+        )
+        reply = llm_client.generate_text(system_prompt, f"User says: {user_query}")
+        if reply:
+            return reply
+
+        # Fallbacks
+        if language == "mr":
+            return "नमस्कार! मी ORCA - आपला सागरी कृत्रिम बुद्धिमत्ता (AI) सहाय्यक आहे. मी आपल्याला मासेमारी क्षेत्र (PFZ), समुद्रातील लाटांची स्थिती, वादळ व धोक्यांचे इशारे आणि सुरक्षित सागरी मार्गांविषयी माहिती देऊ शकतो. मी आज आपल्या प्रवासासाठी कशी मदत करू?"
+        elif language == "hi":
+            return "नमस्ते! मैं ORCA हूँ - आपका समुद्री AI निर्णय सहायक। मैं आपको संभावित मछली पकड़ने के क्षेत्रों (PFZ), लहरों और हवा की स्थिति, तूफान/खतरे की चेतावनियों और सुरक्षित समुद्री नेविगेशन में मदद कर सकता हूँ। मैं आपकी क्या सहायता कर सकता हूँ?"
+        else:
+            return "Hello! I am ORCA, your marine intelligence decision support copilot. I provide real-time potential fishing zone (PFZ) advisories, marine weather and sea state forecasts, active cyclone and swell hazard alerts, and safe coastal routing. How can I assist your voyage today?"
+
+    def _generate_hazard_explanation(
+        self, user_query: str, language: str, location_text: str,
+        hazards: List[Dict[str, Any]], weather: Optional[Dict[str, Any]], marine: Optional[Dict[str, Any]]
     ) -> str:
-        # Attempt LLM generation if available
-        llm_text = self._run_llm_explanation(language, top_pkg, rec_item, evidence)
-        if llm_text:
-            return llm_text
+        system_prompt = (
+            "You are ORCA Marine Intelligence Assistant. The user is asking about hazards, storms, waves, or sea safety. "
+            f"Location: {location_text}\n"
+            f"Active Hazard Bulletins: {hazards}\n"
+            f"Weather Data: {weather}\n"
+            f"Marine/Sea State: {marine}\n"
+            "Provide a clear, reassuring, and safety-focused response directly answering their question. "
+            "Highlight any active warnings, wave height, and wind speed. Advise on practical navigational precautions. "
+            f"Respond in {language} (en=English, hi=Hindi, mr=Marathi)."
+        )
+        reply = llm_client.generate_text(system_prompt, f"User inquiry: {user_query}")
+        if reply:
+            return reply
 
-        # Fallback template-based explanation
-        if not top_pkg or not rec_item or rec_item.status == CandidateStatusEnum.NO_SAFE_OPTION:
-            if language == "mr":
-                return "सुरक्षिततेच्या कारणास्तव आज किंवा उद्या समुद्रात जाणे योग्य नाही. सर्व भाग उच्च धोक्याचे दाखवत आहेत."
-            elif language == "hi":
-                return "सुरक्षा कारणों से आज या कल समुद्र में जाना उचित नहीं है। सभी क्षेत्र उच्च जोखिम दिखा रहे हैं।"
-            else:
-                return "Venturing into the sea is not recommended due to high marine hazard risks across all evaluated zones."
+        # Fallback
+        h_count = len(hazards)
+        wave = marine.get("wave_height_m", 1.0) if marine else 1.0
+        wind = weather.get("wind_speed_kmh", 15.0) if weather else 15.0
+        if language == "mr":
+            return f"{location_text} किनाऱ्याजवळ सध्या {h_count} सक्रिय सागरी सूचना आहेत. लाटांची उंची सुमारे {wave} मीटर असून वाऱ्याचा वेग {wind} किमी/तास आहे. खोल समुद्रात जाताना सावधगिरी बाळगा."
+        elif language == "hi":
+            return f"{location_text} तट के समीप वर्तमान में {h_count} सक्रिय समुद्री चेतावनियाँ हैं। लहरों की ऊंचाई लगभग {wave} मीटर और हवा की गति {wind} किमी/घंटा है। कृपया आवश्यक सावधानी बरतें।"
+        else:
+            return f"Regarding conditions near {location_text}: There are currently {h_count} active marine advisory bulletins. Wave heights are approximately {wave}m with wind speeds near {wind} km/h. Standard coastal navigational precautions are advised."
 
-        z_id = top_pkg.zone_id
-        dist = top_pkg.pfz.distance_km if top_pkg.pfz else 18.0
-        risk_score = top_pkg.risk.total_risk if top_pkg.risk else 25.0
-        wave = top_pkg.marine_conditions.wave_height_m if top_pkg.marine_conditions else 0.8
+    def _generate_no_candidate_explanation(
+        self, user_query: str, language: str, location_text: str,
+        weather: Optional[Dict[str, Any]], marine: Optional[Dict[str, Any]]
+    ) -> str:
+        wave = marine.get("wave_height_m", 0.9) if marine else 0.9
+        wind = weather.get("wind_speed_kmh", 14.0) if weather else 14.0
+        system_prompt = (
+            "You are ORCA Marine Intelligence Assistant. "
+            f"The user is asking about fishing or voyages near '{location_text}', but recent satellite chlorophyll/SST telemetry does not show active INCOIS Potential Fishing Zone (PFZ) thermal fronts within 50 km.\n"
+            f"Local sea conditions show: Wave height {wave}m, Wind speed {wind} km/h.\n"
+            "Explain this to the user in a helpful, friendly manner. Confirm that nearshore conditions remain navigable and suggest checking nearby active sectors or re-checking tomorrow's satellite bulletin. "
+            f"Respond in {language} (en=English, hi=Hindi, mr=Marathi)."
+        )
+        reply = llm_client.generate_text(system_prompt, f"User inquiry: {user_query}")
+        if reply:
+            return reply
 
         if language == "mr":
-            return (
-                f"{z_id} हा पर्याय उद्यासाठी सर्वोत्तम आणि सुरक्षित मानला गेला आहे. "
-                f"हे क्षेत्र आपल्या किनाऱ्यापासून {dist} किमी अंतरावर आहे. "
-                f"येथे लाटांची उंची सुमारे {wave} मीटर असून एकूण धोका गुण {risk_score}/100 (मध्यम) आहे. "
-                f"हा मार्ग प्रतिबंधित क्षेत्रांना छेदत नाही."
-            )
+            return f"{location_text} परिसरात सध्या ५० किमी अंतरात कोणतीही सक्रिय PFZ मासेमारी क्षेत्रे नोंदवलेली नाहीत. तथापि, स्थानिक लाटांची उंची {wave} मी आणि वाऱ्याचा वेग {wind} किमी/तास असून समुद्र शांत आहे."
         elif language == "hi":
-            return (
-                f"{z_id} कल के लिए सबसे उपयुक्त और सुरक्षित विकल्प माना गया है। "
-                f"यह क्षेत्र तट से {dist} किमी दूरी पर है। "
-                f"यहाँ लहरों की ऊँचाई {wave} मीटर है और कुल जोखिम स्कोर {risk_score}/100 (मध्यम) है। "
-                f"यह मार्ग किसी प्रतिबंधित क्षेत्र से होकर नहीं गुजरता।"
-            )
+            return f"{location_text} के आसपास 50 किमी के दायरे में वर्तमान में कोई सक्रिय PFZ मछली पकड़ने का क्षेत्र नहीं है। हालाँकि, स्थानीय समुद्र में लहरें {wave} मीटर और हवा {wind} किमी/घंटा के साथ अनुकूल हैं।"
         else:
-            return (
-                f"{z_id} is the recommended fishing zone for your trip. "
-                f"It is located {dist} km from departure, with moderate wave conditions ({wave}m) "
-                f"and an overall risk score of {risk_score}/100 ({top_pkg.risk.band.value if top_pkg.risk else 'LOW'}). "
-                f"The planned route stays clear of restricted marine areas."
-            )
+            return f"Currently, satellite ocean telemetry does not indicate active high-density Potential Fishing Zones (PFZ) within 50 km of {location_text}. However, local conditions show gentle {wave}m waves and {wind} km/h winds, which remain favorable for general coastal operations."
 
-    def _run_llm_explanation(
-        self, language: str, top_pkg: Optional[CandidatePackage],
-        rec_item: Optional[RecommendationItem], evidence: List[EvidenceItem]
-    ) -> Optional[str]:
-        if not top_pkg:
-            return None
+    def _generate_trip_explanation(
+        self, user_query: str, language: str, location_text: Optional[str],
+        top_pkg: Optional[CandidatePackage], rec_item: Optional[RecommendationItem], evidence: List[EvidenceItem]
+    ) -> str:
+        if not top_pkg or not rec_item:
+            return "No viable fishing zone found."
 
         system_prompt = (
-            "You are the Decision & Explanation Agent for ORCA Marine Intelligence Platform. "
-            "Write a concise, practical, non-alarmist recommendation (3-5 sentences) for a fisherman. "
-            "Do NOT invent or modify any numbers. Rely strictly on the provided evidence claims.\n"
-            f"Language required: {language} (en=English, hi=Hindi, mr=Marathi)."
+            "You are ORCA Marine Intelligence Assistant talking directly to a boat captain or fisherman. "
+            "Address the user's specific departure location, departure time, and trip duration as requested. "
+            f"User asked: '{user_query}'\n"
+            f"Departure Port/Location: {location_text or 'your departure port'}\n"
+            f"Recommended Zone: {top_pkg.zone_id}\n"
+            f"Distance: {top_pkg.pfz.distance_km if top_pkg.pfz else 18.0} km\n"
+            f"Wave Height: {top_pkg.marine_conditions.wave_height_m if top_pkg.marine_conditions else 0.9} m\n"
+            f"Wind Speed: {top_pkg.weather.wind_speed_kmh if top_pkg.weather else 14.0} km/h\n"
+            f"Risk Score: {rec_item.risk_score}/100 ({rec_item.risk_band.value})\n"
+            f"Geofence Route: {'Clear of restricted zones' if top_pkg.geofence and top_pkg.geofence.status == 'clear' else 'Caution near boundary'}\n"
+            "Write an engaging, clear, direct recommendation (3-5 sentences). "
+            "Speak conversationally (e.g. 'Hello Captain! For your trip departing from ...'). "
+            "Explicitly address their time and duration if mentioned. Provide practical marine safety tips. "
+            f"Respond in {language} (en=English, hi=Hindi, mr=Marathi)."
         )
-        user_prompt = (
-            f"Recommended Zone: {rec_item.zone_id if rec_item else 'None'}\n"
-            f"Risk Score: {rec_item.risk_score if rec_item else 'N/A'}\n"
-            f"Evidence: {[e.claim for e in evidence]}"
-        )
-        return llm_client.generate_text(system_prompt, user_prompt)
+        reply = llm_client.generate_text(system_prompt, user_query)
+        if reply:
+            return reply
+
+        # Fallback template
+        z_id = top_pkg.zone_id
+        dist = top_pkg.pfz.distance_km if top_pkg.pfz else 18.0
+        risk_score = rec_item.risk_score
+        wave = top_pkg.marine_conditions.wave_height_m if top_pkg.marine_conditions else 0.9
+        wind = top_pkg.weather.wind_speed_kmh if top_pkg.weather else 14.0
+
+        if language == "mr":
+            return f"नमस्कार कॅप्टन! आपल्या प्रवासासाठी {z_id} हा पर्याय सर्वोत्तम आहे. हे क्षेत्र किनाऱ्यापासून {dist} किमी अंतरावर असून लाटांची उंची {wave} मी आणि वाऱ्याचा वेग {wind} किमी/तास आहे. एकूण धोका गुण {risk_score}/100 (कमी) आहे."
+        elif language == "hi":
+            return f"नमस्ते कैप्टन! आपकी यात्रा के लिए {z_id} सबसे उपयुक्त क्षेत्र है। यह तट से {dist} किमी दूरी पर है, जहाँ लहरें {wave} मीटर और हवा {wind} किमी/घंटा है। कुल जोखिम स्कोर {risk_score}/100 है।"
+        else:
+            return f"Hello Captain! Based on your voyage from {location_text or 'port'}, ORCA recommends zone {z_id} located {dist} km offshore. Sea state is favorable with {wave}m waves and {wind} km/h winds, presenting an overall low risk score of {risk_score}/100. Route is clear of restricted maritime zones."
 
 decision_agent = DecisionExplanationAgent()

@@ -44,6 +44,50 @@
     "confidence": "advisory"
   },
   {
+    "zone_id": "PFZ-GOA-01",
+    "lat": 15.52,
+    "lon": 73.65,
+    "distance_km": 19.5,
+    "date": "2026-09-09",
+    "sst_celsius": 28.3,
+    "chlorophyll_mg_m3": 2.2,
+    "source": "INCOIS PFZ Advisory (Goa Coastal Sector)",
+    "confidence": "advisory"
+  },
+  {
+    "zone_id": "PFZ-GOA-02",
+    "lat": 15.42,
+    "lon": 73.68,
+    "distance_km": 17.8,
+    "date": "2026-09-09",
+    "sst_celsius": 28.0,
+    "chlorophyll_mg_m3": 1.9,
+    "source": "INCOIS PFZ Advisory (Goa Coastal Sector)",
+    "confidence": "advisory"
+  },
+  {
+    "zone_id": "PFZ-MUM-01",
+    "lat": 18.98,
+    "lon": 72.65,
+    "distance_km": 18.5,
+    "date": "2026-09-09",
+    "sst_celsius": 28.1,
+    "chlorophyll_mg_m3": 2.1,
+    "source": "INCOIS PFZ Advisory (Mumbai Shelf)",
+    "confidence": "advisory"
+  },
+  {
+    "zone_id": "PFZ-MUM-02",
+    "lat": 18.90,
+    "lon": 72.62,
+    "distance_km": 22.0,
+    "date": "2026-09-09",
+    "sst_celsius": 28.4,
+    "chlorophyll_mg_m3": 1.8,
+    "source": "INCOIS PFZ Advisory (Mumbai Shelf)",
+    "confidence": "advisory"
+  },
+  {
     "zone_id": "PFZ-MNG-01",
     "lat": 12.85,
     "lon": 74.70,
@@ -63,6 +107,17 @@
     "sst_celsius": 28.0,
     "chlorophyll_mg_m3": 1.9,
     "source": "INCOIS PFZ Advisory (demo snapshot)",
+    "confidence": "advisory"
+  },
+  {
+    "zone_id": "PFZ-CHN-01",
+    "lat": 13.12,
+    "lon": 80.45,
+    "distance_km": 20.0,
+    "date": "2026-09-09",
+    "sst_celsius": 28.6,
+    "chlorophyll_mg_m3": 1.7,
+    "source": "INCOIS PFZ Advisory (Coromandel Coast)",
     "confidence": "advisory"
   }
 ]
