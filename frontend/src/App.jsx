@@ -124,7 +124,7 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
           <select 
             value={selectedPort} 
             onChange={e => setSelectedPort && setSelectedPort(e.target.value)}
-            style={{ padding: '9px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--text)', fontWeight: 600, fontSize: '0.9rem' }}
+            className="selectControl"
           >
             {PORTS.map(p => (
               <option key={p.id} value={p.id}>{p.name}</option>
@@ -434,7 +434,7 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
                 mapRef.current.map.setView([pt.lat, pt.lon], 8)
               }
             }}
-            style={{ padding: '7px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--text)', fontWeight: 600, fontSize: '0.85rem' }}
+            className="selectControl"
           >
             {PORTS.map(p => (
               <option key={p.id} value={p.id}>{p.name}</option>
@@ -660,7 +660,7 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
           <select 
             value={filterPort} 
             onChange={e => handleFilterChange(e.target.value)}
-            style={{ padding: '8px 14px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--text)', fontWeight: 600, fontSize: '0.85rem' }}
+            className="selectControl"
           >
             <option value="all">🇮🇳 All Indian Coast (32 PFZs)</option>
             {PORTS.map(p => (
