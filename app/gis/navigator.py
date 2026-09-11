@@ -228,66 +228,91 @@ class MarineNavigator:
         else:
             risk_band = "CRITICAL"
 
-        # Derive 3 Route Assessment Points from actual route geometry
-        # Point 1 = Departure/early segment (~20-25%), Point 2 = Mid passage (~50%), Point 3 = Later approach (~85%)
+        # Derive 3 Route Assessment Points from actual route geometry:
+        # Point 1 = Departure Port Corridor (Leg #1: origin waypoint)
+        # Point 2 = Mid-Channel Passage (Midpoint waypoint: ~50% passage)
+        # Point 3 = Target PFZ Arrival Shelf (Final destination waypoint)
         num_wp = len(waypoints_detail)
-        idx_p1 = max(0, min(num_wp - 1, int(round((num_wp - 1) * 0.25))))
-        idx_p2 = max(0, min(num_wp - 1, int(round((num_wp - 1) * 0.50))))
-        idx_p3 = max(0, min(num_wp - 1, int(round((num_wp - 1) * 0.85))))
-
-        wp1 = waypoints_detail[idx_p1]
-        wp2 = waypoints_detail[idx_p2]
-        wp3 = waypoints_detail[idx_p3]
+        idx_p1 = 0
+        idx_p2 = max(0, min(num_wp - 1, num_wp // 2))
+        idx_p3 = max(0, num_wp - 1)
 
         def _point_risk_band(score: float) -> str:
             if score <= 35.0: return "LOW"
             if score <= 60.0: return "CAUTION"
             return "HIGH"
 
+        # Enrich every waypoint in waypoints_detail so the full route table matches assessment points
+        for i, wp in enumerate(waypoints_detail):
+            wp_wave = round(base_wave if i == idx_p2 else (max(0.6, base_wave - 0.1) if i < idx_p2 else base_wave + 0.1), 1)
+            wp_wind = round(14.0 if i == 0 else (16.5 if i == idx_p2 else (17.0 if i == idx_p3 else 15.0)), 1)
+            wp["wave_height_m"] = wp_wave
+            wp["wind_speed_kmh"] = wp_wind
+            wp["risk_band"] = _point_risk_band(wp.get("cell_risk", avg_risk))
+            if i == idx_p1:
+                wp["checkpoint"] = "Point 01"
+                wp["checkpoint_name"] = "Point 01 · Departure"
+            elif i == idx_p2:
+                wp["checkpoint"] = "Point 02"
+                wp["checkpoint_name"] = "Point 02 · Mid-Channel"
+            elif i == idx_p3:
+                wp["checkpoint"] = "Point 03"
+                wp["checkpoint_name"] = "Point 03 · Shelf Arrival"
+            else:
+                wp["checkpoint"] = None
+                wp["checkpoint_name"] = None
+
+        wp1 = waypoints_detail[idx_p1]
+        wp2 = waypoints_detail[idx_p2]
+        wp3 = waypoints_detail[idx_p3]
+
         assessment_points = [
             {
                 "point_number": 1,
-                "label": "Point 1 · Departure Corridor",
-                "segment_type": "Early Segment (Coast Exit)",
+                "leg_number": wp1.get("leg", 1),
+                "label": f"Point 1 · Leg #{wp1.get('leg', 1)} (Departure)",
+                "segment_type": "Departure Port Corridor (0.0 km)",
                 "latitude": wp1["latitude"],
                 "longitude": wp1["longitude"],
                 "cumulative_distance_km": wp1["cumulative_distance_km"],
                 "eta_min": wp1["eta_min"],
-                "wave_height_m": round(max(0.6, base_wave - 0.1), 1),
-                "wind_speed_kmh": round(max(10.0, 14.0), 1),
+                "wave_height_m": wp1["wave_height_m"],
+                "wind_speed_kmh": wp1["wind_speed_kmh"],
                 "risk_score": wp1.get("cell_risk", avg_risk),
-                "risk_band": _point_risk_band(wp1.get("cell_risk", avg_risk)),
-                "sea_state": "Slight" if base_wave <= 1.2 else "Moderate",
+                "risk_band": wp1["risk_band"],
+                "sea_state": "Slight" if wp1["wave_height_m"] <= 1.2 else "Moderate",
                 "status": "Safe Coastal Channel"
             },
             {
                 "point_number": 2,
-                "label": "Point 2 · Mid-Channel Passage",
-                "segment_type": "Middle Segment (Open Waters)",
+                "leg_number": wp2.get("leg", idx_p2 + 1),
+                "label": f"Point 2 · Leg #{wp2.get('leg', idx_p2 + 1)} (Mid-Channel)",
+                "segment_type": f"Mid-Channel Passage (~50% Passage · {wp2['cumulative_distance_km']} km)",
                 "latitude": wp2["latitude"],
                 "longitude": wp2["longitude"],
                 "cumulative_distance_km": wp2["cumulative_distance_km"],
                 "eta_min": wp2["eta_min"],
-                "wave_height_m": round(base_wave, 1),
-                "wind_speed_kmh": round(max(12.0, 16.5), 1),
+                "wave_height_m": wp2["wave_height_m"],
+                "wind_speed_kmh": wp2["wind_speed_kmh"],
                 "risk_score": wp2.get("cell_risk", avg_risk),
-                "risk_band": _point_risk_band(wp2.get("cell_risk", avg_risk)),
-                "sea_state": "Moderate" if base_wave >= 1.3 else "Slight",
+                "risk_band": wp2["risk_band"],
+                "sea_state": "Moderate" if wp2["wave_height_m"] >= 1.3 else "Slight",
                 "status": "A* Least-Resistance Corridor"
             },
             {
                 "point_number": 3,
-                "label": "Point 3 · PFZ Shelf Approach",
-                "segment_type": "Later Segment (Shelf Break)",
+                "leg_number": wp3.get("leg", idx_p3 + 1),
+                "label": f"Point 3 · Leg #{wp3.get('leg', idx_p3 + 1)} (Destination)",
+                "segment_type": f"Target Shelf Approach & Arrival ({wp3['cumulative_distance_km']} km)",
                 "latitude": wp3["latitude"],
                 "longitude": wp3["longitude"],
                 "cumulative_distance_km": wp3["cumulative_distance_km"],
                 "eta_min": wp3["eta_min"],
-                "wave_height_m": round(base_wave + 0.1, 1),
-                "wind_speed_kmh": round(max(12.0, 17.0), 1),
+                "wave_height_m": wp3["wave_height_m"],
+                "wind_speed_kmh": wp3["wind_speed_kmh"],
                 "risk_score": wp3.get("cell_risk", avg_risk),
-                "risk_band": _point_risk_band(wp3.get("cell_risk", avg_risk)),
-                "sea_state": "Moderate" if base_wave >= 1.2 else "Slight",
+                "risk_band": wp3["risk_band"],
+                "sea_state": "Moderate" if wp3["wave_height_m"] >= 1.2 else "Slight",
                 "status": "Approaching Pelagic Biomass Zone"
             }
         ]

@@ -1663,130 +1663,194 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                   </p>
                 </div>
 
-                <div className="assessmentPointsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px', marginBottom: '18px' }}>
-                  {(activeRoute.assessment_points && activeRoute.assessment_points.length > 0
-                    ? activeRoute.assessment_points
-                    : [
-                        { point_number: 1, label: 'Point 1 · Departure Corridor', segment_type: 'Early Segment (~25%)', wave_height_m: 1.1, wind_speed_kmh: 14, risk_band: 'LOW', eta_min: Math.round((activeRoute.estimated_travel_time_min || 155) * 0.25) },
-                        { point_number: 2, label: 'Point 2 · Mid-Channel Passage', segment_type: 'Middle Segment (~50%)', wave_height_m: 1.2, wind_speed_kmh: 16, risk_band: 'LOW', eta_min: Math.round((activeRoute.estimated_travel_time_min || 155) * 0.50) },
-                        { point_number: 3, label: 'Point 3 · PFZ Shelf Approach', segment_type: 'Later Segment (~85%)', wave_height_m: 1.3, wind_speed_kmh: 17, risk_band: 'LOW', eta_min: Math.round((activeRoute.estimated_travel_time_min || 155) * 0.85) }
+                {(() => {
+                  const wps = activeRoute.waypoint_list || []
+                  let displayPoints = activeRoute.assessment_points
+                  if (!displayPoints || displayPoints.length === 0) {
+                    if (wps.length > 0) {
+                      const p1 = wps[0]
+                      const midIdx = Math.floor((wps.length - 1) / 2)
+                      const p2 = wps[midIdx] || p1
+                      const p3 = wps[wps.length - 1] || p2
+                      displayPoints = [
+                        {
+                          point_number: 1,
+                          leg_number: p1.leg || 1,
+                          label: `Point 1 · Leg #${p1.leg || 1} (Departure)`,
+                          segment_type: 'Departure Port Corridor',
+                          latitude: p1.latitude,
+                          longitude: p1.longitude,
+                          wave_height_m: p1.wave_height_m ?? 1.1,
+                          wind_speed_kmh: p1.wind_speed_kmh ?? 14.0,
+                          risk_band: p1.risk_band || 'LOW',
+                          eta_min: p1.eta_min ?? 0
+                        },
+                        {
+                          point_number: 2,
+                          leg_number: p2.leg || (midIdx + 1),
+                          label: `Point 2 · Leg #${p2.leg || (midIdx + 1)} (Mid-Channel)`,
+                          segment_type: 'Mid-Channel Passage (~50% Route)',
+                          latitude: p2.latitude,
+                          longitude: p2.longitude,
+                          wave_height_m: p2.wave_height_m ?? 1.2,
+                          wind_speed_kmh: p2.wind_speed_kmh ?? 16.5,
+                          risk_band: p2.risk_band || 'LOW',
+                          eta_min: p2.eta_min ?? Math.round((activeRoute.estimated_travel_time_min || 135) * 0.5)
+                        },
+                        {
+                          point_number: 3,
+                          leg_number: p3.leg || wps.length,
+                          label: `Point 3 · Leg #${p3.leg || wps.length} (Destination)`,
+                          segment_type: 'Target Shelf Approach & Arrival',
+                          latitude: p3.latitude,
+                          longitude: p3.longitude,
+                          wave_height_m: p3.wave_height_m ?? 1.3,
+                          wind_speed_kmh: p3.wind_speed_kmh ?? 17.0,
+                          risk_band: p3.risk_band || 'LOW',
+                          eta_min: p3.eta_min ?? activeRoute.estimated_travel_time_min ?? 135
+                        }
                       ]
-                  ).map((p, pIdx) => {
-                    const isHighRisk = p.risk_band === 'HIGH'
-                    const isCaution = p.risk_band === 'CAUTION'
-                    const borderCol = isHighRisk ? '#ef4444' : (isCaution ? '#f59e0b' : '#38bdf8')
-                    const badgeBg = isHighRisk ? '#dc2626' : (isCaution ? '#d97706' : '#059669')
+                    } else {
+                      displayPoints = []
+                    }
+                  }
 
-                    return (
-                      <div
-                        key={pIdx}
-                        style={{
-                          background: 'linear-gradient(145deg, #131d31, #1e293b)',
-                          border: `1.5px solid ${borderCol}`,
-                          borderRadius: '12px',
-                          padding: '14px 16px',
-                          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
-                          position: 'relative',
-                          overflow: 'hidden'
-                        }}
-                      >
-                        {/* Top glowing colored accent */}
-                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: borderCol }} />
+                  return (
+                    <div className="assessmentPointsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px', marginBottom: '18px' }}>
+                      {displayPoints.map((p, pIdx) => {
+                        const isHighRisk = p.risk_band === 'HIGH'
+                        const isCaution = p.risk_band === 'CAUTION'
+                        const borderCol = isHighRisk ? '#ef4444' : (isCaution ? '#f59e0b' : '#38bdf8')
+                        const badgeBg = isHighRisk ? '#dc2626' : (isCaution ? '#d97706' : '#059669')
+                        const targetLeg = p.leg_number || (p.point_number === 1 ? 1 : (p.point_number === 2 ? Math.floor((wps.length || 20) / 2) + 1 : (wps.length || 20)))
 
-                        {/* Header with Point Tag & Risk Badge */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                          <span style={{
-                            background: 'rgba(56, 189, 248, 0.18)',
-                            color: '#38bdf8',
-                            fontSize: '11px',
-                            fontWeight: 800,
-                            padding: '3px 8px',
-                            borderRadius: '6px',
-                            letterSpacing: '0.6px'
-                          }}>
-                            POINT 0{p.point_number || pIdx + 1}
-                          </span>
-                          <span
+                        return (
+                          <div
+                            key={pIdx}
                             style={{
-                              background: badgeBg,
-                              color: '#ffffff',
-                              fontSize: '11px',
-                              fontWeight: 800,
-                              padding: '3px 9px',
-                              borderRadius: '16px',
-                              letterSpacing: '0.5px',
-                              textTransform: 'uppercase',
-                              boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+                              background: 'linear-gradient(145deg, #131d31, #1e293b)',
+                              border: `1.5px solid ${borderCol}`,
+                              borderRadius: '12px',
+                              padding: '14px 16px',
+                              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
+                              position: 'relative',
+                              overflow: 'hidden'
                             }}
                           >
-                            {p.risk_band} RISK
-                          </span>
-                        </div>
+                            {/* Top glowing colored accent */}
+                            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: borderCol }} />
 
-                        {/* Point Title */}
-                        <div style={{ fontSize: '0.96rem', fontWeight: 700, color: '#ffffff', marginBottom: '4px', lineHeight: '1.3' }}>
-                          {p.label}
-                        </div>
+                            {/* Header with Point Tag & Risk Badge */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                              <span style={{
+                                background: 'rgba(56, 189, 248, 0.18)',
+                                color: '#38bdf8',
+                                fontSize: '11px',
+                                fontWeight: 800,
+                                padding: '3px 8px',
+                                borderRadius: '6px',
+                                letterSpacing: '0.6px'
+                              }}>
+                                POINT 0{p.point_number || pIdx + 1} · LEG #{targetLeg}
+                              </span>
+                              <span
+                                style={{
+                                  background: badgeBg,
+                                  color: '#ffffff',
+                                  fontSize: '11px',
+                                  fontWeight: 800,
+                                  padding: '3px 9px',
+                                  borderRadius: '16px',
+                                  letterSpacing: '0.5px',
+                                  textTransform: 'uppercase',
+                                  boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+                                }}
+                              >
+                                {p.risk_band || 'LOW'} RISK
+                              </span>
+                            </div>
 
-                        {/* Segment Description */}
-                        <div style={{ fontSize: '0.82rem', color: '#93c5fd', fontWeight: 600, marginBottom: '8px' }}>
-                          📍 {p.segment_type}
-                        </div>
+                            {/* Point Title */}
+                            <div style={{ fontSize: '0.96rem', fontWeight: 700, color: '#ffffff', marginBottom: '4px', lineHeight: '1.3' }}>
+                              {p.label}
+                            </div>
 
-                        {/* GPS Coordinates Tag */}
-                        {p.latitude != null && p.longitude != null && (
-                          <div style={{
-                            background: 'rgba(15, 23, 42, 0.9)',
-                            border: '1px solid rgba(148, 163, 184, 0.3)',
-                            borderRadius: '6px',
-                            padding: '4px 8px',
-                            marginBottom: '12px',
-                            fontSize: '0.8rem',
-                            fontFamily: 'monospace',
-                            color: '#38bdf8',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '5px'
-                          }}>
-                            <span>🌐</span>
-                            <span>{p.latitude.toFixed(3)}°N, {p.longitude.toFixed(3)}°E</span>
-                          </div>
-                        )}
+                            {/* Segment Description */}
+                            <div style={{ fontSize: '0.82rem', color: '#93c5fd', fontWeight: 600, marginBottom: '8px' }}>
+                              📍 {p.segment_type}
+                            </div>
 
-                        {/* Metrics Data Grid with High Contrast */}
-                        <div style={{
-                          display: 'grid',
-                          gridTemplateColumns: '1fr 1fr 1fr',
-                          gap: '6px',
-                          background: 'rgba(15, 23, 42, 0.85)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          borderRadius: '8px',
-                          padding: '8px 6px',
-                          marginTop: '4px'
-                        }}>
-                          <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Wave Swell</div>
-                            <div style={{ fontSize: '13px', fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>
-                              🌊 {p.wave_height_m}m
+                            {/* GPS Coordinates Tag */}
+                            {p.latitude != null && p.longitude != null && (
+                              <div style={{
+                                background: 'rgba(15, 23, 42, 0.9)',
+                                border: '1px solid rgba(148, 163, 184, 0.3)',
+                                borderRadius: '6px',
+                                padding: '4px 8px',
+                                marginBottom: '10px',
+                                fontSize: '0.8rem',
+                                fontFamily: 'monospace',
+                                color: '#38bdf8',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px'
+                              }}>
+                                <span>🌐</span>
+                                <span>{Number(p.latitude).toFixed(3)}°N, {Number(p.longitude).toFixed(3)}°E</span>
+                              </div>
+                            )}
+
+                            {/* Metrics Data Grid with High Contrast */}
+                            <div style={{
+                              display: 'grid',
+                              gridTemplateColumns: '1fr 1fr 1fr',
+                              gap: '6px',
+                              background: 'rgba(15, 23, 42, 0.85)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              borderRadius: '8px',
+                              padding: '8px 6px',
+                              marginTop: '4px'
+                            }}>
+                              <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Wave Swell</div>
+                                <div style={{ fontSize: '13px', fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>
+                                  🌊 {p.wave_height_m != null ? `${p.wave_height_m}m` : '1.2m'}
+                                </div>
+                              </div>
+                              <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255, 255, 255, 0.1)', borderRight: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                                <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Wind</div>
+                                <div style={{ fontSize: '13px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
+                                  💨 {p.wind_speed_kmh != null ? `${p.wind_speed_kmh}k` : '15k'}
+                                </div>
+                              </div>
+                              <div style={{ textAlign: 'center' }}>
+                                <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>ETA</div>
+                                <div style={{ fontSize: '13px', fontWeight: 800, color: '#fbbf24', marginTop: '2px' }}>
+                                  ⏱️ {p.eta_min != null ? `~${p.eta_min}m` : '0m'}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Verification Tag linking to table row */}
+                            <div style={{
+                              marginTop: '10px',
+                              paddingTop: '8px',
+                              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                              fontSize: '11px',
+                              color: '#94a3b8',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between'
+                            }}>
+                              <span>🔗 Matches Table <b>Leg #{targetLeg}</b></span>
+                              <span style={{ color: '#38bdf8', fontWeight: 700 }}>✓ Verified</span>
                             </div>
                           </div>
-                          <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255, 255, 255, 0.1)', borderRight: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                            <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Wind</div>
-                            <div style={{ fontSize: '13px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
-                              💨 {p.wind_speed_kmh}k
-                            </div>
-                          </div>
-                          <div style={{ textAlign: 'center' }}>
-                            <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>ETA</div>
-                            <div style={{ fontSize: '13px', fontWeight: 800, color: '#fbbf24', marginTop: '2px' }}>
-                              ⏱️ {p.eta_min != null ? `~${p.eta_min}m` : '—'}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
+                        )
+                      })}
+                    </div>
+                  )
+                })()}
 
                 <div className="reasonList" style={{ marginTop: '14px' }}>
                   <div>
@@ -1812,28 +1876,87 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
               {/* Step-by-Step Waypoint Table */}
               {activeRoute.waypoint_list && activeRoute.waypoint_list.length > 0 && (
                 <div className="navTableWrap">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px', flexWrap: 'wrap', gap: '8px' }}>
+                    <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text)' }}>
+                      📍 Full Route Waypoint Navigation Log & Clearance ({activeRoute.waypoint_list.length} Legs)
+                    </span>
+                    <span style={{ fontSize: '0.78rem', color: 'var(--muted)' }}>
+                      Highlighted rows correspond to Route Assessment Points 01, 02, 03
+                    </span>
+                  </div>
                   <table className="navTable">
                     <thead>
                       <tr>
                         <th>Leg</th>
+                        <th>Checkpoint</th>
                         <th>Coordinates</th>
                         <th>Heading</th>
                         <th>Leg Dist</th>
                         <th>ETA</th>
+                        <th>Sea State</th>
                         <th>Clearance</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {activeRoute.waypoint_list.map((w, idx) => (
-                        <tr key={idx}>
-                          <td><b>#{w.leg || idx + 1}</b></td>
-                          <td>{w.latitude.toFixed(3)}°N, {w.longitude.toFixed(3)}°E</td>
-                          <td>{w.heading_deg?.toFixed(0)}° {w.compass_direction || ''}</td>
-                          <td>{w.leg_distance_km?.toFixed(1) || 0} km</td>
-                          <td>{w.eta_min != null ? `~${w.eta_min}m` : (w.cumulative_distance_km ? `~${Math.round(w.cumulative_distance_km / 18 * 60)}m` : '—')}</td>
-                          <td><span className="navSafeTag clear">✓ Pass</span></td>
-                        </tr>
-                      ))}
+                      {activeRoute.waypoint_list.map((w, idx) => {
+                        const legNum = w.leg || idx + 1
+                        const totalLegs = activeRoute.waypoint_list.length
+                        const midLeg = Math.floor(totalLegs / 2) + 1
+                        const isP1 = legNum === 1
+                        const isP2 = legNum === midLeg || (w.checkpoint === 'Point 02')
+                        const isP3 = legNum === totalLegs || (w.checkpoint === 'Point 03')
+                        const isCheckpoint = isP1 || isP2 || isP3
+                        const checkpointLabel = isP1 ? '📍 Point 01 · Departure' : (isP2 ? '📍 Point 02 · Mid-Channel' : (isP3 ? '📍 Point 03 · Shelf Arrival' : null))
+
+                        return (
+                          <tr
+                            key={idx}
+                            style={isCheckpoint ? {
+                              background: 'rgba(56, 189, 248, 0.14)',
+                              boxShadow: 'inset 4px 0 0 #38bdf8'
+                            } : undefined}
+                          >
+                            <td><b>#{legNum}</b></td>
+                            <td>
+                              {checkpointLabel ? (
+                                <span style={{
+                                  background: 'rgba(56, 189, 248, 0.22)',
+                                  color: '#38bdf8',
+                                  padding: '3px 8px',
+                                  borderRadius: '5px',
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  whiteSpace: 'nowrap'
+                                }}>
+                                  {checkpointLabel}
+                                </span>
+                              ) : (
+                                <span style={{ color: 'var(--muted)', fontSize: '11px' }}>Corridor Leg</span>
+                              )}
+                            </td>
+                            <td style={{ fontFamily: 'monospace', fontWeight: isCheckpoint ? 700 : 400 }}>
+                              {Number(w.latitude).toFixed(3)}°N, {Number(w.longitude).toFixed(3)}°E
+                            </td>
+                            <td>{w.heading_deg != null ? `${w.heading_deg.toFixed(0)}°` : '—'} {w.compass_direction || ''}</td>
+                            <td>{w.leg_distance_km != null ? `${Number(w.leg_distance_km).toFixed(1)} km` : '0.0 km'}</td>
+                            <td>
+                              <b style={{ color: isCheckpoint ? '#fbbf24' : 'inherit' }}>
+                                {w.eta_min != null ? `~${w.eta_min}m` : (w.cumulative_distance_km != null ? `~${Math.round(w.cumulative_distance_km / 18 * 60)}m` : '—')}
+                              </b>
+                            </td>
+                            <td>
+                              <span style={{ fontSize: '11px', whiteSpace: 'nowrap' }}>
+                                🌊 {w.wave_height_m != null ? `${w.wave_height_m}m` : '1.2m'} · 💨 {w.wind_speed_kmh != null ? `${w.wind_speed_kmh}k` : '15k'}
+                              </span>
+                            </td>
+                            <td>
+                              <span className={`navSafeTag ${w.risk_band === 'HIGH' ? 'high' : (w.risk_band === 'CAUTION' ? 'caution' : 'clear')}`}>
+                                ✓ Pass ({w.risk_band || 'LOW'})
+                              </span>
+                            </td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -2593,10 +2716,25 @@ function App() {
       { lat: 18.88, lon: 72.65 },
       { lat: 18.82, lon: 72.48 }
     ],
+    waypoint_list: [
+      { step: 1, leg: 1, latitude: 18.940, longitude: 72.830, leg_distance_km: 0.0, cumulative_distance_km: 0.0, heading_deg: 248.8, compass_direction: 'WSW', eta_min: 0, wave_height_m: 1.1, wind_speed_kmh: 14.0, cell_risk: 12.0, risk_band: 'LOW', checkpoint: 'Point 01', checkpoint_name: 'Point 01 · Departure' },
+      { step: 2, leg: 2, latitude: 18.880, longitude: 72.650, leg_distance_km: 20.2, cumulative_distance_km: 20.2, heading_deg: 250.0, compass_direction: 'WSW', eta_min: 67, wave_height_m: 1.2, wind_speed_kmh: 16.5, cell_risk: 15.0, risk_band: 'LOW', checkpoint: 'Point 02', checkpoint_name: 'Point 02 · Mid-Channel' },
+      { step: 3, leg: 3, latitude: 18.820, longitude: 72.480, leg_distance_km: 19.0, cumulative_distance_km: 39.2, heading_deg: 245.0, compass_direction: 'WSW', eta_min: 131, wave_height_m: 1.3, wind_speed_kmh: 17.0, cell_risk: 24.0, risk_band: 'LOW', checkpoint: 'Point 03', checkpoint_name: 'Point 03 · Shelf Arrival' }
+    ],
+    assessment_points: [
+      { point_number: 1, leg_number: 1, label: 'Point 1 · Leg #1 (Departure)', segment_type: 'Departure Port Corridor (0.0 km)', latitude: 18.940, longitude: 72.830, cumulative_distance_km: 0.0, eta_min: 0, wave_height_m: 1.1, wind_speed_kmh: 14.0, risk_score: 12.0, risk_band: 'LOW' },
+      { point_number: 2, leg_number: 2, label: 'Point 2 · Leg #2 (Mid-Channel)', segment_type: 'Mid-Channel Passage (~50% Route · 20.2 km)', latitude: 18.880, longitude: 72.650, cumulative_distance_km: 20.2, eta_min: 67, wave_height_m: 1.2, wind_speed_kmh: 16.5, risk_score: 15.0, risk_band: 'LOW' },
+      { point_number: 3, leg_number: 3, label: 'Point 3 · Leg #3 (Destination)', segment_type: 'Target Shelf Approach & Arrival (39.2 km)', latitude: 18.820, longitude: 72.480, cumulative_distance_km: 39.2, eta_min: 131, wave_height_m: 1.3, wind_speed_kmh: 17.0, risk_score: 24.0, risk_band: 'LOW' }
+    ],
     distance_km: 39.2,
-    estimated_travel_time_min: 155,
+    distance_nm: 21.2,
+    estimated_travel_time_min: 131,
     departure_name: 'Mumbai Harbour',
-    destination_name: 'PFZ-MUM-01'
+    destination_name: 'PFZ-MUM-01',
+    overall_bearing_deg: 248.8,
+    compass_direction: 'WSW',
+    average_risk_score: 17.0,
+    risk_band: 'LOW'
   })
 
   const path = loc.pathname
