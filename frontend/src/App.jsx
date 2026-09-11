@@ -24,7 +24,9 @@ import {
   getConversationMessages,
   saveChatMessage,
   getPortContext,
-  getFishingMultiDay
+  getFishingMultiDay,
+  deleteConversation,
+  clearConversationMessages
 } from './services/api'
 import { onAuthStateChange, signOutUser, getSession } from './services/supabaseClient'
 import AuthModal from './components/AuthModal'
@@ -1344,36 +1346,6 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
               </div>
             ))}
           </div>
-
-          {/* Overall Assessment & Warnings */}
-          <div className={`tripOverallCard ${overallTripRisk === 'HIGH RISK' ? 'highRisk' : ''}`}>
-            <h4>📋 Overall Voyage Assessment</h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', margin: '10px 0 14px 0' }}>
-              <div style={{ background: 'rgba(56, 189, 248, 0.1)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(56, 189, 248, 0.25)' }}>
-                <span style={{ fontSize: '11px', color: '#38bdf8', textTransform: 'uppercase', fontWeight: 800 }}>🌟 Best Voyage Day</span>
-                <div style={{ fontWeight: 700, fontSize: '14px', marginTop: '2px' }}>
-                  {multiDayForecast?.best_day || (tripDays.reduce((prev, curr) => (curr.suitScore > prev.suitScore ? curr : prev), tripDays[0])?.dateStr)}
-                </div>
-              </div>
-              <div style={{ background: 'rgba(255, 107, 107, 0.1)', padding: '10px 14px', borderRadius: '8px', border: '1px solid rgba(255, 107, 107, 0.25)' }}>
-                <span style={{ fontSize: '11px', color: '#ff6b6b', textTransform: 'uppercase', fontWeight: 800 }}>⚠️ Most Difficult Day</span>
-                <div style={{ fontWeight: 700, fontSize: '14px', marginTop: '2px' }}>
-                  {multiDayForecast?.challenging_day || (tripDays.reduce((prev, curr) => (curr.suitScore < prev.suitScore ? curr : prev), tripDays[0])?.dateStr)}
-                </div>
-              </div>
-            </div>
-
-            <p style={{ lineHeight: '1.5', margin: '8px 0' }}>
-              {multiDayForecast?.trip_summary || (
-                `Your ${stayDuration}-day voyage to ${selectedZone.name} is ${overallTripRisk === 'HIGH RISK' ? 'unfavourable due to elevated swell or squalls' : (overallTripRisk === 'CAUTION' ? 'moderately operable with caution advised' : 'generally favourable for fishing')}. Departure scheduled on ${departureDate} at ${departureTime}.`
-              )}
-            </p>
-            {highRiskPeriod && (
-              <div className="tripHighRiskWarning">
-                ⚠️ High-Risk Warning on Day {highRiskPeriod.dayNum} ({highRiskPeriod.dateStr}): Wave swell reaches {highRiskPeriod.wave} m with {highRiskPeriod.wind} km/h winds and {highRiskPeriod.rainMm} mm rain. Advise harbor return or sheltered anchoring before afternoon.
-              </div>
-            )}
-          </div>
         </Card>
       </div>
 
@@ -1666,10 +1638,23 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                 </div>
 
                 {/* Route Assessment Points 1, 2, 3 derived from Route Geometry */}
-                <h4 style={{ margin: '16px 0 8px 0', fontSize: '0.9rem', color: 'var(--text-main)' }}>
-                  📍 Route Assessment Points (Geometry-Derived)
-                </h4>
-                <div className="assessmentPointsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px', marginBottom: '14px' }}>
+                <div style={{ margin: '22px 0 14px 0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <h4 style={{ margin: 0, fontSize: '1rem', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800 }}>
+                      <span style={{ fontSize: '1.25rem' }}>📍</span>
+                      <span>Route Assessment Points</span>
+                      <span style={{ fontSize: '11px', background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', padding: '3px 8px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.4)', fontWeight: 700 }}>
+                        Geometry-Derived
+                      </span>
+                    </h4>
+                    <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 500 }}>Real-time sea state along passage</span>
+                  </div>
+                  <p style={{ margin: '0 0 12px 0', fontSize: '12.5px', color: '#cbd5e1' }}>
+                    Navigational assessment at early departure corridor, mid-channel passage, and target shelf approach.
+                  </p>
+                </div>
+
+                <div className="assessmentPointsGrid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px', marginBottom: '18px' }}>
                   {(activeRoute.assessment_points && activeRoute.assessment_points.length > 0
                     ? activeRoute.assessment_points
                     : [
@@ -1677,27 +1662,121 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                         { point_number: 2, label: 'Point 2 · Mid-Channel Passage', segment_type: 'Middle Segment (~50%)', wave_height_m: 1.2, wind_speed_kmh: 16, risk_band: 'LOW', eta_min: Math.round((activeRoute.estimated_travel_time_min || 155) * 0.50) },
                         { point_number: 3, label: 'Point 3 · PFZ Shelf Approach', segment_type: 'Later Segment (~85%)', wave_height_m: 1.3, wind_speed_kmh: 17, risk_band: 'LOW', eta_min: Math.round((activeRoute.estimated_travel_time_min || 155) * 0.85) }
                       ]
-                  ).map((p, pIdx) => (
-                    <div key={pIdx} style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(56,189,248,0.25)', borderRadius: '10px', padding: '10px 12px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <b style={{ fontSize: '0.85rem' }}>{p.label}</b>
-                        <span className={`statusPill ${p.risk_band === 'HIGH' ? 'danger' : (p.risk_band === 'CAUTION' ? 'caution' : 'active')}`} style={{ fontSize: '9px', padding: '2px 6px' }}>
-                          {p.risk_band}
-                        </span>
+                  ).map((p, pIdx) => {
+                    const isHighRisk = p.risk_band === 'HIGH'
+                    const isCaution = p.risk_band === 'CAUTION'
+                    const borderCol = isHighRisk ? '#ef4444' : (isCaution ? '#f59e0b' : '#38bdf8')
+                    const badgeBg = isHighRisk ? '#dc2626' : (isCaution ? '#d97706' : '#059669')
+
+                    return (
+                      <div
+                        key={pIdx}
+                        style={{
+                          background: 'linear-gradient(145deg, #131d31, #1e293b)',
+                          border: `1.5px solid ${borderCol}`,
+                          borderRadius: '12px',
+                          padding: '14px 16px',
+                          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
+                          position: 'relative',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {/* Top glowing colored accent */}
+                        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: borderCol }} />
+
+                        {/* Header with Point Tag & Risk Badge */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                          <span style={{
+                            background: 'rgba(56, 189, 248, 0.18)',
+                            color: '#38bdf8',
+                            fontSize: '11px',
+                            fontWeight: 800,
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            letterSpacing: '0.6px'
+                          }}>
+                            POINT 0{p.point_number || pIdx + 1}
+                          </span>
+                          <span
+                            style={{
+                              background: badgeBg,
+                              color: '#ffffff',
+                              fontSize: '11px',
+                              fontWeight: 800,
+                              padding: '3px 9px',
+                              borderRadius: '16px',
+                              letterSpacing: '0.5px',
+                              textTransform: 'uppercase',
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+                            }}
+                          >
+                            {p.risk_band} RISK
+                          </span>
+                        </div>
+
+                        {/* Point Title */}
+                        <div style={{ fontSize: '0.96rem', fontWeight: 700, color: '#ffffff', marginBottom: '4px', lineHeight: '1.3' }}>
+                          {p.label}
+                        </div>
+
+                        {/* Segment Description */}
+                        <div style={{ fontSize: '0.82rem', color: '#93c5fd', fontWeight: 600, marginBottom: '8px' }}>
+                          📍 {p.segment_type}
+                        </div>
+
+                        {/* GPS Coordinates Tag */}
+                        {p.latitude != null && p.longitude != null && (
+                          <div style={{
+                            background: 'rgba(15, 23, 42, 0.9)',
+                            border: '1px solid rgba(148, 163, 184, 0.3)',
+                            borderRadius: '6px',
+                            padding: '4px 8px',
+                            marginBottom: '12px',
+                            fontSize: '0.8rem',
+                            fontFamily: 'monospace',
+                            color: '#38bdf8',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px'
+                          }}>
+                            <span>🌐</span>
+                            <span>{p.latitude.toFixed(3)}°N, {p.longitude.toFixed(3)}°E</span>
+                          </div>
+                        )}
+
+                        {/* Metrics Data Grid with High Contrast */}
+                        <div style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr 1fr',
+                          gap: '6px',
+                          background: 'rgba(15, 23, 42, 0.85)',
+                          border: '1px solid rgba(255, 255, 255, 0.1)',
+                          borderRadius: '8px',
+                          padding: '8px 6px',
+                          marginTop: '4px'
+                        }}>
+                          <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Wave Swell</div>
+                            <div style={{ fontSize: '13px', fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>
+                              🌊 {p.wave_height_m}m
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255, 255, 255, 0.1)', borderRight: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                            <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Wind</div>
+                            <div style={{ fontSize: '13px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
+                              💨 {p.wind_speed_kmh}k
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'center' }}>
+                            <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>ETA</div>
+                            <div style={{ fontSize: '13px', fontWeight: 800, color: '#fbbf24', marginTop: '2px' }}>
+                              ⏱️ {p.eta_min != null ? `~${p.eta_min}m` : '—'}
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: 'var(--muted)' }}>{p.segment_type}</p>
-                      {p.latitude != null && p.longitude != null && (
-                        <p style={{ margin: '0 0 4px 0', fontSize: '0.72rem', fontFamily: 'monospace' }}>
-                          📍 {p.latitude.toFixed(3)}°N, {p.longitude.toFixed(3)}°E
-                        </p>
-                      )}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '4px' }}>
-                        <span>🌊 {p.wave_height_m}m</span>
-                        <span>💨 {p.wind_speed_kmh} km/h</span>
-                        <span>⏱️ {p.eta_min != null ? `~${p.eta_min}m` : 'ETA unavail'}</span>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
 
                 <div className="reasonList" style={{ marginTop: '14px' }}>
@@ -1870,6 +1949,8 @@ function Assistant({
   userInitial = 'C',
   onSelectConversation,
   onNewConversation,
+  onDeleteConversation,
+  onClearChat,
   onSendMessage
 }) {
   const t = k => tr(lang, k)
@@ -1932,6 +2013,8 @@ function Assistant({
     onSendMessage(act)
   }
 
+  const activeConv = conversations.find(c => c.id === activeConvId)
+
   return (
     <div className="assistant">
       <div className="assistantIntro">
@@ -1941,7 +2024,7 @@ function Assistant({
       </div>
 
       <div className="assistantLayout">
-        {/* Previous Chats / History Drawer (Requirement 7) */}
+        {/* Previous Chats / History Drawer */}
         <aside className="chatHistorySidebar">
           <div className="chatHistoryHead">
             <h3>💬 {t('previousChats')}</h3>
@@ -1952,15 +2035,52 @@ function Assistant({
           <div className="chatHistoryList">
             {conversations && conversations.length > 0 ? (
               conversations.map(c => (
-                <button
+                <div
                   key={c.id}
                   className={'historyItem ' + (c.id === activeConvId ? 'active' : '')}
                   onClick={() => onSelectConversation(c.id)}
                   title={c.title}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '8px 10px',
+                    cursor: 'pointer',
+                    borderRadius: '8px',
+                    gap: '6px'
+                  }}
                 >
-                  <span>💬</span>
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.title}</span>
-                </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', flex: 1, minWidth: 0 }}>
+                    <span style={{ flexShrink: 0 }}>💬</span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '13px' }}>{c.title}</span>
+                  </div>
+                  {onDeleteConversation && (
+                    <button
+                      onClick={(e) => onDeleteConversation(c.id, e)}
+                      title={lang === 'mr' ? 'हा चॅट हटवा' : (lang === 'hi' ? 'यह चैट हटाएं' : 'Delete this conversation')}
+                      className="deleteConvBtn"
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#94a3b8',
+                        cursor: 'pointer',
+                        padding: '4px 6px',
+                        borderRadius: '4px',
+                        fontSize: '13px',
+                        lineHeight: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        opacity: 0.7,
+                        flexShrink: 0
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.opacity = '1'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.opacity = '0.7'; }}
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
               ))
             ) : (
               <div className="emptyHistoryNotice">{t('noChatsYet')}</div>
@@ -1970,6 +2090,83 @@ function Assistant({
 
         {/* Chat Stream & Composer */}
         <div className="chat">
+          {/* Active Chat Header Bar with Clear Messages & Delete Chat Buttons */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '10px 16px',
+            borderBottom: '1px solid var(--line, rgba(255, 255, 255, 0.08))',
+            background: 'var(--surface2, rgba(15, 23, 42, 0.5))',
+            borderRadius: '16px 16px 0 0'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', minWidth: 0 }}>
+              <span style={{ fontSize: '15px', flexShrink: 0 }}>💬</span>
+              <span style={{
+                fontWeight: 700,
+                fontSize: '13.5px',
+                color: 'var(--text-main, #f8fafc)',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
+                {activeConv?.title || (lang === 'mr' ? 'सक्रिय सागरी चर्चा' : (lang === 'hi' ? 'सक्रिय समुद्री चैट' : 'Current Marine Intelligence Chat'))}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+              {onClearChat && (
+                <button
+                  onClick={onClearChat}
+                  title={lang === 'mr' ? 'या चॅटमधील सर्व संदेश साफ करा' : (lang === 'hi' ? 'वर्तमान चैट के सभी संदेश साफ करें' : 'Clear all messages in current chat')}
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.12)',
+                    border: '1px solid rgba(239, 68, 68, 0.3)',
+                    color: '#f87171',
+                    borderRadius: '6px',
+                    padding: '5px 10px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.25)' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.12)' }}
+                >
+                  <span>🗑️</span>
+                  <span>{lang === 'mr' ? 'मेसेज साफ करा' : (lang === 'hi' ? 'संदेश साफ करें' : 'Clear Messages')}</span>
+                </button>
+              )}
+              {activeConvId && onDeleteConversation && (
+                <button
+                  onClick={(e) => onDeleteConversation(activeConvId, e)}
+                  title={lang === 'mr' ? 'हा संपूर्ण चॅट हटवा' : (lang === 'hi' ? 'यह पूरा चैट सत्र हटाएं' : 'Delete this entire conversation')}
+                  style={{
+                    background: 'rgba(148, 163, 184, 0.12)',
+                    border: '1px solid rgba(148, 163, 184, 0.25)',
+                    color: '#cbd5e1',
+                    borderRadius: '6px',
+                    padding: '5px 10px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'; e.currentTarget.style.color = '#ef4444' }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(148, 163, 184, 0.12)'; e.currentTarget.style.color = '#cbd5e1' }}
+                >
+                  <span>❌</span>
+                  <span>{lang === 'mr' ? 'चॅट हटवा' : (lang === 'hi' ? 'चैट हटाएं' : 'Delete Chat')}</span>
+                </button>
+              )}
+            </div>
+          </div>
+
           <div className="messages">
             {messages.map((m, i) => {
               const role = m.role || m.sender || 'orca'
@@ -2498,6 +2695,51 @@ function App() {
     }
   }
 
+  const handleDeleteConversation = async (convId, e) => {
+    if (e && e.stopPropagation) e.stopPropagation()
+    if (!convId) return
+    const isCurrent = convId === activeConvId
+    const confirmed = window.confirm(
+      lang === 'mr' ? 'तुम्हाला ही चर्चा हटवायची आहे का?' : (lang === 'hi' ? 'क्या आप इस चैट सत्र को हटाना चाहते हैं?' : 'Are you sure you want to delete this conversation?')
+    )
+    if (!confirmed) return
+
+    try {
+      await deleteConversation(activeUserId, convId)
+      const remaining = conversations.filter(c => c.id !== convId)
+      setConversations(remaining)
+
+      if (isCurrent) {
+        if (remaining.length > 0) {
+          handleSelectConversation(remaining[0].id)
+        } else {
+          // If no conversations left, create a fresh one
+          handleNewConversation()
+        }
+      }
+    } catch (err) {
+      console.error('Failed to delete conversation:', err)
+    }
+  }
+
+  const handleClearChat = async () => {
+    const confirmed = window.confirm(
+      lang === 'mr' ? 'वर्तमान चर्चेतील सर्व संदेश साफ करायचे आहेत का?' : (lang === 'hi' ? 'क्या आप इस चैट के सभी संदेश साफ करना चाहते हैं?' : 'Clear all messages in the current conversation?')
+    )
+    if (!confirmed) return
+
+    try {
+      if (activeConvId) {
+        await clearConversationMessages(activeConvId)
+      }
+      const initialText = getInitialAnswer(lang, userLocation)
+      const initTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: initialText, time: initTime }])
+    } catch (err) {
+      console.error('Failed to clear chat messages:', err)
+    }
+  }
+
   const handleSendChatMessage = async (textToSend) => {
     if (!textToSend || !textToSend.trim() || chatLoading) return
     const queryText = textToSend.trim()
@@ -2955,6 +3197,8 @@ function App() {
         userInitial={userInitial}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
+        onDeleteConversation={handleDeleteConversation}
+        onClearChat={handleClearChat}
         onSendMessage={handleSendChatMessage}
       />
     )

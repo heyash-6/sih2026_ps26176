@@ -484,6 +484,20 @@ def add_chat_message_endpoint(conv_id: str, req: AddChatMessageRequest):
         "message": txt
     }
 
+@app.delete("/api/conversations/{conv_id}")
+def delete_conversation_endpoint(conv_id: str):
+    """Delete a conversation and all its associated messages."""
+    from app.database.supabase_client import supabase_client
+    success = supabase_client.delete_conversation(conv_id)
+    return {"status": "deleted" if success else "failed", "conversation_id": conv_id}
+
+@app.delete("/api/conversations/{conv_id}/messages")
+def clear_conversation_messages_endpoint(conv_id: str):
+    """Clear all messages in a conversation."""
+    from app.database.supabase_client import supabase_client
+    success = supabase_client.clear_conversation_messages(conv_id)
+    return {"status": "cleared" if success else "failed", "conversation_id": conv_id}
+
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):
     """SPA client-side routing fallback for React Router (/map, /analytics, /assistant, etc.)."""

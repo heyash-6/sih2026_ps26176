@@ -875,4 +875,35 @@ class SupabaseClient:
             logger.warning(f"Supabase insert_chat_message exception: {e}")
         return None
 
+    def clear_conversation_messages(self, conversation_id: str) -> bool:
+        """Delete all messages belonging to a conversation."""
+        if not self._is_configured or not conversation_id:
+            return True
+        try:
+            with httpx.Client(timeout=6.0) as client:
+                res = client.delete(
+                    f"{self.rest_url}/chat_messages?conversation_id=eq.{conversation_id}",
+                    headers=self.headers
+                )
+                return res.status_code in [200, 204]
+        except Exception as e:
+            logger.warning(f"Supabase clear_conversation_messages exception: {e}")
+        return False
+
+    def delete_conversation(self, conversation_id: str) -> bool:
+        """Delete a conversation and its messages."""
+        if not self._is_configured or not conversation_id:
+            return True
+        try:
+            self.clear_conversation_messages(conversation_id)
+            with httpx.Client(timeout=6.0) as client:
+                res = client.delete(
+                    f"{self.rest_url}/conversations?id=eq.{conversation_id}",
+                    headers=self.headers
+                )
+                return res.status_code in [200, 204]
+        except Exception as e:
+            logger.warning(f"Supabase delete_conversation exception: {e}")
+        return False
+
 supabase_client = SupabaseClient()

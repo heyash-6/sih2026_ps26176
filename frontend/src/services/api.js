@@ -461,6 +461,54 @@ export async function saveChatMessage(convId, userIdOrSender, senderOrText, text
   return msgObj;
 }
 
+export async function deleteConversation(userId, convId) {
+  if (!convId) return false;
+  const storageKey = `orca_convs_${userId}`;
+  const msgKey = `orca_msgs_${convId}`;
+
+  // Update local storage
+  try {
+    localStorage.removeItem(msgKey);
+    if (userId) {
+      const cached = localStorage.getItem(storageKey);
+      if (cached) {
+        const convs = JSON.parse(cached);
+        const filtered = convs.filter(c => c.id !== convId);
+        localStorage.setItem(storageKey, JSON.stringify(filtered));
+      }
+    }
+  } catch {}
+
+  // Delete from backend
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/conversations/${encodeURIComponent(convId)}`, {
+      method: 'DELETE'
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn('[ORCA API] deleteConversation network error:', err);
+    return true;
+  }
+}
+
+export async function clearConversationMessages(convId) {
+  if (!convId) return false;
+  const msgKey = `orca_msgs_${convId}`;
+  try {
+    localStorage.removeItem(msgKey);
+  } catch {}
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/conversations/${encodeURIComponent(convId)}/messages`, {
+      method: 'DELETE'
+    });
+    return res.ok;
+  } catch (err) {
+    console.warn('[ORCA API] clearConversationMessages network error:', err);
+    return true;
+  }
+}
+
 /**
  * Port-Specific Dashboard Context, Marine Conditions, Advisories & Active/Inactive PFZs
  */
