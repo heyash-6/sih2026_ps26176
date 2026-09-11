@@ -266,12 +266,12 @@ def get_all_alerts():
 @app.get("/api/analytics")
 def get_analytics(
     period: str = Query("7", description="Time period: '24' for 24h, '7' for 7 days"),
-    port: str = Query("mumbai", description="Port ID for port-specific tide predictions")
+    port: str = Query("mumbai", description="Port ID for port-specific ocean analytics and tides")
 ):
-    """Retrieve ocean observations time-series (SST, Chlorophyll, Waves) and tide predictions."""
+    """Retrieve port-specific ocean observations time-series (SST, Chlorophyll, Waves, Productivity) and tide predictions."""
     from app.database.supabase_client import supabase_client
-    days = 1 if period == "24" else 7
-    data = supabase_client.get_ocean_analytics_timeseries(period_days=days)
+    days = 1 if (period == "24" or period == "24h") else 7
+    data = supabase_client.get_ocean_analytics_timeseries(port_id=port, period_days=days)
     data["tide_information"] = supabase_client.get_tide_predictions(port_id=port)
     return data
 

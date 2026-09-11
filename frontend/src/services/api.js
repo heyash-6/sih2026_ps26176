@@ -159,9 +159,9 @@ export async function evaluateRisk(riskInput) {
 /**
  * Ocean Analytics & Observations Time-Series from Supabase
  */
-export async function getAnalytics(period = '7') {
+export async function getAnalytics(period = '7', port = 'mumbai') {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/analytics?period=${encodeURIComponent(period)}`);
+    const res = await fetch(`${API_BASE_URL}/api/analytics?period=${encodeURIComponent(period)}&port=${encodeURIComponent(port)}`);
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {

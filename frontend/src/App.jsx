@@ -748,11 +748,11 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
   )
 }
 
-function AreaChart({ values, color, fill, labels = [] }) {
+function AreaChart({ values, color, fill, labels = [], emptyMessage = 'Data unavailable for selected period' }) {
   if (!values || !Array.isArray(values) || values.length === 0) {
     return (
-      <div className="areaChart" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '240px', color: 'var(--muted)' }}>
-        <span>Data unavailable for selected period</span>
+      <div className="areaChart" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '240px', color: 'var(--muted)', padding: '16px', textAlign: 'center' }}>
+        <span>{emptyMessage}</span>
       </div>
     )
   }
@@ -797,17 +797,26 @@ function AreaChart({ values, color, fill, labels = [] }) {
   )
 }
 
-function Analytics({ lang, oceanStats, setOceanPeriod, selectedPort = 'mumbai', setSelectedPort, portContext }) {
+function Analytics({
+  lang,
+  oceanStats,
+  oceanPeriod = '7',
+  setOceanPeriod,
+  selectedPort = 'mumbai',
+  setSelectedPort,
+  portContext,
+  oceanLoading = false,
+  oceanError = null
+}) {
   const t = k => tr(lang, k)
-  const [period, setPeriod] = useState('7')
-
-  const temp = oceanStats?.sea_surface_temp?.values || [27.2, 27.5, 27.8, 28.1, 28.4, 28.6, 28.8]
-  const chl = oceanStats?.chlorophyll?.values || [0.44, 0.48, 0.52, 0.56, 0.60, 0.63, 0.66]
-  const waves = oceanStats?.wave_height?.values || [0.72, 0.78, 0.86, 0.82, 0.76, 0.68, 0.74]
-  const wind = oceanStats?.wind_speed?.values || [14, 16, 18, 17, 20, 22, 19]
-  const labels = oceanStats?.labels || ['Day -6', 'Day -5', 'Day -4', 'Day -3', 'Day -2', 'Yesterday', 'Today']
-
   const currentPort = PORTS.find(p => p.id === selectedPort) || PORTS[3]
+
+  const temp = oceanStats?.sea_surface_temp?.values
+  const chl = oceanStats?.chlorophyll?.values
+  const waves = oceanStats?.wave_height?.values
+  const prodVals = oceanStats?.productivity_index?.values
+  const labels = oceanStats?.labels || []
+
   const tideInfo = portContext?.tide_information || oceanStats?.tide_information || {
     port_name: currentPort.name,
     high_tide: { time: '04:12', water_level_m: 3.8, type: 'HIGH TIDE' },
@@ -821,9 +830,21 @@ function Analytics({ lang, oceanStats, setOceanPeriod, selectedPort = 'mumbai', 
   }
 
   const handlePeriodChange = (val) => {
-    setPeriod(val)
     if (setOceanPeriod) setOceanPeriod(val)
   }
+
+  const lastUpdatedText = useMemo(() => {
+    if (!oceanStats?.last_updated) return null
+    try {
+      const dt = new Date(oceanStats.last_updated)
+      if (isNaN(dt.getTime())) return oceanStats.last_updated.slice(0, 16).replace('T', ' ')
+      return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' (' + dt.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ')'
+    } catch {
+      return oceanStats.last_updated.slice(0, 16).replace('T', ' ')
+    }
+  }, [oceanStats?.last_updated])
+
+  const rangeLabel = (oceanPeriod === '24' || oceanPeriod === '24h') ? '24 Hours' : '7 Days'
 
   return (
     <>
@@ -831,7 +852,7 @@ function Analytics({ lang, oceanStats, setOceanPeriod, selectedPort = 'mumbai', 
         <div>
           <span className="eyebrow">ORCA / {t('analytics')} • {currentPort.name}</span>
           <h2>{t('analytics')}</h2>
-          <p>Real-time satellite SST, Chlorophyll-a front tracking, and Survey of India tidal predictions.</p>
+          <p>Real-time satellite SST, Chlorophyll-a front tracking, Wave height observation, and Survey of India tidal predictions.</p>
         </div>
         <div className="analyticsActions">
           <select 
@@ -844,59 +865,140 @@ function Analytics({ lang, oceanStats, setOceanPeriod, selectedPort = 'mumbai', 
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
           </select>
-          <span className="liveDot">Live Satellite Telemetry</span>
-          <select value={period} onChange={e => handlePeriodChange(e.target.value)}>
+          <span className="liveDot">
+            {lastUpdatedText ? `🛰️ Last Updated: ${lastUpdatedText}` : 'Live Satellite Telemetry'}
+          </span>
+          <select value={oceanPeriod} onChange={e => handlePeriodChange(e.target.value)}>
             <option value="24">{t('hours24')}</option>
             <option value="7">{t('days7')}</option>
           </select>
         </div>
       </div>
 
+      {oceanLoading && (
+        <div style={{
+          background: 'var(--surface-elevated, #162032)',
+          border: '1px solid var(--accent, #339af0)',
+          borderRadius: '12px',
+          padding: '12px 20px',
+          marginBottom: '18px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          color: 'var(--text)'
+        }}>
+          <span className="liveDot" style={{ animation: 'pulse 1.2s infinite' }} />
+          <span>Loading ocean analytics data for <b>{currentPort.name}</b> ({rangeLabel})...</span>
+        </div>
+      )}
+
+      {oceanError && (
+        <div style={{
+          background: 'rgba(255, 107, 107, 0.12)',
+          border: '1px solid #ff6b6b',
+          borderRadius: '12px',
+          padding: '12px 20px',
+          marginBottom: '18px',
+          color: '#ff6b6b',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <span><b>Unable to load ocean analytics data.</b> Please check backend connection.</span>
+          <button className="pillBtn" onClick={() => handlePeriodChange(oceanPeriod)} style={{ fontSize: '11px', padding: '4px 10px' }}>Retry</button>
+        </div>
+      )}
+
       <div className="analyticsKpis">
         <div className="kpiCard kpi-temp">
           <span>SEA SURFACE TEMP</span>
-          <strong>{oceanStats?.sea_surface_temp?.current || temp.at(-1).toFixed(1)}°C</strong>
-          <small>Observed baseline <b>{oceanStats?.sea_surface_temp?.trend_delta || '+0.2°C'}</b></small>
+          <strong>{oceanStats?.sea_surface_temp?.current != null ? `${oceanStats.sea_surface_temp.current}°C` : '—'}</strong>
+          <small>Observed baseline <b>{oceanStats?.sea_surface_temp?.trend_delta || '—'}</b></small>
         </div>
         <div className="kpiCard kpi-green">
           <span>CHLOROPHYLL</span>
-          <strong>{oceanStats?.chlorophyll?.current || chl.at(-1).toFixed(2)} <em>mg/m³</em></strong>
+          <strong>{oceanStats?.chlorophyll?.current != null ? `${oceanStats.chlorophyll.current}` : '—'} <em>mg/m³</em></strong>
           <small>Pelagic condition <b>{oceanStats?.chlorophyll?.status || 'Favourable'}</b></small>
         </div>
         <div className="kpiCard kpi-blue">
           <span>WAVE HEIGHT</span>
-          <strong>{oceanStats?.wave_height?.current || waves.at(-1).toFixed(1)} <em>m</em></strong>
+          <strong>{oceanStats?.wave_height?.current != null ? `${oceanStats.wave_height.current}` : '—'} <em>m</em></strong>
           <small>Sea state <b>{oceanStats?.wave_height?.status || 'Low'}</b></small>
         </div>
         <div className="kpiCard kpi-cyan">
           <span>PRODUCTIVITY INDEX</span>
-          <strong>{oceanStats?.productivity_index || 84} <em>/100</em></strong>
-          <small>Regional ranking <b>Upper quartile</b></small>
+          <strong>{oceanStats?.productivity_index?.current != null ? `${oceanStats.productivity_index.current}` : '—'} <em>/100</em></strong>
+          <small>Pelagic biomass <b>{oceanStats?.productivity_index?.status || 'Favourable Biomass'}</b></small>
         </div>
       </div>
 
       <div className="analyticsGrid">
-        <Card title="Sea Surface Temperature (SST)" action={<span className="chartBadge red">{oceanStats?.sea_surface_temp?.trend_delta || '+0.2°C today'}</span>}>
-          <p className="chartSub">Satellite GHRSST daily variation along {currentPort.name}</p>
-          <AreaChart values={temp} color="temp" fill="#ff6b6b" labels={labels} />
+        <Card title="Sea Surface Temperature (SST)" action={<span className="chartBadge red">{oceanStats?.sea_surface_temp?.trend_delta || '+0.0°C'}</span>}>
+          <p className="chartSub">Satellite GHRSST observation along {currentPort.name} ({rangeLabel})</p>
+          <AreaChart
+            values={temp}
+            color="temp"
+            fill="#ff6b6b"
+            labels={labels}
+            emptyMessage={`SST data is currently unavailable for ${currentPort.name} for the selected period.`}
+          />
           <div className="chartStats">
-            <div><span>Average</span><b>{oceanStats?.sea_surface_temp?.average || '28.1'}°C</b></div>
-            <div><span>Minimum</span><b>{oceanStats?.sea_surface_temp?.min || '26.9'}°C</b></div>
-            <div><span>Maximum</span><b>{oceanStats?.sea_surface_temp?.max || '29.2'}°C</b></div>
+            <div><span>Average</span><b>{oceanStats?.sea_surface_temp?.average != null ? `${oceanStats.sea_surface_temp.average}°C` : '—'}</b></div>
+            <div><span>Minimum</span><b>{oceanStats?.sea_surface_temp?.min != null ? `${oceanStats.sea_surface_temp.min}°C` : '—'}</b></div>
+            <div><span>Maximum</span><b>{oceanStats?.sea_surface_temp?.max != null ? `${oceanStats.sea_surface_temp.max}°C` : '—'}</b></div>
           </div>
         </Card>
 
-        <Card title="Chlorophyll-a Concentration" action={<span className="chartBadge green">{oceanStats?.chlorophyll?.trend_delta || '+6.1% monthly'}</span>}>
-          <p className="chartSub">Satellite ocean colour aggregation along continental shelf break</p>
-          <AreaChart values={chl} color="chl" fill="#20c997" labels={labels} />
+        <Card title="Chlorophyll-a Concentration" action={<span className="chartBadge green">{oceanStats?.chlorophyll?.trend_delta || '+0.0%'}</span>}>
+          <p className="chartSub">Satellite ocean colour aggregation along continental shelf break ({rangeLabel})</p>
+          <AreaChart
+            values={chl}
+            color="chl"
+            fill="#20c997"
+            labels={labels}
+            emptyMessage={`Chlorophyll data is currently unavailable for ${currentPort.name} for the selected period.`}
+          />
           <div className="chartStats">
-            <div><span>Current concentration</span><b>{oceanStats?.chlorophyll?.current || '0.62'} mg/m³</b></div>
+            <div><span>Current concentration</span><b>{oceanStats?.chlorophyll?.current != null ? `${oceanStats.chlorophyll.current} mg/m³` : '—'}</b></div>
             <div><span>Status</span><b>{oceanStats?.chlorophyll?.status || 'Favourable Front'}</b></div>
+            <div><span>Average</span><b>{oceanStats?.chlorophyll?.average != null ? `${oceanStats.chlorophyll.average} mg/m³` : '—'}</b></div>
+          </div>
+        </Card>
+
+        <Card title="Significant Wave Height (SWH)" action={<span className="chartBadge blue">{oceanStats?.wave_height?.trend_delta || '+0.0m'}</span>}>
+          <p className="chartSub">Operational INCOIS WaveWatch III & wave buoy observations along {currentPort.name} ({rangeLabel})</p>
+          <AreaChart
+            values={waves}
+            color="waves"
+            fill="#339af0"
+            labels={labels}
+            emptyMessage={`Wave height data is currently unavailable for ${currentPort.name} for the selected period.`}
+          />
+          <div className="chartStats">
+            <div><span>Current height</span><b>{oceanStats?.wave_height?.current != null ? `${oceanStats.wave_height.current} m` : '—'}</b></div>
+            <div><span>Sea state</span><b>{oceanStats?.wave_height?.status || 'Low'}</b></div>
+            <div><span>Average</span><b>{oceanStats?.wave_height?.average != null ? `${oceanStats.wave_height.average} m` : '—'}</b></div>
+          </div>
+        </Card>
+
+        <Card title="Marine Productivity Index" action={<span className="chartBadge cyan">{oceanStats?.productivity_index?.status || 'Favourable Biomass'}</span>}>
+          <p className="chartSub">Dynamic pelagic suitability derived from port SST thermal stability, chlorophyll, and upwelling ({rangeLabel})</p>
+          <AreaChart
+            values={prodVals}
+            color="prod"
+            fill="#15aabf"
+            labels={labels}
+            emptyMessage={`Productivity index data is currently unavailable for ${currentPort.name} for the selected period.`}
+          />
+          <div className="chartStats">
+            <div><span>Current score</span><b>{oceanStats?.productivity_index?.current != null ? `${oceanStats.productivity_index.current} /100` : '—'}</b></div>
+            <div><span>Peak score</span><b>{oceanStats?.productivity_index?.max != null ? `${oceanStats.productivity_index.max} /100` : '—'}</b></div>
+            <div><span>Mean index</span><b>{oceanStats?.productivity_index?.average != null ? `${oceanStats.productivity_index.average} /100` : '—'}</b></div>
           </div>
         </Card>
       </div>
 
-      {/* 3. TIDE INFORMATION (Location-Aware from Database Prediction) */}
+      {/* 5. TIDE INFORMATION (Location-Aware from Database Prediction) */}
       <div className="tideSection">
         <Card 
           title="Tide Information" 
@@ -932,7 +1034,7 @@ function Analytics({ lang, oceanStats, setOceanPeriod, selectedPort = 'mumbai', 
               {tideInfo.events.map((ev, idx) => (
                 <div key={idx} className="tideEventItem">
                   <span className={`tag ${ev.type === 'HIGH TIDE' ? 'high' : 'low'}`}>{ev.type}</span>
-                  <span><b>{ev.time}</b> ({ev.date || '11 Sep 2026'})</span>
+                  <span><b>{ev.time}</b> ({ev.date || 'Today'})</span>
                   <span>Water Level: <b>{ev.water_level_m} m</b></span>
                 </div>
               ))}
@@ -2049,6 +2151,9 @@ function App() {
   const [alertList, setAlertList] = useState(staticAlerts)
   const [oceanStats, setOceanStats] = useState(null)
   const [oceanPeriod, setOceanPeriod] = useState('7')
+  const [oceanLoading, setOceanLoading] = useState(false)
+  const [oceanError, setOceanError] = useState(null)
+  const oceanReqRef = useRef(0)
 
   // Location Intelligence State (Version 3)
   const [userLocation, setUserLocation] = useState(null)
@@ -2449,6 +2554,32 @@ function App() {
     })
   }
 
+  const loadOceanStats = async (port, period) => {
+    oceanReqRef.current += 1
+    const reqId = oceanReqRef.current
+    setOceanLoading(true)
+    setOceanError(null)
+    try {
+      const res = await getAnalytics(period, port)
+      if (reqId !== oceanReqRef.current) return
+      if (res && res.sea_surface_temp) {
+        setOceanStats(res)
+        setOceanError(null)
+      } else {
+        setOceanError('Unable to load ocean analytics data.')
+      }
+    } catch (err) {
+      if (reqId === oceanReqRef.current) {
+        console.error('Ocean analytics error:', err)
+        setOceanError('Unable to load ocean analytics data.')
+      }
+    } finally {
+      if (reqId === oceanReqRef.current) {
+        setOceanLoading(false)
+      }
+    }
+  }
+
   // Fetch live Alerts, Analytics, and PFZ from backend/Supabase
   useEffect(() => {
     getAllAlerts().then(res => {
@@ -2456,9 +2587,7 @@ function App() {
         setAlertList(res.alerts)
       }
     })
-    getAnalytics(oceanPeriod).then(res => {
-      if (res) setOceanStats(res)
-    })
+    loadOceanStats(selectedPort, oceanPeriod)
     loadPfzs(selectedPort)
   }, [selectedPort, oceanPeriod])
 
@@ -2532,6 +2661,7 @@ function App() {
       <Analytics
         lang={lang}
         oceanStats={oceanStats}
+        oceanPeriod={oceanPeriod}
         setOceanPeriod={setOceanPeriod}
         selectedPort={selectedPort}
         setSelectedPort={p => {
@@ -2539,6 +2669,8 @@ function App() {
           loadPfzs(p)
         }}
         portContext={portContext}
+        oceanLoading={oceanLoading}
+        oceanError={oceanError}
       />
     )
   }
