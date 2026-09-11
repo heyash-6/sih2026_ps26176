@@ -1637,20 +1637,29 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                   </div>
                 </div>
 
-                {/* Route Assessment Points 1, 2, 3 derived from Route Geometry */}
-                <div style={{ margin: '22px 0 14px 0' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <h4 style={{ margin: 0, fontSize: '1rem', color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 800 }}>
-                      <span style={{ fontSize: '1.25rem' }}>📍</span>
-                      <span>Route Assessment Points</span>
-                      <span style={{ fontSize: '11px', background: 'rgba(56, 189, 248, 0.2)', color: '#38bdf8', padding: '3px 8px', borderRadius: '12px', border: '1px solid rgba(56, 189, 248, 0.4)', fontWeight: 700 }}>
-                        Geometry-Derived
-                      </span>
-                    </h4>
-                    <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 500 }}>Real-time sea state along passage</span>
+                {/* Route Assessment Points Information Header Card */}
+                <div className="routeAssessmentHeaderCard">
+                  <div className="routeAssessmentHeaderTop">
+                    <div className="routeAssessmentHeaderLeft">
+                      <div className="routeAssessmentHeaderIcon" aria-hidden="true">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="5" cy="18" r="3" />
+                          <circle cx="19" cy="6" r="3" />
+                          <path d="M8 18h3.5a4 4 0 0 0 4-4v-1a4 4 0 0 1 4-4H16" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h4 className="routeAssessmentTitle">Route Assessment Points</h4>
+                        <p className="routeAssessmentSubtitle">Geometry-derived assessment of sea conditions along the selected passage.</p>
+                      </div>
+                    </div>
+                    <div className="routeAssessmentHeaderRight">
+                      <span className="routeAssessmentBadge">Geometry-Derived</span>
+                      <span className="routeAssessmentRealtimeLabel">Real-time sea state along passage</span>
+                    </div>
                   </div>
-                  <p style={{ margin: '0 0 12px 0', fontSize: '12.5px', color: '#cbd5e1' }}>
-                    Navigational assessment at early departure corridor, mid-channel passage, and target shelf approach.
+                  <p className="routeAssessmentBottomDesc">
+                    Assessment covers the departure corridor, mid-channel passage, and target shelf approach.
                   </p>
                 </div>
 
