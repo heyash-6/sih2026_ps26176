@@ -172,6 +172,43 @@ def post_route(request: RouteRequest):
         "geofence": geofence.model_dump()
     }
 
+class NavRouteRequest(BaseModel):
+    start_latitude: float
+    start_longitude: float
+    end_latitude: float
+    end_longitude: float
+    vessel_speed_kmh: Optional[float] = 18.0
+
+@app.post("/api/gis/route/safe")
+def calculate_safe_marine_route(req: NavRouteRequest):
+    """Calculate safest risk-aware A* route avoiding restricted zones."""
+    from app.gis.navigator import navigator
+    return navigator.calculate_safe_route(
+        req.start_latitude, req.start_longitude,
+        req.end_latitude, req.end_longitude,
+        vessel_speed_kmh=req.vessel_speed_kmh or 18.0
+    )
+
+@app.post("/api/gis/navigation/analyze")
+def analyze_voyage_navigation(req: NavRouteRequest):
+    """Analyze comprehensive voyage navigation (PFZs, hazards, conditions, safe route)."""
+    from app.gis.navigator import navigator
+    return navigator.analyze_navigation(
+        req.start_latitude, req.start_longitude,
+        req.end_latitude, req.end_longitude,
+        vessel_speed_kmh=req.vessel_speed_kmh or 18.0
+    )
+
+@app.get("/api/location/resolve")
+@app.get("/api/location/nearest-port")
+def get_user_location_intelligence(
+    lat: float = Query(..., description="User GPS Latitude"),
+    lon: float = Query(..., description="User GPS Longitude")
+):
+    """Resolve user's GPS coordinates to nearest Indian coastal hub with live telemetry & nearby PFZs."""
+    from app.gis.location_service import resolve_user_location
+    return resolve_user_location(lat, lon)
+
 @app.post("/api/risk")
 def post_risk(request: RiskInput):
     """Direct Deterministic Risk Engine evaluation endpoint."""

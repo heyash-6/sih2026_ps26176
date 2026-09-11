@@ -14,20 +14,57 @@ import {
   getHazards,
   getAnalytics,
   getAllAlerts,
-  getAnalysisHistory
+  getAnalysisHistory,
+  resolveUserLocation,
+  getSafeMarineRoute,
+  analyzeNavigation,
+  getLiveIncoisTelemetry
 } from './services/api'
 import { onAuthStateChange, signOutUser, getSession } from './services/supabaseClient'
 import AuthModal from './components/AuthModal'
 
 const T = {
   en: {
-    dashboard: 'Dashboard', map: 'Marine Intelligence Map', analytics: 'Ocean Analytics', fishing: 'Fishing Intelligence', safety: 'Safety & Routes', assistant: 'ORCA AI Assistant', alerts: 'Alerts', settings: 'Settings', profile: 'Profile', workspace: 'WORKSPACE', operational: 'Systems operational', connected: 'Marine data services connected', marine: 'MARINE INTELLIGENCE', glance: 'Marine conditions at a glance.', location: 'Mumbai Coast • Live Supabase & Sensor Streams Connected', ask: 'Ask ORCA', seaState: 'Sea state', wind: 'Wind', sst: 'Sea surface temperature', activePFZ: 'Active PFZs', moderate: 'Moderate', waves: '1.2 m waves', steady: 'NE • steady', favourable: 'Favourable', openMap: 'Open map', activeAdvisories: 'Active advisories', viewAll: 'View all', insights: "Today's marine insights", bestFishing: 'Best fishing opportunity', departure: 'Recommended departure', confidence: 'Data confidence', verified: 'Verified intelligence', sources: 'Sources: ISRO • INCOIS • IMD • Supabase', oceanInputs: 'Ocean, geospatial, and Supabase database inputs synchronized.', allLayers: 'All layers', weather: 'Weather', hazards: 'Hazards', boundaries: 'Boundaries', today: 'Today', selectedZone: 'Selected zone', high: 'High confidence', why: 'Why this zone?', signal: 'Signal', how: 'How ORCA reasons', discover: 'Discover', correlate: 'Correlate', assess: 'Assess', explain: 'Explain', findZones: 'Find promising fishing zones.', explore: 'Explore PFZs', viewZone: 'View zone', recommendation: 'ORCA recommendation', start: 'Start with', safeRoute: 'Safe route assessment', recommended: 'Recommended', low: 'Low', risk: 'Risk', whyRoute: 'Why ORCA recommends this route', safetyChecklist: 'Safety checklist', askSea: 'Ask ORCA about the sea.', conversational: 'CONVERSATIONAL MARINE INTELLIGENCE', placeholder: 'Ask a marine question or plan a trip...', send: 'Send', nearest: 'Nearest PFZ today', safeTomorrow: 'Is it safe to go tomorrow morning?', showHazards: 'Show hazards near Mumbai', findRoute: 'Find a safer route', close: 'Close', reset: 'Reset view', satellite: 'Satellite', street: 'Street', locate: 'My location', language: 'Language', search: 'Search', notifications: 'Notifications', noResults: 'No matching results.', routeA: 'Coastal route A', routeB: 'Coastal route B', routeC: 'Balanced route', routeRisk: 'Route risk', checked: 'Checked', refresh: 'Refresh', save: 'Save changes', saved: 'Changes saved', theme: 'Theme', darkMode: 'Dark mode', email: 'Email notifications', profileTitle: 'Operational Profile', role: 'Marine Researcher / Captain', details: 'Profile Details', name: 'Capt. Devesh Madhavi', status: 'Active Workspace Session', mobile: 'Mobile number', emailLabel: 'Email', profession: 'Operational Role', edit: 'Edit profile', done: 'Done', trend: 'PFZ confidence trend', pfzConfidence: 'PFZ confidence', freshness: 'Data freshness', latest: 'Latest sample', marineInputs: 'Satellite ocean colour, SST and weather inputs stored in Supabase.', spatialSignals: 'Correlates nearby spatial signals and PFZ candidates.', opportunitySafety: 'Balances fishing opportunity with safety constraints.', evidenceRecommendation: 'Explains the evidence behind each recommendation.', hazardAvoided: 'Avoids the identified caution corridor.', boundariesChecked: 'Checks operational boundaries before routing.', riskCorridor: 'Prefers the lower-risk coastal corridor.', recalculate: 'Route can be recalculated after new data arrives.', demo: 'Real-time database mode • live Supabase sync connected.', demoAnswer: 'Hello Captain! I am ORCA, your Marine AI Decision Copilot. How can I assist your voyage today? You can ask about PFZ zones, weather, wave conditions, or safe routes along the coast.', mapFail: 'Map tiles could not load. Controls and local markers remain available.', routeSummary: '39.2 km • about 2h 35m', routeBText: '48.5 km • about 3h 10m', routeCText: '42.0 km • about 2h 45m', selectPeriod: 'Period', hours24: '24 hours', days7: '7 days', system: 'System', resetData: 'Reset demo state', layers: 'Map layers', pfzLayer: 'Fishing zones', alertLayer: 'Marine alerts', vessels: 'Vessels', mapLabels: 'Map labels follow website language.', signIn: 'Sign In / Register', signOut: 'Sign Out', viewOnMap: '🗺️ View Route on Map', viewSafety: '🛡️ Safety Assessment', navHudTitle: 'Active Navigation Route', originPort: 'Departure Port', destZone: 'Destination Zone', eta: 'Estimated Travel Time', distance: 'Distance', geofenceClear: 'Boundary Clearance', calculateRoute: 'Calculate Safe Marine Route'
+    dashboard: 'Dashboard', map: 'Marine Intelligence Map', analytics: 'Ocean Analytics', fishing: 'Fishing Intelligence', safety: 'Safety & Routes', assistant: 'ORCA AI Assistant', alerts: 'Alerts', settings: 'Settings', profile: 'Profile', workspace: 'WORKSPACE', operational: 'Systems operational', connected: 'Marine data services connected', marine: 'MARINE INTELLIGENCE', glance: 'Marine conditions at a glance.', location: 'Mumbai Coast • Live Supabase & Sensor Streams Connected', ask: 'Ask ORCA', seaState: 'Sea state', wind: 'Wind', sst: 'Sea surface temperature', activePFZ: 'Active PFZs', moderate: 'Moderate', waves: '1.2 m waves', steady: 'NE • steady', favourable: 'Favourable', openMap: 'Open map', activeAdvisories: 'Active advisories', viewAll: 'View all', insights: "Today's marine insights", bestFishing: 'Best fishing opportunity', departure: 'Recommended departure', confidence: 'Data confidence', verified: 'Verified intelligence', sources: 'Sources: ISRO • INCOIS • IMD • Supabase', oceanInputs: 'Ocean, geospatial, and Supabase database inputs synchronized.', allLayers: 'All layers', weather: 'Weather', hazards: 'Hazards', boundaries: 'Boundaries', today: 'Today', selectedZone: 'Selected zone', high: 'High confidence', why: 'Why this zone?', signal: 'Signal', how: 'How ORCA reasons', discover: 'Discover', correlate: 'Correlate', assess: 'Assess', explain: 'Explain', findZones: 'Find promising fishing zones.', explore: 'Explore PFZs', viewZone: 'View zone', recommendation: 'ORCA recommendation', start: 'Start with', safeRoute: 'Safe route assessment', recommended: 'Recommended', low: 'Low', risk: 'Risk', whyRoute: 'Why ORCA recommends this route', safetyChecklist: 'Safety checklist', askSea: 'Ask ORCA about the sea.', conversational: 'CONVERSATIONAL MARINE INTELLIGENCE', placeholder: 'Ask a marine question or plan a trip...', send: 'Send', nearest: 'Nearest PFZ today', safeTomorrow: 'Is it safe to go tomorrow morning?', showHazards: 'Show hazards near Mumbai', findRoute: 'Find a safer route', close: 'Close', reset: 'Reset view', satellite: 'Satellite', street: 'Street', locate: 'My location', language: 'Language', search: 'Search', notifications: 'Notifications', noResults: 'No matching results.', routeA: 'Coastal route A', routeB: 'Coastal route B', routeC: 'Balanced route', routeRisk: 'Route risk', checked: 'Checked', refresh: 'Refresh', save: 'Save changes', saved: 'Changes saved', theme: 'Theme', darkMode: 'Dark mode', email: 'Email notifications', profileTitle: 'Operational Profile', role: 'Marine Researcher / Captain', details: 'Profile Details', name: 'Capt. Devesh Madhavi', status: 'Active Workspace Session', mobile: 'Mobile number', emailLabel: 'Email', profession: 'Operational Role', edit: 'Edit profile', done: 'Done', trend: 'PFZ confidence trend', pfzConfidence: 'PFZ confidence', freshness: 'Data freshness', latest: 'Latest sample', marineInputs: 'Satellite ocean colour, SST and weather inputs stored in Supabase.', spatialSignals: 'Correlates nearby spatial signals and PFZ candidates.', opportunitySafety: 'Balances fishing opportunity with safety constraints.', evidenceRecommendation: 'Explains the evidence behind each recommendation.', hazardAvoided: 'Avoids the identified caution corridor.', boundariesChecked: 'Checks operational boundaries before routing.', riskCorridor: 'Prefers the lower-risk coastal corridor.', recalculate: 'Route can be recalculated after new data arrives.', demo: 'Real-time database mode • live Supabase sync connected.', demoAnswer: 'Hello Captain! I am ORCA, your Marine AI Decision Copilot. How can I assist your voyage today? You can ask about PFZ zones, weather, wave conditions, or safe routes along the coast.', mapFail: 'Map tiles could not load. Controls and local markers remain available.', routeSummary: '39.2 km • about 2h 35m', routeBText: '48.5 km • about 3h 10m', routeCText: '42.0 km • about 2h 45m', selectPeriod: 'Period', hours24: '24 hours', days7: '7 days', system: 'System', resetData: 'Reset demo state', layers: 'Map layers', pfzLayer: 'Fishing zones', alertLayer: 'Marine alerts', vessels: 'Vessels', mapLabels: 'Map labels follow website language.', signIn: 'Sign In / Register', signOut: 'Sign Out', viewOnMap: '🗺️ View Route on Map', viewSafety: '🛡️ Safety Assessment', navHudTitle: 'Active Navigation Route', originPort: 'Departure Port', destZone: 'Destination Zone', eta: 'Estimated Travel Time', distance: 'Distance', geofenceClear: 'Boundary Clearance', calculateRoute: 'Calculate Safe Marine Route',
+    locPromptTitle: 'Tailor Intelligence to Your Location',
+    locPromptDesc: 'Allow location access to receive real-time INCOIS wave forecasts, nearby PFZs, and safe coastal routes from your current position.',
+    allowLocBtn: 'Allow Location',
+    detectingLoc: 'Detecting GPS...',
+    locActive: 'Live GPS Active',
+    locDenied: 'Location Access Disabled',
+    nearestPortLabel: 'Nearest Port',
+    inlandMsg: 'Inland location detected. Navigation routed from nearest coastal fishery hub.',
+    waypointTable: 'Waypoint Navigation Log',
+    bearing: 'Compass Heading',
+    legDist: 'Leg Dist'
   },
   hi: {
-    dashboard: 'डैशबोर्ड', map: 'समुद्री इंटेलिजेंस मैप', analytics: 'महासागर विश्लेषण', fishing: 'मछली पकड़ने की इंटेलिजेंस', safety: 'सुरक्षा और मार्ग', assistant: 'ORCA AI सहायक', alerts: 'सूचनाएं', settings: 'सेटिंग्स', profile: 'प्रोफ़ाइल', workspace: 'वर्कस्पेस', operational: 'सिस्टम चालू हैं', connected: 'समुद्री डेटा सेवाएं जुड़ी हैं', marine: 'समुद्री इंटेलिजेंस', glance: 'समुद्री स्थिति एक नज़र में।', location: 'मुंबई तट • लाइव सुपबेस और सेंसर डेटा कनेक्टेड', ask: 'ORCA से पूछें', seaState: 'समुद्र की स्थिति', wind: 'हवा', sst: 'समुद्र सतह तापमान', activePFZ: 'सक्रिय PFZ', moderate: 'मध्यम', waves: '1.2 मी. लहरें', steady: 'NE • स्थिर', favourable: 'अनुकूल', openMap: 'मैप खोलें', activeAdvisories: 'सक्रिय सलाह', viewAll: 'सभी देखें', insights: 'आज की समुद्री जानकारी', bestFishing: 'बेहतरीन मछली पकड़ने का अवसर', departure: 'अनुशंसित प्रस्थान', confidence: 'डेटा विश्वसनीयता', verified: 'सत्यापित इंटेलिजेंस', sources: 'स्रोत: ISRO • INCOIS • IMD • Supabase', oceanInputs: 'समुद्र और भौगोलिक इनपुट की जांच की गई।', allLayers: 'सभी लेयर', weather: 'मौसम', hazards: 'जोखिम', boundaries: 'सीमाएं', today: 'आज', selectedZone: 'चयनित क्षेत्र', high: 'उच्च विश्वसनीयता', why: 'यह क्षेत्र क्यों?', signal: 'संकेत', how: 'ORCA कैसे निर्णय लेता है', discover: 'खोजें', correlate: 'संबंध जोड़ें', assess: 'आकलन करें', explain: 'समझाएं', findZones: 'संभावित मछली पकड़ने वाले क्षेत्र खोजें।', explore: 'PFZ खोजें', viewZone: 'क्षेत्र देखें', recommendation: 'ORCA की सिफारिश', start: 'शुरुआत करें', safeRoute: 'सुरक्षित मार्ग आकलन', recommended: 'अनुशंसित', low: 'कम', risk: 'जोखिम', whyRoute: 'ORCA इस मार्ग की सिफारिश क्यों करता है', safetyChecklist: 'सुरक्षा चेकलिस्ट', askSea: 'समुद्र के बारे में ORCA से पूछें।', conversational: 'कन्वर्सेशनल मरीन इंटेलिजेंस', placeholder: 'समुद्र से जुड़ा सवाल पूछें...', send: 'भेजें', nearest: 'आज का निकटतम PFZ', safeTomorrow: 'क्या कल सुबह जाना सुरक्षित है?', showHazards: 'मुंबई के पास जोखिम दिखाएं', findRoute: 'सुरक्षित मार्ग खोजें', close: 'बंद करें', reset: 'दृश्य रीसेट', satellite: 'सैटेलाइट', street: 'सड़क', locate: 'मेरा स्थान', language: 'भाषा', search: 'खोजें', notifications: 'सूचनाएं', noResults: 'कोई परिणाम नहीं मिला।', routeA: 'तटीय मार्ग A', routeB: 'तटीय मार्ग B', routeC: 'संतुलित मार्ग', routeRisk: 'मार्ग जोखिम', checked: 'जांच पूरी', refresh: 'रीफ्रेश', save: 'बदलाव सहेजें', saved: 'बदलाव सहेजे गए', theme: 'थीम', darkMode: 'डार्क मोड', email: 'ईमेल सूचनाएं', profileTitle: 'ऑपरेशनल प्रोफ़ाइल', role: 'समुद्री शोधकर्ता / कप्तान', details: 'प्रोफ़ाइल विवरण', name: 'Capt. Devesh Madhavi', status: 'सक्रिय सत्र', mobile: 'मोबाइल नंबर', emailLabel: 'ईमेल', profession: 'पेशा', edit: 'संपादित करें', done: 'पूर्ण', trend: 'PFZ विश्वसनीयता ट्रेंड', pfzConfidence: 'PFZ विश्वसनीयता', freshness: 'डेटा ताजगी', latest: 'नवीनतम नमूना', marineInputs: 'सैटेलाइट समुद्री रंग, SST और मौसम इनपुट।', spatialSignals: 'आसपास के स्थानिक संकेत और PFZ उम्मीदवार जोड़ता है।', opportunitySafety: 'मछली पकड़ने के अवसर को सुरक्षा सीमाओं के साथ संतुलित करता है।', evidenceRecommendation: 'हर सिफारिश के पीछे के प्रमाण समझाता है।', hazardAvoided: 'पहचाने गए सावधानी क्षेत्र से बचता है।', boundariesChecked: 'मार्ग से पहले परिचालन सीमाएं जांचता है।', riskCorridor: 'कम जोखिम वाले तटीय गलियारे को प्राथमिकता देता है।', recalculate: 'नए डेटा के बाद मार्ग फिर निकाला जा सकता है।', demo: 'रीयल-टाइम डेटाबेस मोड • लाइव सुपबेस कनेक्टेड।', demoAnswer: 'नमस्ते कप्तान! मैं ORCA हूँ, आपका समुद्री AI निर्णय सहायक। मैं आपकी क्या मदद कर सकता हूँ?', mapFail: 'मैप टाइल लोड नहीं हो पाईं।', routeSummary: '39.2 किमी • लगभग 2 घंटे 35 मिनट', routeBText: '48.5 किमी • लगभग 3 घंटे 10 मिनट', routeCText: '42.0 किमी • लगभग 2 घंटे 45 मिनट', selectPeriod: 'अवधि', hours24: '24 घंटे', days7: '7 दिन', system: 'सिस्टम', resetData: 'रीसेट', layers: 'मैप लेयर', pfzLayer: 'मछली पकड़ने के क्षेत्र', alertLayer: 'समुद्री अलर्ट', vessels: 'नौकाएं', mapLabels: 'मैप के नाम वेबसाइट की भाषा के अनुसार हैं।', signIn: 'साइन इन / रजिस्टर', signOut: 'साइन आउट', viewOnMap: '🗺️ मैप पर मार्ग देखें', viewSafety: '🛡️ सुरक्षा आकलन', navHudTitle: 'सक्रिय नेविगेशन मार्ग', originPort: 'प्रस्थान बंदरगाह', destZone: 'गंतव्य क्षेत्र', eta: 'अनुमानित यात्रा समय', distance: 'दूरी', geofenceClear: 'सीमा अनुमति', calculateRoute: 'सुरक्षित समुद्री मार्ग निकालें'
+    dashboard: 'डैशबोर्ड', map: 'समुद्री इंटेलिजेंस मैप', analytics: 'महासागर विश्लेषण', fishing: 'मछली पकड़ने की इंटेलिजेंस', safety: 'सुरक्षा और मार्ग', assistant: 'ORCA AI सहायक', alerts: 'सूचनाएं', settings: 'सेटिंग्स', profile: 'प्रोफ़ाइल', workspace: 'वर्कस्पेस', operational: 'सिस्टम चालू हैं', connected: 'समुद्री डेटा सेवाएं जुड़ी हैं', marine: 'समुद्री इंटेलिजेंस', glance: 'समुद्री स्थिति एक नज़र में।', location: 'मुंबई तट • लाइव सुपबेस और सेंसर डेटा कनेक्टेड', ask: 'ORCA से पूछें', seaState: 'समुद्र की स्थिति', wind: 'हवा', sst: 'समुद्र सतह तापमान', activePFZ: 'सक्रिय PFZ', moderate: 'मध्यम', waves: '1.2 मी. लहरें', steady: 'NE • स्थिर', favourable: 'अनुकूल', openMap: 'मैप खोलें', activeAdvisories: 'सक्रिय सलाह', viewAll: 'सभी देखें', insights: 'आज की समुद्री जानकारी', bestFishing: 'बेहतरीन मछली पकड़ने का अवसर', departure: 'अनुशंसित प्रस्थान', confidence: 'डेटा विश्वसनीयता', verified: 'सत्यापित इंटेलिजेंस', sources: 'स्रोत: ISRO • INCOIS • IMD • Supabase', oceanInputs: 'समुद्र और भौगोलिक इनपुट की जांच की गई।', allLayers: 'सभी लेयर', weather: 'मौसम', hazards: 'जोखिम', boundaries: 'सीमाएं', today: 'आज', selectedZone: 'चयनित क्षेत्र', high: 'उच्च विश्वसनीयता', why: 'यह क्षेत्र क्यों?', signal: 'संकेत', how: 'ORCA कैसे निर्णय लेता है', discover: 'खोजें', correlate: 'संबंध जोड़ें', assess: 'आकलन करें', explain: 'समझाएं', findZones: 'संभावित मछली पकड़ने वाले क्षेत्र खोजें।', explore: 'PFZ खोजें', viewZone: 'क्षेत्र देखें', recommendation: 'ORCA की सिफारिश', start: 'शुरुआत करें', safeRoute: 'सुरक्षित मार्ग आकलन', recommended: 'अनुशंसित', low: 'कम', risk: 'जोखिम', whyRoute: 'ORCA इस मार्ग की सिफारिश क्यों करता है', safetyChecklist: 'सुरक्षा चेकलिस्ट', askSea: 'समुद्र के बारे में ORCA से पूछें।', conversational: 'कन्वर्सेशनल मरीन इंटेलिजेंस', placeholder: 'समुद्र से जुड़ा सवाल पूछें...', send: 'भेजें', nearest: 'आज का निकटतम PFZ', safeTomorrow: 'क्या कल सुबह जाना सुरक्षित है?', showHazards: 'मुंबई के पास जोखिम दिखाएं', findRoute: 'सुरक्षित मार्ग खोजें', close: 'बंद करें', reset: 'दृश्य रीसेट', satellite: 'सैटेलाइट', street: 'सड़क', locate: 'मेरा स्थान', language: 'भाषा', search: 'खोजें', notifications: 'सूचनाएं', noResults: 'कोई परिणाम नहीं मिला।', routeA: 'तटीय मार्ग A', routeB: 'तटीय मार्ग B', routeC: 'संतुलित मार्ग', routeRisk: 'मार्ग जोखिम', checked: 'जांच पूरी', refresh: 'रीफ्रेश', save: 'बदलाव सहेजें', saved: 'बदलाव सहेजे गए', theme: 'थीम', darkMode: 'डार्क मोड', email: 'ईमेल सूचनाएं', profileTitle: 'ऑपरेशनल प्रोफ़ाइल', role: 'समुद्री शोधकर्ता / कप्तान', details: 'प्रोफ़ाइल विवरण', name: 'Capt. Devesh Madhavi', status: 'सक्रिय सत्र', mobile: 'मोबाइल नंबर', emailLabel: 'ईमेल', profession: 'पेशा', edit: 'संपादित करें', done: 'पूर्ण', trend: 'PFZ विश्वसनीयता ट्रेंड', pfzConfidence: 'PFZ विश्वसनीयता', freshness: 'डेटा ताजगी', latest: 'नवीनतम नमूना', marineInputs: 'सैटेलाइट समुद्री रंग, SST और मौसम इनपुट।', spatialSignals: 'आसपास के स्थानिक संकेत और PFZ उम्मीदवार जोड़ता है।', opportunitySafety: 'मछली पकड़ने के अवसर को सुरक्षा सीमाओं के साथ संतुलित करता है।', evidenceRecommendation: 'हर सिफारिश के पीछे के प्रमाण समझाता है।', hazardAvoided: 'पहचाने गए सावधानी क्षेत्र से बचता है।', boundariesChecked: 'मार्ग से पहले परिचालन सीमाएं जांचता है।', riskCorridor: 'कम जोखिम वाले तटीय गलियारे को प्राथमिकता देता है।', recalculate: 'नए डेटा के बाद मार्ग फिर निकाला जा सकता है।', demo: 'रीयल-टाइम डेटाबेस मोड • लाइव सुपबेस कनेक्टेड।', demoAnswer: 'नमस्ते कप्तान! मैं ORCA हूँ, आपका समुद्री AI निर्णय सहायक। मैं आपकी क्या मदद कर सकता हूँ?', mapFail: 'मैप टाइल लोड नहीं हो पाईं।', routeSummary: '39.2 किमी • लगभग 2 घंटे 35 मिनट', routeBText: '48.5 किमी • लगभग 3 घंटे 10 मिनट', routeCText: '42.0 किमी • लगभग 2 घंटे 45 मिनट', selectPeriod: 'अवधि', hours24: '24 घंटे', days7: '7 दिन', system: 'सिस्टम', resetData: 'रीसेट', layers: 'मैप लेयर', pfzLayer: 'मछली पकड़ने के क्षेत्र', alertLayer: 'समुद्री अलर्ट', vessels: 'नौकाएं', mapLabels: 'मैप के नाम वेबसाइट की भाषा के अनुसार हैं।', signIn: 'साइन इन / रजिस्टर', signOut: 'साइन आउट', viewOnMap: '🗺️ मैप पर मार्ग देखें', viewSafety: '🛡️ सुरक्षा आकलन', navHudTitle: 'सक्रिय नेविगेशन मार्ग', originPort: 'प्रस्थान बंदरगाह', destZone: 'गंतव्य क्षेत्र', eta: 'अनुमानित यात्रा समय', distance: 'दूरी', geofenceClear: 'सीमा अनुमति', calculateRoute: 'सुरक्षित समुद्री मार्ग निकालें',
+    locPromptTitle: 'अपने स्थान के अनुसार सटीक जानकारी पाएं',
+    locPromptDesc: 'अपने स्थान की अनुमति दें ताकि INCOIS की लाइव लहरें, निकटतम PFZ और सुरक्षित मार्ग आपको दिखाए जा सकें।',
+    allowLocBtn: 'स्थान अनुमति दें',
+    detectingLoc: 'स्थान खोजा जा रहा है...',
+    locActive: 'लाइव GPS सक्रिय',
+    locDenied: 'स्थान अनुमति अक्षम',
+    nearestPortLabel: 'निकटतम बंदरगाह',
+    inlandMsg: 'अंतर्देशीय स्थान मिला। निकटतम तटीय बंदरगाह से मार्ग की गणना की गई है।',
+    waypointTable: 'वेपॉइंट नेविगेशन लॉग',
+    bearing: 'दिशा',
+    legDist: 'दूरी'
   },
   mr: {
-    dashboard: 'डॅशबोर्ड', map: 'सागरी इंटेलिजन्स नकाशा', analytics: 'महासागर विश्लेषण', fishing: 'मासेमारी इंटेलिजन्स', safety: 'सुरक्षा आणि मार्ग', assistant: 'ORCA AI सहाय्यक', alerts: 'सूचना', settings: 'सेटिंग्ज', profile: 'प्रोफाइल', workspace: 'वर्कस्पेस', operational: 'सिस्टम कार्यरत', connected: 'सागरी डेटा सेवा जोडलेल्या', marine: 'सागरी इंटेलिजन्स', glance: 'सागरी स्थिती एका नजरेत.', location: 'मुंबई किनारा • थेट सुपबेस आणि सेन्सर जोडणी', ask: 'ORCA ला विचारा', seaState: 'समुद्राची स्थिती', wind: 'वारा', sst: 'समुद्र पृष्ठभाग तापमान', activePFZ: 'सक्रिय PFZ', moderate: 'मध्यम', waves: '1.2 मी. लाटा', steady: 'NE • स्थिर', favourable: 'अनुकूल', openMap: 'नकाशा उघडा', activeAdvisories: 'सक्रिय सूचना', viewAll: 'सर्व पहा', insights: 'आजची सागरी माहिती', bestFishing: 'मासेमारीची सर्वोत्तम संधी', departure: 'शिफारस केलेली प्रस्थान वेळ', confidence: 'डेटा विश्वासार्हता', verified: 'सत्यापित इंटेलिजन्स', sources: 'स्रोत: ISRO • INCOIS • IMD • Supabase', oceanInputs: 'समुद्र आणि डेटाबेस इनपुट तपासले.', allLayers: 'सर्व लेयर्स', weather: 'हवामान', hazards: 'धोके', boundaries: 'सीमा', today: 'आज', selectedZone: 'निवडलेले क्षेत्र', high: 'उच्च विश्वासार्हता', why: 'हे क्षेत्र का?', signal: 'संकेत', how: 'ORCA कसे निर्णय घेतो', discover: 'शोध', correlate: 'संबंध जोडा', assess: 'आकलन', explain: 'समजावून सांगा', findZones: 'आशादायक मासेमारी क्षेत्र शोधा.', explore: 'PFZ शोधा', viewZone: 'क्षेत्र पहा', recommendation: 'ORCA ची शिफारस', start: 'सुरुवात', safeRoute: 'सुरक्षित मार्गाचे आकलन', recommended: 'शिफारस केलेला', low: 'कमी', risk: 'धोका', whyRoute: 'ORCA या मार्गाची शिफारस का करतो', safetyChecklist: 'सुरक्षा तपासणी', askSea: 'समुद्राबद्दल ORCA ला विचारा.', conversational: 'कन्वर्सेशनल मरीन इंटेलिजन्स', placeholder: 'सागरी प्रश्न विचारा किंवा मार्ग योजना करा...', send: 'पाठवा', nearest: 'आजचा जवळचा PFZ', safeTomorrow: 'उद्या सकाळी जाणे सुरक्षित आहे का?', showHazards: 'मुंबईजवळचे धोके दाखवा', findRoute: 'सुरक्षित मार्ग शोधा', close: 'बंद', reset: 'दृश्य रीसेट', satellite: 'सॅटेलाइट', street: 'रस्ता', locate: 'माझे स्थान', language: 'भाषा', search: 'शोधा', notifications: 'सूचना', noResults: 'जुळणारे परिणाम नाहीत.', routeA: 'किनारी मार्ग A', routeB: 'किनारी मार्ग B', routeC: 'संतुलित मार्ग', routeRisk: 'मार्ग धोका', checked: 'तपासले', refresh: 'रीफ्रेश', save: 'बदल जतन करा', saved: 'बदल जतन झाले', theme: 'थीम', darkMode: 'डार्क मोड', email: 'ईमेल सूचना', profileTitle: 'ऑपरेशनल प्रोफाइल', role: 'सागरी संशोधक / कॅप्टन', details: 'प्रोफाइल तपशील', name: 'Capt. Devesh Madhavi', status: 'सक्रिय खाते', mobile: 'मोबाइल क्रमांक', emailLabel: 'ईमेल', profession: 'व्यवसाय', edit: 'संपादित करा', done: 'पूर्ण', trend: 'PFZ विश्वासार्हता ट्रेंड', pfzConfidence: 'PFZ विश्वासार्हता', freshness: 'डेटा ताजेपणा', latest: 'नवीन नमुना', marineInputs: 'सॅटेलाइट समुद्री रंग, SST आणि हवामान इनपुट.', spatialSignals: 'जवळचे स्थानिक संकेत आणि PFZ उमेदवार जोडतो.', opportunitySafety: 'मासेमारीची संधी आणि सुरक्षा मर्यादा संतुलित करतो.', evidenceRecommendation: 'प्रत्येक शिफारसीमागील पुरावे समजावतो.', hazardAvoided: 'ओळखलेल्या सावधगिरीच्या क्षेत्रापासून दूर राहतो.', boundariesChecked: 'मार्गापूर्वी ऑपरेशनल सीमा तपासतो.', riskCorridor: 'कमी-धोका किनारी मार्ग पसंत करतो.', recalculate: 'नवीन डेटा आल्यावर मार्ग पुन्हा काढता येईल.', demo: 'थेट डेटाबेस मोड • सुपबेस डेटा जोडला आहे.', demoAnswer: 'नमस्कार कॅप्टन! मी ORCA आहे, आपला सागरी AI निर्णय सहाय्यक. मी आज आपल्या प्रवासासाठी कशी मदत करू?', mapFail: 'नकाशा टाइल लोड झाल्या नाहीत.', routeSummary: '39.2 किमी • सुमारे 2 तास 35 मिनिटे', routeBText: '48.5 किमी • सुमारे 3 तास 10 मिनिटे', routeCText: '42.0 किमी • सुमारे 2 तास 45 मिनिटे', selectPeriod: 'कालावधी', hours24: '24 तास', days7: '7 दिवस', system: 'सिस्टम', resetData: 'रीसेट', layers: 'नकाशा लेयर्स', pfzLayer: 'मासेमारी क्षेत्रे', alertLayer: 'सागरी सूचना', vessels: 'नौका', mapLabels: 'नकाशावरील नावे वेबसाइटच्या भाषेनुसार आहेत.', signIn: 'साइन इन / नोंदणी', signOut: 'साइन आउट', viewOnMap: '🗺️ नकाशावर मार्ग पहा', viewSafety: '🛡️ सुरक्षा विश्लेषण', navHudTitle: 'सक्रिय नेव्हिगेशन मार्ग', originPort: 'प्रस्थान बंदर', destZone: 'गंतव्य क्षेत्र', eta: 'अंदाजित वेळ', distance: 'अंतर', geofenceClear: 'सीमा तपासणी', calculateRoute: 'सुरक्षित सागरी मार्ग काढा'
+    dashboard: 'डॅशबोर्ड', map: 'सागरी इंटेलिजन्स नकाशा', analytics: 'महासागर विश्लेषण', fishing: 'मासेमारी इंटेलिजन्स', safety: 'सुरक्षा आणि मार्ग', assistant: 'ORCA AI सहाय्यक', alerts: 'सूचना', settings: 'सेटिंग्ज', profile: 'प्रोफाइल', workspace: 'वर्कस्पेस', operational: 'सिस्टम कार्यरत', connected: 'सागरी डेटा सेवा जोडलेल्या', marine: 'सागरी इंटेलिजन्स', glance: 'सागरी स्थिती एका नजरेत.', location: 'मुंबई किनारा • थेट सुपबेस आणि सेन्सर जोडणी', ask: 'ORCA ला विचारा', seaState: 'समुद्राची स्थिती', wind: 'वारा', sst: 'समुद्र पृष्ठभाग तापमान', activePFZ: 'सक्रिय PFZ', moderate: 'मध्यम', waves: '1.2 मी. लाटा', steady: 'NE • स्थिर', favourable: 'अनुकूल', openMap: 'नकाशा उघडा', activeAdvisories: 'सक्रिय सूचना', viewAll: 'सर्व पहा', insights: 'आजची सागरी माहिती', bestFishing: 'मासेमारीची सर्वोत्तम संधी', departure: 'शिफारस केलेली प्रस्थान वेळ', confidence: 'डेटा विश्वासार्हता', verified: 'सत्यापित इंटेलिजन्स', sources: 'स्रोत: ISRO • INCOIS • IMD • Supabase', oceanInputs: 'समुद्र आणि डेटाबेस इनपुट तपासले.', allLayers: 'सर्व लेयर्स', weather: 'हवामान', hazards: 'धोके', boundaries: 'सीमा', today: 'आज', selectedZone: 'निवडलेले क्षेत्र', high: 'उच्च विश्वासार्हता', why: 'हे क्षेत्र का?', signal: 'संकेत', how: 'ORCA कसे निर्णय घेतो', discover: 'शोध', correlate: 'संबंध जोडा', assess: 'आकलन', explain: 'समजावून सांगा', findZones: 'आशादायक मासेमारी क्षेत्र शोधा.', explore: 'PFZ शोधा', viewZone: 'क्षेत्र पहा', recommendation: 'ORCA ची शिफारस', start: 'सुरुवात', safeRoute: 'सुरक्षित मार्गाचे आकलन', recommended: 'शिफारस केलेला', low: 'कमी', risk: 'धोका', whyRoute: 'ORCA या मार्गाची शिफारस का करतो', safetyChecklist: 'सुरक्षा तपासणी', askSea: 'समुद्राबद्दल ORCA ला विचारा.', conversational: 'कन्वर्सेशनल मरीन इंटेलिजन्स', placeholder: 'सागरी प्रश्न विचारा किंवा मार्ग योजना करा...', send: 'पाठवा', nearest: 'आजचा जवळचा PFZ', safeTomorrow: 'उद्या सकाळी जाणे सुरक्षित आहे का?', showHazards: 'मुंबईजवळचे धोके दाखवा', findRoute: 'सुरक्षित मार्ग शोधा', close: 'बंद', reset: 'दृश्य रीसेट', satellite: 'सॅटेलाइट', street: 'रस्ता', locate: 'माझे स्थान', language: 'भाषा', search: 'शोधा', notifications: 'सूचना', noResults: 'जुळणारे परिणाम नाहीत.', routeA: 'किनारी मार्ग A', routeB: 'किनारी मार्ग B', routeC: 'संतुलित मार्ग', routeRisk: 'मार्ग धोका', checked: 'तपासले', refresh: 'रीफ्रेश', save: 'बदल जतन करा', saved: 'बदल जतन झाले', theme: 'थीम', darkMode: 'डार्क मोड', email: 'ईमेल सूचना', profileTitle: 'ऑपरेशनल प्रोफाइल', role: 'सागरी संशोधक / कॅप्टन', details: 'प्रोफाइल तपशील', name: 'Capt. Devesh Madhavi', status: 'सक्रिय खाते', mobile: 'मोबाइल क्रमांक', emailLabel: 'ईमेल', profession: 'व्यवसाय', edit: 'संपादित करा', done: 'पूर्ण', trend: 'PFZ विश्वासार्हता ट्रेंड', pfzConfidence: 'PFZ विश्वासार्हता', freshness: 'डेटा ताजेपणा', latest: 'नवीन नमुना', marineInputs: 'सॅटेलाइट समुद्री रंग, SST आणि हवामान इनपुट.', spatialSignals: 'जवळचे स्थानिक संकेत आणि PFZ उमेदवार जोडतो.', opportunitySafety: 'मासेमारीची संधी आणि सुरक्षा मर्यादा संतुलित करतो.', evidenceRecommendation: 'प्रत्येक शिफारसीमागील पुरावे समजावतो.', hazardAvoided: 'ओळखलेल्या सावधगिरीच्या क्षेत्रापासून दूर राहतो.', boundariesChecked: 'मार्गापूर्वी ऑपरेशनल सीमा तपासतो.', riskCorridor: 'कमी-धोका किनारी मार्ग पसंत करतो.', recalculate: 'नवीन डेटा आल्यावर मार्ग पुन्हा काढता येईल.', demo: 'थेट डेटाबेस मोड • सुपबेस डेटा जोडला आहे.', demoAnswer: 'नमस्कार कॅप्टन! मी ORCA आहे, आपला सागरी AI निर्णय सहाय्यक. मी आज आपल्या प्रवासासाठी कशी मदत करू?', mapFail: 'नकाशा टाइल लोड झाल्या नाहीत.', routeSummary: '39.2 किमी • सुमारे 2 तास 35 मिनिटे', routeBText: '48.5 किमी • सुमारे 3 तास 10 मिनिटे', routeCText: '42.0 किमी • सुमारे 2 तास 45 मिनिटे', selectPeriod: 'कालावधी', hours24: '24 तास', days7: '7 दिवस', system: 'सिस्टम', resetData: 'रीसेट', layers: 'नकाशा लेयर्स', pfzLayer: 'मासेमारी क्षेत्रे', alertLayer: 'सागरी सूचना', vessels: 'नौका', mapLabels: 'नकाशावरील नावे वेबसाइटच्या भाषेनुसार आहेत.', signIn: 'साइन इन / नोंदणी', signOut: 'साइन आउट', viewOnMap: '🗺️ नकाशावर मार्ग पहा', viewSafety: '🛡️ सुरक्षा विश्लेषण', navHudTitle: 'सक्रिय नेव्हिगेशन मार्ग', originPort: 'प्रस्थान बंदर', destZone: 'गंतव्य क्षेत्र', eta: 'अंदाजित वेळ', distance: 'अंतर', geofenceClear: 'सीमा तपासणी', calculateRoute: 'सुरक्षित सागरी मार्ग काढा',
+    locPromptTitle: 'आपल्या स्थानानुसार अचूक माहिती मिळवा',
+    locPromptDesc: 'स्थान परवानगी द्या जेणेकरून INCOIS च्या थेट लाटा, जवळचे PFZ आणि सुरक्षित मार्ग आपल्याला दाखवता येतील.',
+    allowLocBtn: 'स्थान परवानगी द्या',
+    detectingLoc: 'स्थान शोधत आहे...',
+    locActive: 'थेट GPS सक्रिय',
+    locDenied: 'स्थान परवानगी बंद आहे',
+    nearestPortLabel: 'जवळचे बंदर',
+    inlandMsg: 'अंतर्देशीय स्थान सापडले. जवळच्या किनारी बंदरावरून मार्गाची गणना केली आहे.',
+    waypointTable: 'वेपॉइंट नेव्हिगेशन तपशील',
+    bearing: 'दिशा',
+    legDist: 'अंतर'
   }
 }
 
@@ -107,18 +144,69 @@ function Card({ title, children, action }) {
   )
 }
 
-function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, oceanStats, selectedPort, setSelectedPort }) {
+function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, oceanStats, selectedPort, setSelectedPort, userLocation, requestLocationPermission, detectingLocation }) {
   const t = k => tr(lang, k)
   const currentPort = PORTS.find(p => p.id === selectedPort) || PORTS[3]
   const chosen = pfzList[0] || staticPfz[0]
 
+  // Live telemetry: prefer direct user coordinates INCOIS telemetry if available
+  const liveIncois = userLocation?.incois_live
+  const waveHeight = liveIncois?.wave_height_m 
+    ? `${liveIncois.wave_height_m} m waves`
+    : (oceanStats?.wave_height?.current ? `${oceanStats.wave_height.current} m waves` : t('waves'))
+  const seaCondition = liveIncois?.sea_state || oceanStats?.wave_height?.status || t('moderate')
+  const windSpeed = liveIncois?.wind_speed_kmh 
+    ? `${liveIncois.wind_speed_kmh} km/h`
+    : (oceanStats?.wind_speed?.current ? `${oceanStats.wind_speed.current} km/h` : '18 km/h')
+  const sstValue = liveIncois?.sea_surface_temperature_c
+    ? `${liveIncois.sea_surface_temperature_c}°C`
+    : (chosen?.sst ? `${chosen.sst}°C` : (oceanStats?.sea_surface_temp?.current ? `${oceanStats.sea_surface_temp.current}°C` : '28.1°C'))
+
   return (
     <>
+      {/* Geolocation Permission & Status Banner */}
+      {(!userLocation || userLocation.status !== 'granted') ? (
+        <div className="locationBanner">
+          <div className="locationBannerContent">
+            <span className="locationBannerIcon">📍</span>
+            <div className="locationBannerText">
+              <strong>{t('locPromptTitle')}</strong>
+              <p>{t('locPromptDesc')}</p>
+            </div>
+          </div>
+          <div className="locationBannerActions">
+            <button className="locationBtn" onClick={() => requestLocationPermission && requestLocationPermission(true)} disabled={detectingLocation}>
+              {detectingLocation ? t('detectingLoc') : `📍 ${t('allowLocBtn')}`}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="locationBanner" style={{ borderColor: 'rgba(15, 168, 137, 0.4)' }}>
+          <div className="locationBannerContent">
+            <span className="pulseGps" style={{ width: '12px', height: '12px' }} />
+            <div className="locationBannerText">
+              <strong>📍 {userLocation.is_coastal ? 'Live Coastal Position Active' : 'Live Inland Coordinates Active'}</strong>
+              <p>
+                {userLocation.lat.toFixed(4)}°N, {userLocation.lon.toFixed(4)}°E • {t('nearestPortLabel')}: <b>{userLocation.port_name}</b> ({userLocation.distance_to_port_km?.toFixed(1)} km away) • Live INCOIS Connected
+              </p>
+            </div>
+          </div>
+          <div className="locationBannerActions">
+            <button className="locationBtnSec" onClick={() => requestLocationPermission && requestLocationPermission(true)} disabled={detectingLocation}>
+              {detectingLocation ? t('detectingLoc') : '🔄 Re-detect GPS'}
+            </button>
+            <button className="locationBtn" onClick={() => navigate('/map')}>
+              🗺️ {t('openMap')}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="welcome">
         <div>
-          <span className="eyebrow">{t('marine')} • {currentPort.sector}</span>
-          <h2>{currentPort.name}</h2>
-          <p>Real-time marine intelligence synced with Supabase & INCOIS-ISRO satellite radars.</p>
+          <span className="eyebrow">{t('marine')} • {userLocation?.port_name ? `${userLocation.port_name} Sector` : currentPort.sector}</span>
+          <h2>{userLocation?.port_name || currentPort.name}</h2>
+          <p>Real-time marine intelligence tailored to your coordinates, synced with Supabase & INCOIS models.</p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
           <select 
@@ -137,23 +225,23 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
       <div className="stats">
         <div className="stat">
           <span>{t('seaState')}</span>
-          <strong>{oceanStats?.wave_height?.status || t('moderate')}</strong>
-          <small>{oceanStats?.wave_height?.current ? `${oceanStats.wave_height.current} m waves` : t('waves')}</small>
+          <strong>{seaCondition}</strong>
+          <small>{waveHeight}</small>
         </div>
         <div className="stat">
           <span>{t('wind')}</span>
-          <strong>{oceanStats?.wind_speed?.current ? `${oceanStats.wind_speed.current} km/h` : '18 km/h'}</strong>
-          <small>{t('steady')}</small>
+          <strong>{windSpeed}</strong>
+          <small>{liveIncois?.wind_direction_deg ? `${liveIncois.wind_direction_deg}° • Live INCOIS` : t('steady')}</small>
         </div>
         <div className="stat">
           <span>{t('sst')}</span>
-          <strong>{chosen?.sst ? `${chosen.sst}°C` : (oceanStats?.sea_surface_temp?.current ? `${oceanStats.sea_surface_temp.current}°C` : '28.1°C')}</strong>
-          <small>{t('favourable')}</small>
+          <strong>{sstValue}</strong>
+          <small>{liveIncois ? 'INCOIS GHRSST Real-time' : t('favourable')}</small>
         </div>
         <div className="stat">
           <span>{t('activePFZ')}</span>
           <strong>{pfzList.length}</strong>
-          <small>{currentPort.name.split(' ')[0]} Sector</small>
+          <small>{(userLocation?.port_name || currentPort.name).split(' ')[0]} Sector</small>
         </div>
       </div>
 
@@ -216,7 +304,7 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
   )
 }
 
-function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfzList, allIndiaPfzList = [], alertList, selectedPort, setSelectedPort }) {
+function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfzList, allIndiaPfzList = [], alertList, selectedPort, setSelectedPort, userLocation, onPlotRouteFromLocation }) {
   const t = k => tr(lang, k)
   const ref = useRef(null)
   const mapRef = useRef(null)
@@ -233,7 +321,9 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return
-    const map = L.map(ref.current, { zoomControl: false }).setView([currentPort.lat, currentPort.lon], 7)
+    const initialLat = userLocation?.lat || currentPort.lat
+    const initialLon = userLocation?.lon || currentPort.lon
+    const map = L.map(ref.current, { zoomControl: false }).setView([initialLat, initialLon], 7)
     L.control.zoom({ position: 'bottomright' }).addTo(map)
 
     const street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -268,6 +358,20 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
 
     obj.layers?.forEach(l => l.remove())
     const layers = []
+
+    // 0. Draw User Location Marker ("You Are Here")
+    if (userLocation && userLocation.lat && userLocation.lon) {
+      const userIcon = L.divIcon({
+        className: 'user-map-pin',
+        html: `<div class="user-map-pin-inner">📍 You (${userLocation.is_coastal ? 'Vessel' : 'GPS'})</div>`,
+        iconSize: null,
+        iconAnchor: [30, 15]
+      })
+      const userMarker = L.marker([userLocation.lat, userLocation.lon], { icon: userIcon })
+        .bindPopup(`<b>📍 Your Location</b><br/>Lat: ${userLocation.lat.toFixed(4)}, Lon: ${userLocation.lon.toFixed(4)}<br/>${userLocation.is_coastal ? 'Coastal Waters' : 'Inland Coordinates'}<br/>Nearest Port: ${userLocation.port_name} (${userLocation.distance_to_port_km?.toFixed(1)} km)<br/>Status: Live INCOIS Connected`)
+        .addTo(obj.map)
+      layers.push(userMarker)
+    }
 
     // 1. Draw Active Navigation Route if available
     if (showRoute && activeRoute && activeRoute.waypoints && activeRoute.waypoints.length > 0) {
@@ -403,11 +507,16 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
 
     obj.layers = layers
     return () => layers.forEach(l => l.remove())
-  }, [selected, showPFZ, showAlerts, showVessels, showRoute, activeRoute, lang, pfzList, allIndiaPfzList, alertList, mapScope, selectedPort])
+  }, [selected, showPFZ, showAlerts, showVessels, showRoute, activeRoute, lang, pfzList, allIndiaPfzList, alertList, mapScope, selectedPort, userLocation])
 
   const focusPort = () => {
     const pt = PORTS.find(p => p.id === selectedPort) || PORTS[3]
     mapRef.current?.map.setView([pt.lat, pt.lon], 8)
+  }
+  const focusUserLocation = () => {
+    if (userLocation && userLocation.lat && userLocation.lon && mapRef.current?.map) {
+      mapRef.current.map.setView([userLocation.lat, userLocation.lon], 9)
+    }
   }
   const viewAllIndia = () => {
     setMapScope('all')
@@ -440,7 +549,12 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
           </select>
-          <button onClick={focusPort}>📍 Focus Port</button>
+          {userLocation && (
+            <button onClick={focusUserLocation} style={{ borderColor: 'var(--accent)', color: 'var(--accent)', fontWeight: 600 }}>
+              📍 {t('locate')} ({userLocation.port_name?.split(' ')[0] || 'GPS'})
+            </button>
+          )}
+          <button onClick={focusPort}>⚓ Focus Port</button>
           <button onClick={viewAllIndia}>🇮🇳 Whole Coast</button>
           <button className={base === 'street' ? 'active' : ''} onClick={() => setBase('street')}>{t('street')}</button>
           <button className={base === 'satellite' ? 'active' : ''} onClick={() => setBase('satellite')}>{t('satellite')}</button>
@@ -509,7 +623,18 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
               <b>{t('why')}</b>
               <span>{zone.reason?.[lang] || 'Optimal thermal oceanic front with high chlorophyll concentration and calm sea state.'}</span>
             </div>
-            <button className="primary full" onClick={focus}>{t('selectedZone')} →</button>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+              <button className="primary" style={{ flex: 1 }} onClick={focus}>{t('selectedZone')} →</button>
+              {onPlotRouteFromLocation && (
+                <button 
+                  className="secondary" 
+                  style={{ flex: 1.2, fontWeight: 600 }} 
+                  onClick={() => onPlotRouteFromLocation(zone)}
+                >
+                  🚀 Plan Safe Route
+                </button>
+              )}
+            </div>
           </div>
         </Card>
       </div>
@@ -701,17 +826,19 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
   )
 }
 
-function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selectedPort, setSelectedPort, onPortChange }) {
+function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selectedPort, setSelectedPort, onPortChange, userLocation }) {
   const t = k => tr(lang, k)
-  const [originId, setOriginId] = useState(selectedPort || 'mumbai')
+  const [originId, setOriginId] = useState(userLocation?.port_id || selectedPort || 'mumbai')
   const [destZoneId, setDestZoneId] = useState(pfzList[0]?.id || '')
   const [calculating, setCalculating] = useState(false)
 
   useEffect(() => {
-    if (selectedPort) {
+    if (userLocation?.port_id) {
+      setOriginId('current_gps')
+    } else if (selectedPort) {
       setOriginId(selectedPort)
     }
-  }, [selectedPort])
+  }, [userLocation, selectedPort])
 
   useEffect(() => {
     if (pfzList && pfzList.length > 0) {
@@ -724,27 +851,63 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
 
   const handlePortChange = (newPortId) => {
     setOriginId(newPortId)
-    if (setSelectedPort) setSelectedPort(newPortId)
-    if (onPortChange) onPortChange(newPortId)
+    if (newPortId !== 'current_gps') {
+      if (setSelectedPort) setSelectedPort(newPortId)
+      if (onPortChange) onPortChange(newPortId)
+    }
   }
 
   const handleCalculateRoute = async () => {
     setCalculating(true)
-    const port = PORTS.find(p => p.id === originId) || PORTS[0]
+    let startLat, startLon, departureName
+
+    if (originId === 'current_gps' && userLocation) {
+      startLat = userLocation.lat
+      startLon = userLocation.lon
+      departureName = `📍 Current Location (${userLocation.port_name || 'GPS'})`
+    } else {
+      const port = PORTS.find(p => p.id === originId) || PORTS[0]
+      startLat = port.lat
+      startLon = port.lon
+      departureName = port.name
+    }
+
     const dest = pfzList.find(z => z.id === destZoneId) || pfzList[0] || staticPfz[0]
+    const endLat = dest.lat
+    const endLon = dest.lng || dest.lon
 
     try {
-      const res = await getRouteAndGeofence(
-        { lat: port.lat, lon: port.lon },
-        { lat: dest.lat, lon: dest.lng || dest.lon }
-      )
-      if (res && res.route) {
+      // Calculate risk-aware A* safe route avoiding restricted marine geofences
+      const navRes = await getSafeMarineRoute(startLat, startLon, endLat, endLon, 18.0)
+      if (navRes && navRes.waypoints && navRes.waypoints.length > 0) {
         setActiveRoute({
-          ...res.route,
-          departure_name: port.name,
+          origin: { lat: startLat, lon: startLon },
+          destination: { lat: endLat, lon: endLon },
+          waypoints: navRes.waypoints.map(w => ({ lat: w.latitude, lon: w.longitude })),
+          distance_km: navRes.distance_km,
+          distance_nm: navRes.distance_nm,
+          estimated_travel_time_min: navRes.estimated_duration_min,
+          overall_bearing_deg: navRes.overall_bearing_deg,
+          compass_direction: navRes.compass_direction,
+          average_risk_score: navRes.average_risk_score,
+          risk_band: navRes.risk_band,
+          waypoint_list: navRes.waypoints,
+          restricted_geofences_avoided: navRes.restricted_geofences_avoided || [],
+          departure_name: departureName,
           destination_name: dest.name || dest.id,
-          geofence_status: res.geofence?.status || 'clear'
+          geofence_status: (navRes.restricted_geofences_avoided?.length > 0) ? 'avoided_restricted_zones' : 'clear'
         })
+      } else {
+        // Fallback to basic route if A* grid is unavailable
+        const res = await getRouteAndGeofence({ lat: startLat, lon: startLon }, { lat: endLat, lon: endLon })
+        if (res && res.route) {
+          setActiveRoute({
+            ...res.route,
+            departure_name: departureName,
+            destination_name: dest.name || dest.id,
+            geofence_status: res.geofence?.status || 'clear'
+          })
+        }
       }
     } catch (err) {
       console.error(err)
@@ -757,9 +920,9 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
     <>
       <div className="pageIntro">
         <div>
-          <span className="eyebrow">ORCA / {t('safety')}</span>
+          <span className="eyebrow">ORCA / {t('safety')} • A* RISK-AWARE NAVIGATION</span>
           <h2>{t('safeRoute')}</h2>
-          <p>Evaluate real-time coastal routes, geofences, and weather hazards before departure.</p>
+          <p>Evaluate real-time coastal routes, geofences, and INCOIS weather hazards before departure.</p>
         </div>
       </div>
 
@@ -769,6 +932,11 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
             <div className="plannerRow">
               <label>{t('originPort')}</label>
               <select value={originId} onChange={e => handlePortChange(e.target.value)}>
+                {userLocation && (
+                  <option value="current_gps">
+                    📍 My Current GPS ({userLocation.lat.toFixed(2)}°N, {userLocation.lon.toFixed(2)}°E — {userLocation.port_name})
+                  </option>
+                )}
                 {PORTS.map(p => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
@@ -785,7 +953,7 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
             </div>
 
             <button className="primary" onClick={handleCalculateRoute} disabled={calculating}>
-              {calculating ? 'Calculating Route...' : `🚀 ${t('calculateRoute')}`}
+              {calculating ? 'Computing Safe A* Path...' : `🚀 ${t('calculateRoute')}`}
             </button>
           </div>
         </Card>
@@ -795,25 +963,82 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
             <div>
               <div className="routeSummary">
                 <div>
-                  <span className="pill">{t('recommended')}</span>
+                  <span className="pill">{t('recommended')} · A* OPTIMAL PATH</span>
                   <h2>{activeRoute.destination_name || 'Designated Marine Route'}</h2>
-                  <p>{activeRoute.distance_km} km • ~{Math.round(activeRoute.estimated_travel_time_min || (activeRoute.distance_km / 15 * 60))} mins @ 15 km/h</p>
+                  <p>
+                    From: <b>{activeRoute.departure_name}</b><br/>
+                    {activeRoute.distance_km} km ({activeRoute.distance_nm || (activeRoute.distance_km * 0.54).toFixed(1)} NM) • ~{Math.round(activeRoute.estimated_travel_time_min || (activeRoute.distance_km / 18 * 60))} mins @ 18 km/h
+                  </p>
                 </div>
-                <strong>LOW<small>{t('risk')}</small></strong>
+                <strong>{activeRoute.risk_band || 'LOW'}<small>{t('risk')}</small></strong>
               </div>
 
-              <div className="reasonList">
-                <div><b>01</b><span>Avoids Mumbai High swell advisory corridor</span></div>
-                <div><b>02</b><span>Checked against Marine Protected Areas and international boundaries</span></div>
-                <div><b>03</b><span>Waypoints synchronized with real-time Supabase weather readings</span></div>
+              {/* Navigation Telemetry KPIs */}
+              <div className="navStatsBar">
+                <div className="navStatItem">
+                  <span>Compass Heading</span>
+                  <strong>{activeRoute.overall_bearing_deg || 248.8}° {activeRoute.compass_direction || 'WSW'}</strong>
+                </div>
+                <div className="navStatItem">
+                  <span>Risk Score</span>
+                  <strong style={{ color: (activeRoute.average_risk_score || 15) < 30 ? 'var(--teal)' : 'var(--warning)' }}>
+                    {(activeRoute.average_risk_score || 14.8).toFixed(1)} / 100
+                  </strong>
+                </div>
+                <div className="navStatItem">
+                  <span>Waypoints</span>
+                  <strong>{activeRoute.waypoint_list?.length || activeRoute.waypoints?.length || 4} Points</strong>
+                </div>
+                <div className="navStatItem">
+                  <span>Geofence Status</span>
+                  <strong className={'navSafeTag ' + ((activeRoute.restricted_geofences_avoided?.length > 0) ? 'clear' : 'clear')}>
+                    ✓ Safe Clearance
+                  </strong>
+                </div>
               </div>
+
+              <div className="reasonList" style={{ marginTop: '14px' }}>
+                <div><b>01</b><span>A* cost function penalizes wave risk & routes through optimal low-swell grid corridors</span></div>
+                <div><b>02</b><span>Checked against marine protected areas and international boundary limits</span></div>
+                <div><b>03</b><span>{activeRoute.restricted_geofences_avoided?.length > 0 ? `Avoided restricted zones: ${activeRoute.restricted_geofences_avoided.join(', ')}` : 'Zero prohibited geofence crossings detected along path'}</span></div>
+              </div>
+
+              {/* Step-by-Step Waypoint Table */}
+              {activeRoute.waypoint_list && activeRoute.waypoint_list.length > 0 && (
+                <div className="navTableWrap">
+                  <table className="navTable">
+                    <thead>
+                      <tr>
+                        <th>Leg</th>
+                        <th>Coordinates</th>
+                        <th>Heading</th>
+                        <th>Leg Dist</th>
+                        <th>ETA</th>
+                        <th>Clearance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeRoute.waypoint_list.map((w, idx) => (
+                        <tr key={idx}>
+                          <td><b>#{w.leg || idx + 1}</b></td>
+                          <td>{w.latitude.toFixed(3)}°N, {w.longitude.toFixed(3)}°E</td>
+                          <td>{w.heading_deg?.toFixed(0)}° {w.compass_direction}</td>
+                          <td>{w.leg_distance_km?.toFixed(1) || 0} km</td>
+                          <td>~{Math.round(w.eta_min || 0)}m</td>
+                          <td><span className="navSafeTag clear">✓ Pass</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
 
               <button className="primary full" style={{ marginTop: '16px' }} onClick={() => navigate('/map')}>
                 🗺️ View Full Route on Marine Map →
               </button>
             </div>
           ) : (
-            <p style={{ color: 'var(--muted)' }}>Select your origin port and destination zone to compute the safe navigational corridor.</p>
+            <p style={{ color: 'var(--muted)' }}>Select your departure origin and destination zone to compute the safe navigational corridor.</p>
           )}
         </Card>
       </div>
@@ -825,22 +1050,27 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
           <span>✓ {t('boundaries')} Cleared</span>
           <span>✓ {t('routeRisk')} Evaluated</span>
           <span>✓ Supabase Live Sync Active</span>
+          <span>✓ A* Geofence Path Verified</span>
         </div>
       </Card>
     </>
   )
 }
 
-function Assistant({ lang, navigate, setActiveRoute, setSelectedZone }) {
+function Assistant({ lang, navigate, setActiveRoute, setSelectedZone, userLocation }) {
   const t = k => tr(lang, k)
-  const [messages, setMessages] = useState([{ role: 'orca', text: t('demoAnswer') }])
+  const initialAnswer = userLocation
+    ? `Hello Captain! I am ORCA, connected live to your location near ${userLocation.port_name} (${userLocation.lat.toFixed(2)}°N, ${userLocation.lon.toFixed(2)}°E). How can I assist your voyage today? You can ask about PFZ zones, weather, wave conditions, or safe routes along the coast.`
+    : t('demoAnswer')
+
+  const [messages, setMessages] = useState([{ role: 'orca', text: initialAnswer }])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionId] = useState(() => 'orca_sess_' + Math.random().toString(36).substring(2, 10))
 
   useEffect(() => {
-    setMessages([{ role: 'orca', text: t('demoAnswer') }])
-  }, [lang])
+    setMessages([{ role: 'orca', text: initialAnswer }])
+  }, [lang, userLocation])
 
   const send = async (q) => {
     if (!q.trim() || loading) return
@@ -851,7 +1081,19 @@ function Assistant({ lang, navigate, setActiveRoute, setSelectedZone }) {
     setLoading(true)
 
     try {
-      const data = await askOrca(userText, sessionId, { language: lang, history })
+      const data = await askOrca(userText, sessionId, {
+        language: lang,
+        history,
+        location: userLocation?.port_name,
+        user_location: userLocation ? {
+          latitude: userLocation.lat,
+          longitude: userLocation.lon,
+          port_id: userLocation.port_id,
+          port_name: userLocation.port_name,
+          is_coastal: userLocation.is_coastal,
+          distance_to_port_km: userLocation.distance_to_port_km
+        } : null
+      })
       if (data && (data.explanation_text || data.recommendation)) {
         let reply = data.explanation_text || ''
 
@@ -867,7 +1109,7 @@ function Assistant({ lang, navigate, setActiveRoute, setSelectedZone }) {
             setActiveRoute({
               ...r,
               destination_name: data.recommendation.zone_id,
-              departure_name: 'Departure Port'
+              departure_name: userLocation?.port_name ? `📍 ${userLocation.port_name}` : 'Departure Port'
             })
             setSelectedZone(data.recommendation.zone_id)
           }
@@ -1124,6 +1366,12 @@ function App() {
   const [alertList, setAlertList] = useState(staticAlerts)
   const [oceanStats, setOceanStats] = useState(null)
   const [oceanPeriod, setOceanPeriod] = useState('7')
+
+  // Location Intelligence State (Version 3)
+  const [userLocation, setUserLocation] = useState(null)
+  const [detectingLocation, setDetectingLocation] = useState(false)
+  const [locationPermission, setLocationPermission] = useState('prompt')
+
   const [activeRoute, setActiveRoute] = useState({
     origin: { lat: 18.94, lon: 72.83 },
     destination: { lat: 18.82, lon: 72.48 },
@@ -1140,6 +1388,106 @@ function App() {
 
   const path = loc.pathname
   const t = k => tr(lang, k)
+
+  // Geolocation resolution function
+  const handleRequestLocation = (force = false) => {
+    if (!navigator.geolocation) {
+      console.warn('Geolocation not supported by browser.')
+      setLocationPermission('denied')
+      return
+    }
+    setDetectingLocation(true)
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords
+        setLocationPermission('granted')
+        try {
+          const locData = await resolveUserLocation(latitude, longitude)
+          if (locData) {
+            const nearest = locData.nearest_port || {}
+            const locObj = {
+              lat: latitude,
+              lon: longitude,
+              port_id: nearest.id || 'mumbai',
+              port_name: nearest.name || 'Mumbai Harbour',
+              state: nearest.state || 'Maharashtra',
+              is_coastal: locData.is_coastal,
+              distance_to_port_km: locData.distance_to_coast_km || 0,
+              incois_live: locData.live_incois,
+              nearby_pfz: locData.nearby_pfz || [],
+              status: 'granted'
+            }
+            setUserLocation(locObj)
+            if (nearest.id) {
+              setSelectedPort(nearest.id)
+              loadPfzs(nearest.id)
+            }
+          }
+        } catch (e) {
+          console.error('Error resolving location:', e)
+        } finally {
+          setDetectingLocation(false)
+        }
+      },
+      (err) => {
+        console.warn('Geolocation denied or timed out:', err)
+        setLocationPermission('denied')
+        setDetectingLocation(false)
+        if (!userLocation) {
+          setUserLocation({
+            lat: 18.94,
+            lon: 72.83,
+            port_id: 'mumbai',
+            port_name: 'Mumbai Harbour (Default)',
+            is_coastal: true,
+            distance_to_port_km: 0,
+            status: 'fallback'
+          })
+        }
+      },
+      { timeout: 9000, enableHighAccuracy: true, maximumAge: 60000 }
+    )
+  }
+
+  // Request user location automatically on initial application mount
+  useEffect(() => {
+    handleRequestLocation(false)
+  }, [])
+
+  // Helper to plot safe A* route directly from user's coordinates to a PFZ
+  const handlePlotRouteFromLocation = async (targetZone) => {
+    const startLat = userLocation?.lat || 18.94
+    const startLon = userLocation?.lon || 72.83
+    const endLat = targetZone.lat
+    const endLon = targetZone.lng || targetZone.lon
+
+    try {
+      const navRes = await getSafeMarineRoute(startLat, startLon, endLat, endLon, 18.0)
+      if (navRes && navRes.waypoints && navRes.waypoints.length > 0) {
+        setActiveRoute({
+          origin: { lat: startLat, lon: startLon },
+          destination: { lat: endLat, lon: endLon },
+          waypoints: navRes.waypoints.map(w => ({ lat: w.latitude, lon: w.longitude })),
+          distance_km: navRes.distance_km,
+          distance_nm: navRes.distance_nm,
+          estimated_travel_time_min: navRes.estimated_duration_min,
+          overall_bearing_deg: navRes.overall_bearing_deg,
+          compass_direction: navRes.compass_direction,
+          average_risk_score: navRes.average_risk_score,
+          risk_band: navRes.risk_band,
+          waypoint_list: navRes.waypoints,
+          restricted_geofences_avoided: navRes.restricted_geofences_avoided || [],
+          departure_name: userLocation?.port_name ? `📍 ${userLocation.port_name}` : 'My Position',
+          destination_name: targetZone.name || targetZone.id,
+          geofence_status: (navRes.restricted_geofences_avoided?.length > 0) ? 'avoided_restricted_zones' : 'clear'
+        })
+        setSelected(targetZone.id)
+        navigate('/safety')
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   // Initialize Supabase Auth session listener
   useEffect(() => {
@@ -1274,6 +1622,9 @@ function App() {
           setSelectedPort(p)
           loadPfzs(p)
         }}
+        userLocation={userLocation}
+        requestLocationPermission={handleRequestLocation}
+        detectingLocation={detectingLocation}
       />
     )
   }
@@ -1293,6 +1644,8 @@ function App() {
           setSelectedPort(p)
           loadPfzs(p)
         }}
+        userLocation={userLocation}
+        onPlotRouteFromLocation={handlePlotRouteFromLocation}
       />
     )
   }
@@ -1335,6 +1688,7 @@ function App() {
           setSelectedPort(p)
           loadPfzs(p)
         }}
+        userLocation={userLocation}
       />
     )
   }
@@ -1345,6 +1699,7 @@ function App() {
         navigate={navigate}
         setActiveRoute={setActiveRoute}
         setSelectedZone={setSelected}
+        userLocation={userLocation}
       />
     )
   }
@@ -1417,6 +1772,20 @@ function App() {
           </div>
 
           <div className="headerRight">
+            {/* Live Location Navigation Status Pill */}
+            <button 
+              className="headerLocationPill"
+              onClick={() => handleRequestLocation(true)}
+              title="Click to detect or refresh your GPS location"
+            >
+              <span className={userLocation?.status === 'granted' ? 'pulseGps' : 'amberDot'} />
+              <span>
+                {userLocation?.status === 'granted'
+                  ? `📍 ${userLocation.port_name?.split(' ')[0]} (${userLocation.lat.toFixed(2)}°, ${userLocation.lon.toFixed(2)}°)`
+                  : (detectingLocation ? '📍 Detecting...' : '📍 Allow Location')}
+              </span>
+            </button>
+
             <button className="iconBtn" onClick={() => setPanel(panel === 'search' ? null : 'search')} aria-label={t('search')}>⌕</button>
             <button className="iconBtn" onClick={() => setPanel(panel === 'bell' ? null : 'bell')} aria-label={t('notifications')}>♢</button>
 

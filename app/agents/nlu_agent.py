@@ -294,6 +294,12 @@ class NLULanguageAgent:
         if prior_context:
             if not location_text and prior_context.get("location"):
                 location_text = prior_context["location"]
+            if not location_text and prior_context.get("user_location"):
+                u_loc = prior_context["user_location"]
+                if isinstance(u_loc, dict):
+                    location_text = u_loc.get("port_name") or u_loc.get("city") or u_loc.get("port_id")
+                elif isinstance(u_loc, str):
+                    location_text = u_loc
             if prior_context.get("date") and "tomorrow" not in text_lower and "कल" not in text_lower and "उद्या" not in text_lower:
                 target_date = prior_context["date"]
             if prior_context.get("time_window") and not time_match:

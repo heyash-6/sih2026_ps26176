@@ -200,3 +200,80 @@ export async function triggerSync() {
   }
 }
 
+/**
+ * Resolve User GPS coordinates to closest coastal port & live telemetry
+ */
+export async function resolveUserLocation(lat, lon) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/location/resolve?lat=${lat}&lon=${lon}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] resolveUserLocation failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Calculate Safe Marine Navigation Route via Risk-Aware A*
+ */
+export async function getSafeMarineRoute(startLat, startLon, endLat, endLon, vesselSpeedKmh = 18.0) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/gis/route/safe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        start_latitude: startLat,
+        start_longitude: startLon,
+        end_latitude: endLat,
+        end_longitude: endLon,
+        vessel_speed_kmh: vesselSpeedKmh
+      })
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] getSafeMarineRoute failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Analyze Voyage Navigation (PFZ, Hazards, Conditions, Waypoints)
+ */
+export async function analyzeNavigation(startLat, startLon, endLat, endLon, vesselSpeedKmh = 18.0) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/gis/navigation/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        start_latitude: startLat,
+        start_longitude: startLon,
+        end_latitude: endLat,
+        end_longitude: endLon,
+        vessel_speed_kmh: vesselSpeedKmh
+      })
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] analyzeNavigation failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Live INCOIS Telemetry for specific coordinate
+ */
+export async function getLiveIncoisTelemetry(lat, lon) {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/incois/live?lat=${lat}&lon=${lon}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] getLiveIncoisTelemetry failed:', err);
+    return null;
+  }
+}
+
+

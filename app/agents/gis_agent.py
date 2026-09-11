@@ -67,21 +67,25 @@ class GISAgent:
 
     def get_route(self, origin: LatLon, destination: LatLon, speed_kmh: Optional[float] = None) -> Route:
         speed = speed_kmh or settings.default_vessel_speed_kmh
-        dist = self.distance_km(origin, destination)
-        
-        # Calculate travel time in minutes
-        travel_time_min = int((dist / speed) * 60)
-        
-        # Intermediate coastal waypoint for map visualization
-        mid_lat = round((origin.lat + destination.lat) / 2, 4)
-        mid_lon = round((origin.lon + destination.lon) / 2, 4)
-        
-        waypoints = [
-            Waypoint(lat=origin.lat, lon=origin.lon),
-            Waypoint(lat=mid_lat, lon=mid_lon),
-            Waypoint(lat=destination.lat, lon=destination.lon)
-        ]
-        
+        try:
+            from app.gis.navigator import navigator
+            safe = navigator.calculate_safe_route(origin.lat, origin.lon, destination.lat, destination.lon, vessel_speed_kmh=speed)
+            waypoints = [Waypoint(lat=w["latitude"], lon=w["longitude"]) for w in safe.get("waypoints", [])]
+            dist = safe["summary"]["total_distance_km"]
+            travel_time_min = safe["summary"]["estimated_duration_minutes"]
+            method = "A* Risk-Aware Marine Navigation Engine"
+        except Exception:
+            dist = self.distance_km(origin, destination)
+            travel_time_min = int((dist / speed) * 60)
+            mid_lat = round((origin.lat + destination.lat) / 2, 4)
+            mid_lon = round((origin.lon + destination.lon) / 2, 4)
+            waypoints = [
+                Waypoint(lat=origin.lat, lon=origin.lon),
+                Waypoint(lat=mid_lat, lon=mid_lon),
+                Waypoint(lat=destination.lat, lon=destination.lon)
+            ]
+            method = "coastal_waypoint_approximation"
+
         return Route(
             origin=origin,
             destination=destination,
@@ -89,7 +93,7 @@ class GISAgent:
             distance_km=dist,
             estimated_travel_time_min=travel_time_min,
             assumed_speed_kmh=speed,
-            method="coastal_waypoint_approximation"
+            method=method
         )
 
     def check_geofence(self, route: Route) -> GeofenceResult:
