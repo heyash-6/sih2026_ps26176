@@ -388,3 +388,58 @@ CREATE POLICY "Service role full access alerts"
     ON public.alerts FOR ALL 
     TO service_role 
     USING (true);
+
+-- ==============================================================================
+-- 12. Chat Conversations & Messages Architecture (Requirement 5 & 6)
+-- ==============================================================================
+CREATE TABLE IF NOT EXISTS public.conversations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id TEXT,
+    title TEXT NOT NULL DEFAULT 'New Conversation',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.chat_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    conversation_id UUID NOT NULL REFERENCES public.conversations(id) ON DELETE CASCADE,
+    user_id TEXT,
+    sender TEXT NOT NULL CHECK (sender IN ('user', 'orca')),
+    message TEXT NOT NULL,
+    language TEXT DEFAULT 'en',
+    has_route BOOLEAN DEFAULT false,
+    metadata JSONB DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_conversations_user_id ON public.conversations(user_id);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_conv_id ON public.chat_messages(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_user_id ON public.chat_messages(user_id);
+
+ALTER TABLE public.conversations ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public and authenticated read conversations" ON public.conversations;
+CREATE POLICY "Public and authenticated read conversations" ON public.conversations FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public and authenticated insert conversations" ON public.conversations;
+CREATE POLICY "Public and authenticated insert conversations" ON public.conversations FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public and authenticated update conversations" ON public.conversations;
+CREATE POLICY "Public and authenticated update conversations" ON public.conversations FOR UPDATE USING (true);
+
+DROP POLICY IF EXISTS "Public and authenticated delete conversations" ON public.conversations;
+CREATE POLICY "Public and authenticated delete conversations" ON public.conversations FOR DELETE USING (true);
+
+DROP POLICY IF EXISTS "Public and authenticated read chat_messages" ON public.chat_messages;
+CREATE POLICY "Public and authenticated read chat_messages" ON public.chat_messages FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public and authenticated insert chat_messages" ON public.chat_messages;
+CREATE POLICY "Public and authenticated insert chat_messages" ON public.chat_messages FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Service role full access conversations" ON public.conversations;
+CREATE POLICY "Service role full access conversations" ON public.conversations FOR ALL TO service_role USING (true);
+
+DROP POLICY IF EXISTS "Service role full access chat_messages" ON public.chat_messages;
+CREATE POLICY "Service role full access chat_messages" ON public.chat_messages FOR ALL TO service_role USING (true);
+

@@ -26,7 +26,7 @@ class PlannerAgent:
         errors: List[ErrorDetail] = []
         step_counter = 1
 
-        location_text = entities.location_text or "Ratnagiri"
+        location_text = entities.location_text or "Mumbai"
         date_str = entities.date or "2026-09-09"
         datetime_str = f"{date_str}T05:00:00+05:30"
 
@@ -37,7 +37,7 @@ class PlannerAgent:
         duration_ms = int((time.time() - t0) * 1000)
         
         if not coords:
-            coords = LatLon(lat=16.9902, lon=73.3120, resolved_from="Ratnagiri Fallback", method="fallback")
+            coords = LatLon(lat=18.9400, lon=72.8300, resolved_from="Mumbai Harbour", method="coastal_hub")
 
         execution_trace.append(ExecutionTraceStep(
             step=step_counter, tool="geocode", status="done", duration_ms=duration_ms,

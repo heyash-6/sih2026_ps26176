@@ -1,6 +1,6 @@
 from typing import Dict, Any, Optional
 from app.config import settings
-from app.schemas.nlu import NLUInput, NLUOutput
+from app.schemas.nlu import NLUInput, NLUOutput, IntentEnum
 from app.schemas.decision import FinalDecisionOutput, CandidatePackage
 from app.schemas.marine import PFZCandidate
 from app.schemas.weather import WeatherReading, MarineConditions, HazardAlert
@@ -68,6 +68,23 @@ class Orchestrator:
 
         _ORCA_SESSION_MEMORY.setdefault(session_id, {})["location"] = nlu_out.entities.location_text
         _ORCA_SESSION_MEMORY[session_id]["date"] = nlu_out.entities.date
+
+        # Fast Short-Circuit for Greetings & Conceptual / Ocean Science Queries (Requirement 9 & 20)
+        # Bypasses unnecessary PFZ search, A* grid routing, and risk calculation for instantaneous < 500ms responses
+        is_greeting_or_concept = (
+            nlu_out.intent in [IntentEnum.OTHER, IntentEnum.CHLOROPHYLL_SST_LOOKUP, IntentEnum.PRODUCTIVITY_EXPLANATION]
+            and not any(kw in text.lower() for kw in ["fish", "trip", "wave", "hazard", "storm", "cyclone", "safe to go", "can i go", "मार्ग"])
+        )
+        if is_greeting_or_concept:
+            return decision_agent.decide_and_explain(
+                session_id=session_id,
+                language=nlu_out.language,
+                candidates=[],
+                execution_trace=[],
+                user_query=text,
+                intent=nlu_out.intent.value,
+                location_text=nlu_out.entities.location_text
+            )
 
         # Step 3: Run Planner Agent (Decomposes, calls specialist tools, evaluates risk)
         plan_out = planner_agent.plan_and_execute(nlu_out)

@@ -276,4 +276,142 @@ export async function getLiveIncoisTelemetry(lat, lon) {
   }
 }
 
+/**
+ * -----------------------------------------------------------------------------
+ * User-Specific Conversation & Chat History Services (Requirements 5, 6, 7, 8)
+ * -----------------------------------------------------------------------------
+ */
+
+export async function getUserConversations(userId) {
+  if (!userId) return [];
+  const storageKey = `orca_convs_${userId}`;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/conversations?user_id=${encodeURIComponent(userId)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.conversations)) {
+        localStorage.setItem(storageKey, JSON.stringify(data.conversations));
+        return data.conversations;
+      }
+    }
+  } catch (err) {
+    console.warn('[ORCA API] getUserConversations network error, falling back to local cache:', err);
+  }
+  // Local cache fallback
+  try {
+    const cached = localStorage.getItem(storageKey);
+    return cached ? JSON.parse(cached) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function createNewConversation(userId, title = 'New Marine Chat') {
+  if (!userId) return null;
+  const storageKey = `orca_convs_${userId}`;
+  const localId = 'conv_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+  const newConvObj = {
+    id: localId,
+    user_id: userId,
+    title: title.slice(0, 70),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/conversations`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, title: title.slice(0, 70) })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const serverConv = Array.isArray(data) ? data[0] : data;
+      if (serverConv?.id) {
+        // Update local cache
+        const convs = await getUserConversations(userId);
+        const updated = [serverConv, ...convs.filter(c => c.id !== serverConv.id)];
+        localStorage.setItem(storageKey, JSON.stringify(updated));
+        return serverConv;
+      }
+    }
+  } catch (err) {
+    console.warn('[ORCA API] createNewConversation network error, saving locally:', err);
+  }
+
+  // Fallback to local storage
+  const cached = localStorage.getItem(storageKey);
+  const currentList = cached ? JSON.parse(cached) : [];
+  const updatedList = [newConvObj, ...currentList];
+  localStorage.setItem(storageKey, JSON.stringify(updatedList));
+  return newConvObj;
+}
+
+export async function getConversationMessages(convId) {
+  if (!convId) return [];
+  const storageKey = `orca_msgs_${convId}`;
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/conversations/${encodeURIComponent(convId)}/messages`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.messages)) {
+        localStorage.setItem(storageKey, JSON.stringify(data.messages));
+        return data.messages;
+      }
+    }
+  } catch (err) {
+    console.warn('[ORCA API] getConversationMessages network error, checking local cache:', err);
+  }
+  // Local cache fallback
+  try {
+    const cached = localStorage.getItem(storageKey);
+    return cached ? JSON.parse(cached) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function saveChatMessage(convId, userId, sender, text, language = 'en', hasRoute = false, metadata = {}) {
+  if (!convId) return null;
+  const storageKey = `orca_msgs_${convId}`;
+  const msgObj = {
+    id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+    conversation_id: convId,
+    user_id: userId,
+    sender,
+    message: text,
+    language,
+    has_route: hasRoute,
+    metadata,
+    created_at: new Date().toISOString()
+  };
+
+  // Immediate local cache update
+  try {
+    const cached = localStorage.getItem(storageKey);
+    const msgs = cached ? JSON.parse(cached) : [];
+    localStorage.setItem(storageKey, JSON.stringify([...msgs, msgObj]));
+  } catch {}
+
+  // Sync to backend Supabase
+  try {
+    fetch(`${API_BASE_URL}/api/conversations/${encodeURIComponent(convId)}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        conversation_id: convId,
+        user_id: userId,
+        sender,
+        message: text,
+        language,
+        has_route: hasRoute,
+        metadata
+      })
+    }).catch(() => {});
+  } catch {}
+
+  return msgObj;
+}
+
+
 

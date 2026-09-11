@@ -433,4 +433,123 @@ class SupabaseClient:
             logger.warning(f"Supabase upsert_pfz_zones error: {e}")
         return False
 
+    # -------------------------------------------------------------------------
+    # 7. User-Specific Chat Conversations & History (Requirement 5 & 6)
+    # -------------------------------------------------------------------------
+    def get_user_conversations(self, user_id: str, limit: int = 30) -> List[Dict[str, Any]]:
+        """Retrieve all conversations for a specific user, sorted newest updated first."""
+        if not self._is_configured or not user_id:
+            return []
+        try:
+            with httpx.Client(timeout=6.0) as client:
+                res = client.get(
+                    f"{self.rest_url}/conversations?user_id=eq.{user_id}&order=updated_at.desc&limit={limit}",
+                    headers=self.headers
+                )
+                if res.status_code == 200:
+                    return res.json()
+                logger.warning(f"Supabase get_user_conversations error {res.status_code}: {res.text}")
+        except Exception as e:
+            logger.warning(f"Supabase get_user_conversations exception: {e}")
+        return []
+
+    def create_conversation(self, user_id: str, title: str = "New Marine Chat") -> Optional[Dict[str, Any]]:
+        """Create a new conversation record for a user."""
+        if not self._is_configured:
+            return None
+        try:
+            payload = {
+                "user_id": user_id,
+                "title": title[:80]
+            }
+            with httpx.Client(timeout=6.0) as client:
+                res = client.post(
+                    f"{self.rest_url}/conversations",
+                    headers={**self.headers, "Prefer": "return=representation"},
+                    json=payload
+                )
+                if res.status_code in [200, 201]:
+                    data = res.json()
+                    return data[0] if isinstance(data, list) and data else data
+                logger.warning(f"Supabase create_conversation error {res.status_code}: {res.text}")
+        except Exception as e:
+            logger.warning(f"Supabase create_conversation exception: {e}")
+        return None
+
+    def update_conversation_title(self, conversation_id: str, title: str) -> bool:
+        """Update conversation title and touch updated_at timestamp."""
+        if not self._is_configured:
+            return False
+        try:
+            with httpx.Client(timeout=6.0) as client:
+                res = client.patch(
+                    f"{self.rest_url}/conversations?id=eq.{conversation_id}",
+                    headers=self.headers,
+                    json={"title": title[:80], "updated_at": datetime.now().isoformat()}
+                )
+                return res.status_code in [200, 204]
+        except Exception as e:
+            logger.warning(f"Supabase update_conversation_title exception: {e}")
+        return False
+
+    def get_conversation_messages(self, conversation_id: str, limit: int = 100) -> List[Dict[str, Any]]:
+        """Retrieve all messages for a specific conversation in chronological order."""
+        if not self._is_configured or not conversation_id:
+            return []
+        try:
+            with httpx.Client(timeout=6.0) as client:
+                res = client.get(
+                    f"{self.rest_url}/chat_messages?conversation_id=eq.{conversation_id}&order=created_at.asc&limit={limit}",
+                    headers=self.headers
+                )
+                if res.status_code == 200:
+                    return res.json()
+                logger.warning(f"Supabase get_conversation_messages error {res.status_code}: {res.text}")
+        except Exception as e:
+            logger.warning(f"Supabase get_conversation_messages exception: {e}")
+        return []
+
+    def insert_chat_message(
+        self,
+        conversation_id: str,
+        user_id: Optional[str],
+        sender: str,
+        message: str,
+        language: str = "en",
+        has_route: bool = False,
+        metadata: Optional[Dict[str, Any]] = None
+    ) -> Optional[Dict[str, Any]]:
+        """Persist a message into the conversation thread."""
+        if not self._is_configured:
+            return None
+        try:
+            payload = {
+                "conversation_id": conversation_id,
+                "user_id": user_id,
+                "sender": sender,
+                "message": message,
+                "language": language,
+                "has_route": has_route,
+                "metadata": metadata or {}
+            }
+            with httpx.Client(timeout=6.0) as client:
+                res = client.post(
+                    f"{self.rest_url}/chat_messages",
+                    headers={**self.headers, "Prefer": "return=representation"},
+                    json=payload
+                )
+                if res.status_code in [200, 201]:
+                    # Touch conversation updated_at
+                    client.patch(
+                        f"{self.rest_url}/conversations?id=eq.{conversation_id}",
+                        headers=self.headers,
+                        json={"updated_at": datetime.now().isoformat()}
+                    )
+                    data = res.json()
+                    return data[0] if isinstance(data, list) and data else data
+                logger.warning(f"Supabase insert_chat_message error {res.status_code}: {res.text}")
+        except Exception as e:
+            logger.warning(f"Supabase insert_chat_message exception: {e}")
+        return None
+
 supabase_client = SupabaseClient()

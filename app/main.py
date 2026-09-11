@@ -283,7 +283,8 @@ def get_table_data(table_name: str, limit: int = Query(50, description="Max rows
     allowed = [
         "pfz_zones", "weather_observations", "wave_observations", 
         "ocean_observations", "marine_analyses", "alerts", 
-        "current_observations", "tide_observations", "users"
+        "current_observations", "tide_observations", "users",
+        "conversations", "chat_messages"
     ]
     if table_name not in allowed:
         raise HTTPException(status_code=400, detail="Invalid table name")
@@ -359,6 +360,59 @@ def trigger_sync():
         m = weather_hazard_agent.get_marine_conditions(lat, lon, now_iso)
         synced.append({"hub": name, "temp": w.temperature_c, "waves": m.wave_height_m})
     return {"status": "synced", "hubs": synced}
+
+class CreateConversationRequest(BaseModel):
+    user_id: str
+    title: Optional[str] = "New Marine Chat"
+
+class AddChatMessageRequest(BaseModel):
+    conversation_id: Optional[str] = None
+    user_id: Optional[str] = None
+    sender: str
+    message: str
+    language: Optional[str] = "en"
+    has_route: Optional[bool] = False
+    metadata: Optional[Dict[str, Any]] = None
+
+@app.get("/api/conversations")
+def get_conversations(user_id: str = Query(..., description="User ID")):
+    """Get all conversations for a specific user."""
+    from app.database.supabase_client import supabase_client
+    convs = supabase_client.get_user_conversations(user_id)
+    return {"conversations": convs, "count": len(convs)}
+
+@app.post("/api/conversations")
+def create_conversation_endpoint(req: CreateConversationRequest):
+    """Create a new conversation."""
+    from app.database.supabase_client import supabase_client
+    conv = supabase_client.create_conversation(req.user_id, req.title or "New Marine Chat")
+    if conv:
+        return conv
+    raise HTTPException(status_code=500, detail="Failed to create conversation")
+
+@app.get("/api/conversations/{conv_id}/messages")
+def get_conversation_messages_endpoint(conv_id: str):
+    """Get all messages for a specific conversation."""
+    from app.database.supabase_client import supabase_client
+    msgs = supabase_client.get_conversation_messages(conv_id)
+    return {"messages": msgs, "count": len(msgs)}
+
+@app.post("/api/conversations/{conv_id}/messages")
+def add_chat_message_endpoint(conv_id: str, req: AddChatMessageRequest):
+    """Append a message to a conversation."""
+    from app.database.supabase_client import supabase_client
+    msg = supabase_client.insert_chat_message(
+        conversation_id=conv_id,
+        user_id=req.user_id,
+        sender=req.sender,
+        message=req.message,
+        language=req.language or "en",
+        has_route=req.has_route or False,
+        metadata=req.metadata or {}
+    )
+    if msg:
+        return msg
+    raise HTTPException(status_code=500, detail="Failed to persist message")
 
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):

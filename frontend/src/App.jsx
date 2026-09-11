@@ -18,7 +18,11 @@ import {
   resolveUserLocation,
   getSafeMarineRoute,
   analyzeNavigation,
-  getLiveIncoisTelemetry
+  getLiveIncoisTelemetry,
+  getUserConversations,
+  createNewConversation,
+  getConversationMessages,
+  saveChatMessage
 } from './services/api'
 import { onAuthStateChange, signOutUser, getSession } from './services/supabaseClient'
 import AuthModal from './components/AuthModal'
@@ -36,7 +40,11 @@ const T = {
     inlandMsg: 'Inland location detected. Navigation routed from nearest coastal fishery hub.',
     waypointTable: 'Waypoint Navigation Log',
     bearing: 'Compass Heading',
-    legDist: 'Leg Dist'
+    legDist: 'Leg Dist',
+    previousChats: 'Previous Chats',
+    newChat: 'New Chat',
+    recenter: 'Recenter Map',
+    noChatsYet: 'No previous conversations.'
   },
   hi: {
     dashboard: 'डैशबोर्ड', map: 'समुद्री इंटेलिजेंस मैप', analytics: 'महासागर विश्लेषण', fishing: 'मछली पकड़ने की इंटेलिजेंस', safety: 'सुरक्षा और मार्ग', assistant: 'ORCA AI सहायक', alerts: 'सूचनाएं', settings: 'सेटिंग्स', profile: 'प्रोफ़ाइल', workspace: 'वर्कस्पेस', operational: 'सिस्टम चालू हैं', connected: 'समुद्री डेटा सेवाएं जुड़ी हैं', marine: 'समुद्री इंटेलिजेंस', glance: 'समुद्री स्थिति एक नज़र में।', location: 'मुंबई तट • लाइव सुपबेस और सेंसर डेटा कनेक्टेड', ask: 'ORCA से पूछें', seaState: 'समुद्र की स्थिति', wind: 'हवा', sst: 'समुद्र सतह तापमान', activePFZ: 'सक्रिय PFZ', moderate: 'मध्यम', waves: '1.2 मी. लहरें', steady: 'NE • स्थिर', favourable: 'अनुकूल', openMap: 'मैप खोलें', activeAdvisories: 'सक्रिय सलाह', viewAll: 'सभी देखें', insights: 'आज की समुद्री जानकारी', bestFishing: 'बेहतरीन मछली पकड़ने का अवसर', departure: 'अनुशंसित प्रस्थान', confidence: 'डेटा विश्वसनीयता', verified: 'सत्यापित इंटेलिजेंस', sources: 'स्रोत: ISRO • INCOIS • IMD • Supabase', oceanInputs: 'समुद्र और भौगोलिक इनपुट की जांच की गई।', allLayers: 'सभी लेयर', weather: 'मौसम', hazards: 'जोखिम', boundaries: 'सीमाएं', today: 'आज', selectedZone: 'चयनित क्षेत्र', high: 'उच्च विश्वसनीयता', why: 'यह क्षेत्र क्यों?', signal: 'संकेत', how: 'ORCA कैसे निर्णय लेता है', discover: 'खोजें', correlate: 'संबंध जोड़ें', assess: 'आकलन करें', explain: 'समझाएं', findZones: 'संभावित मछली पकड़ने वाले क्षेत्र खोजें।', explore: 'PFZ खोजें', viewZone: 'क्षेत्र देखें', recommendation: 'ORCA की सिफारिश', start: 'शुरुआत करें', safeRoute: 'सुरक्षित मार्ग आकलन', recommended: 'अनुशंसित', low: 'कम', risk: 'जोखिम', whyRoute: 'ORCA इस मार्ग की सिफारिश क्यों करता है', safetyChecklist: 'सुरक्षा चेकलिस्ट', askSea: 'समुद्र के बारे में ORCA से पूछें।', conversational: 'कन्वर्सेशनल मरीन इंटेलिजेंस', placeholder: 'समुद्र से जुड़ा सवाल पूछें...', send: 'भेजें', nearest: 'आज का निकटतम PFZ', safeTomorrow: 'क्या कल सुबह जाना सुरक्षित है?', showHazards: 'मुंबई के पास जोखिम दिखाएं', findRoute: 'सुरक्षित मार्ग खोजें', close: 'बंद करें', reset: 'दृश्य रीसेट', satellite: 'सैटेलाइट', street: 'सड़क', locate: 'मेरा स्थान', language: 'भाषा', search: 'खोजें', notifications: 'सूचनाएं', noResults: 'कोई परिणाम नहीं मिला।', routeA: 'तटीय मार्ग A', routeB: 'तटीय मार्ग B', routeC: 'संतुलित मार्ग', routeRisk: 'मार्ग जोखिम', checked: 'जांच पूरी', refresh: 'रीफ्रेश', save: 'बदलाव सहेजें', saved: 'बदलाव सहेजे गए', theme: 'थीम', darkMode: 'डार्क मोड', email: 'ईमेल सूचनाएं', profileTitle: 'ऑपरेशनल प्रोफ़ाइल', role: 'समुद्री शोधकर्ता / कप्तान', details: 'प्रोफ़ाइल विवरण', name: 'Capt. Devesh Madhavi', status: 'सक्रिय सत्र', mobile: 'मोबाइल नंबर', emailLabel: 'ईमेल', profession: 'पेशा', edit: 'संपादित करें', done: 'पूर्ण', trend: 'PFZ विश्वसनीयता ट्रेंड', pfzConfidence: 'PFZ विश्वसनीयता', freshness: 'डेटा ताजगी', latest: 'नवीनतम नमूना', marineInputs: 'सैटेलाइट समुद्री रंग, SST और मौसम इनपुट।', spatialSignals: 'आसपास के स्थानिक संकेत और PFZ उम्मीदवार जोड़ता है।', opportunitySafety: 'मछली पकड़ने के अवसर को सुरक्षा सीमाओं के साथ संतुलित करता है।', evidenceRecommendation: 'हर सिफारिश के पीछे के प्रमाण समझाता है।', hazardAvoided: 'पहचाने गए सावधानी क्षेत्र से बचता है।', boundariesChecked: 'मार्ग से पहले परिचालन सीमाएं जांचता है।', riskCorridor: 'कम जोखिम वाले तटीय गलियारे को प्राथमिकता देता है।', recalculate: 'नए डेटा के बाद मार्ग फिर निकाला जा सकता है।', demo: 'रीयल-टाइम डेटाबेस मोड • लाइव सुपबेस कनेक्टेड।', demoAnswer: 'नमस्ते कप्तान! मैं ORCA हूँ, आपका समुद्री AI निर्णय सहायक। मैं आपकी क्या मदद कर सकता हूँ?', mapFail: 'मैप टाइल लोड नहीं हो पाईं।', routeSummary: '39.2 किमी • लगभग 2 घंटे 35 मिनट', routeBText: '48.5 किमी • लगभग 3 घंटे 10 मिनट', routeCText: '42.0 किमी • लगभग 2 घंटे 45 मिनट', selectPeriod: 'अवधि', hours24: '24 घंटे', days7: '7 दिन', system: 'सिस्टम', resetData: 'रीसेट', layers: 'मैप लेयर', pfzLayer: 'मछली पकड़ने के क्षेत्र', alertLayer: 'समुद्री अलर्ट', vessels: 'नौकाएं', mapLabels: 'मैप के नाम वेबसाइट की भाषा के अनुसार हैं।', signIn: 'साइन इन / रजिस्टर', signOut: 'साइन आउट', viewOnMap: '🗺️ मैप पर मार्ग देखें', viewSafety: '🛡️ सुरक्षा आकलन', navHudTitle: 'सक्रिय नेविगेशन मार्ग', originPort: 'प्रस्थान बंदरगाह', destZone: 'गंतव्य क्षेत्र', eta: 'अनुमानित यात्रा समय', distance: 'दूरी', geofenceClear: 'सीमा अनुमति', calculateRoute: 'सुरक्षित समुद्री मार्ग निकालें',
@@ -50,7 +58,11 @@ const T = {
     inlandMsg: 'अंतर्देशीय स्थान मिला। निकटतम तटीय बंदरगाह से मार्ग की गणना की गई है।',
     waypointTable: 'वेपॉइंट नेविगेशन लॉग',
     bearing: 'दिशा',
-    legDist: 'दूरी'
+    legDist: 'दूरी',
+    previousChats: 'पिछली बातचीत',
+    newChat: 'नई बातचीत',
+    recenter: 'मैप रीसेंटर करें',
+    noChatsYet: 'कोई पिछली बातचीत नहीं है।'
   },
   mr: {
     dashboard: 'डॅशबोर्ड', map: 'सागरी इंटेलिजन्स नकाशा', analytics: 'महासागर विश्लेषण', fishing: 'मासेमारी इंटेलिजन्स', safety: 'सुरक्षा आणि मार्ग', assistant: 'ORCA AI सहाय्यक', alerts: 'सूचना', settings: 'सेटिंग्ज', profile: 'प्रोफाइल', workspace: 'वर्कस्पेस', operational: 'सिस्टम कार्यरत', connected: 'सागरी डेटा सेवा जोडलेल्या', marine: 'सागरी इंटेलिजन्स', glance: 'सागरी स्थिती एका नजरेत.', location: 'मुंबई किनारा • थेट सुपबेस आणि सेन्सर जोडणी', ask: 'ORCA ला विचारा', seaState: 'समुद्राची स्थिती', wind: 'वारा', sst: 'समुद्र पृष्ठभाग तापमान', activePFZ: 'सक्रिय PFZ', moderate: 'मध्यम', waves: '1.2 मी. लाटा', steady: 'NE • स्थिर', favourable: 'अनुकूल', openMap: 'नकाशा उघडा', activeAdvisories: 'सक्रिय सूचना', viewAll: 'सर्व पहा', insights: 'आजची सागरी माहिती', bestFishing: 'मासेमारीची सर्वोत्तम संधी', departure: 'शिफारस केलेली प्रस्थान वेळ', confidence: 'डेटा विश्वासार्हता', verified: 'सत्यापित इंटेलिजन्स', sources: 'स्रोत: ISRO • INCOIS • IMD • Supabase', oceanInputs: 'समुद्र आणि डेटाबेस इनपुट तपासले.', allLayers: 'सर्व लेयर्स', weather: 'हवामान', hazards: 'धोके', boundaries: 'सीमा', today: 'आज', selectedZone: 'निवडलेले क्षेत्र', high: 'उच्च विश्वासार्हता', why: 'हे क्षेत्र का?', signal: 'संकेत', how: 'ORCA कसे निर्णय घेतो', discover: 'शोध', correlate: 'संबंध जोडा', assess: 'आकलन', explain: 'समजावून सांगा', findZones: 'आशादायक मासेमारी क्षेत्र शोधा.', explore: 'PFZ शोधा', viewZone: 'क्षेत्र पहा', recommendation: 'ORCA ची शिफारस', start: 'सुरुवात', safeRoute: 'सुरक्षित मार्गाचे आकलन', recommended: 'शिफारस केलेला', low: 'कमी', risk: 'धोका', whyRoute: 'ORCA या मार्गाची शिफारस का करतो', safetyChecklist: 'सुरक्षा तपासणी', askSea: 'समुद्राबद्दल ORCA ला विचारा.', conversational: 'कन्वर्सेशनल मरीन इंटेलिजन्स', placeholder: 'सागरी प्रश्न विचारा किंवा मार्ग योजना करा...', send: 'पाठवा', nearest: 'आजचा जवळचा PFZ', safeTomorrow: 'उद्या सकाळी जाणे सुरक्षित आहे का?', showHazards: 'मुंबईजवळचे धोके दाखवा', findRoute: 'सुरक्षित मार्ग शोधा', close: 'बंद', reset: 'दृश्य रीसेट', satellite: 'सॅटेलाइट', street: 'रस्ता', locate: 'माझे स्थान', language: 'भाषा', search: 'शोधा', notifications: 'सूचना', noResults: 'जुळणारे परिणाम नाहीत.', routeA: 'किनारी मार्ग A', routeB: 'किनारी मार्ग B', routeC: 'संतुलित मार्ग', routeRisk: 'मार्ग धोका', checked: 'तपासले', refresh: 'रीफ्रेश', save: 'बदल जतन करा', saved: 'बदल जतन झाले', theme: 'थीम', darkMode: 'डार्क मोड', email: 'ईमेल सूचना', profileTitle: 'ऑपरेशनल प्रोफाइल', role: 'सागरी संशोधक / कॅप्टन', details: 'प्रोफाइल तपशील', name: 'Capt. Devesh Madhavi', status: 'सक्रिय खाते', mobile: 'मोबाइल क्रमांक', emailLabel: 'ईमेल', profession: 'व्यवसाय', edit: 'संपादित करा', done: 'पूर्ण', trend: 'PFZ विश्वासार्हता ट्रेंड', pfzConfidence: 'PFZ विश्वासार्हता', freshness: 'डेटा ताजेपणा', latest: 'नवीन नमुना', marineInputs: 'सॅटेलाइट समुद्री रंग, SST आणि हवामान इनपुट.', spatialSignals: 'जवळचे स्थानिक संकेत आणि PFZ उमेदवार जोडतो.', opportunitySafety: 'मासेमारीची संधी आणि सुरक्षा मर्यादा संतुलित करतो.', evidenceRecommendation: 'प्रत्येक शिफारसीमागील पुरावे समजावतो.', hazardAvoided: 'ओळखलेल्या सावधगिरीच्या क्षेत्रापासून दूर राहतो.', boundariesChecked: 'मार्गापूर्वी ऑपरेशनल सीमा तपासतो.', riskCorridor: 'कमी-धोका किनारी मार्ग पसंत करतो.', recalculate: 'नवीन डेटा आल्यावर मार्ग पुन्हा काढता येईल.', demo: 'थेट डेटाबेस मोड • सुपबेस डेटा जोडला आहे.', demoAnswer: 'नमस्कार कॅप्टन! मी ORCA आहे, आपला सागरी AI निर्णय सहाय्यक. मी आज आपल्या प्रवासासाठी कशी मदत करू?', mapFail: 'नकाशा टाइल लोड झाल्या नाहीत.', routeSummary: '39.2 किमी • सुमारे 2 तास 35 मिनिटे', routeBText: '48.5 किमी • सुमारे 3 तास 10 मिनिटे', routeCText: '42.0 किमी • सुमारे 2 तास 45 मिनिटे', selectPeriod: 'कालावधी', hours24: '24 तास', days7: '7 दिवस', system: 'सिस्टम', resetData: 'रीसेट', layers: 'नकाशा लेयर्स', pfzLayer: 'मासेमारी क्षेत्रे', alertLayer: 'सागरी सूचना', vessels: 'नौका', mapLabels: 'नकाशावरील नावे वेबसाइटच्या भाषेनुसार आहेत.', signIn: 'साइन इन / नोंदणी', signOut: 'साइन आउट', viewOnMap: '🗺️ नकाशावर मार्ग पहा', viewSafety: '🛡️ सुरक्षा विश्लेषण', navHudTitle: 'सक्रिय नेव्हिगेशन मार्ग', originPort: 'प्रस्थान बंदर', destZone: 'गंतव्य क्षेत्र', eta: 'अंदाजित वेळ', distance: 'अंतर', geofenceClear: 'सीमा तपासणी', calculateRoute: 'सुरक्षित सागरी मार्ग काढा',
@@ -64,7 +76,11 @@ const T = {
     inlandMsg: 'अंतर्देशीय स्थान सापडले. जवळच्या किनारी बंदरावरून मार्गाची गणना केली आहे.',
     waypointTable: 'वेपॉइंट नेव्हिगेशन तपशील',
     bearing: 'दिशा',
-    legDist: 'अंतर'
+    legDist: 'अंतर',
+    previousChats: 'मागील संभाषणे',
+    newChat: 'नवीन संभाषण',
+    recenter: 'नकाशा रीसेंटर करा',
+    noChatsYet: 'कोणतीही मागील संभाषणे नाहीत.'
   }
 }
 
@@ -518,6 +534,16 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
       mapRef.current.map.setView([userLocation.lat, userLocation.lon], 9)
     }
   }
+  const recenterMap = () => {
+    if (userLocation && userLocation.lat && userLocation.lon && mapRef.current?.map) {
+      mapRef.current.map.setView([userLocation.lat, userLocation.lon], 9)
+    } else {
+      const pt = PORTS.find(p => p.id === selectedPort) || PORTS[3]
+      if (mapRef.current?.map) {
+        mapRef.current.map.setView([pt.lat, pt.lon], 8)
+      }
+    }
+  }
   const viewAllIndia = () => {
     setMapScope('all')
     mapRef.current?.map.setView([16.5, 78.5], 5)
@@ -556,6 +582,7 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
           )}
           <button onClick={focusPort}>⚓ Focus Port</button>
           <button onClick={viewAllIndia}>🇮🇳 Whole Coast</button>
+          <button onClick={recenterMap} style={{ fontWeight: 700 }}>🎯 {t('recenter')}</button>
           <button className={base === 'street' ? 'active' : ''} onClick={() => setBase('street')}>{t('street')}</button>
           <button className={base === 'satellite' ? 'active' : ''} onClick={() => setBase('satellite')}>{t('satellite')}</button>
         </div>
@@ -572,6 +599,7 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
               <label><input type="checkbox" checked={showPFZ} onChange={e => setShowPFZ(e.target.checked)} /> {t('pfzLayer')}</label>
               <label><input type="checkbox" checked={showAlerts} onChange={e => setShowAlerts(e.target.checked)} /> {t('alertLayer')}</label>
               <button onClick={focus}>{t('selectedZone')}</button>
+              <button onClick={recenterMap}>🎯 {t('recenter')}</button>
             </div>
 
             {/* Floating Navigation HUD */}
@@ -1057,81 +1085,109 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
   )
 }
 
-function Assistant({ lang, navigate, setActiveRoute, setSelectedZone, userLocation }) {
-  const t = k => tr(lang, k)
-  const initialAnswer = userLocation
-    ? `Hello Captain! I am ORCA, connected live to your location near ${userLocation.port_name} (${userLocation.lat.toFixed(2)}°N, ${userLocation.lon.toFixed(2)}°E). How can I assist your voyage today? You can ask about PFZ zones, weather, wave conditions, or safe routes along the coast.`
-    : t('demoAnswer')
+function MarkdownView({ text }) {
+  if (!text) return null
+  const lines = String(text).split('\n')
+  const elements = []
+  let currentList = []
 
-  const [messages, setMessages] = useState([{ role: 'orca', text: initialAnswer }])
-  const [input, setInput] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [sessionId] = useState(() => 'orca_sess_' + Math.random().toString(36).substring(2, 10))
-
-  useEffect(() => {
-    setMessages([{ role: 'orca', text: initialAnswer }])
-  }, [lang, userLocation])
-
-  const send = async (q) => {
-    if (!q.trim() || loading) return
-    const userText = q.trim()
-    const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }))
-    setMessages(m => [...m, { role: 'user', text: userText }])
-    setInput('')
-    setLoading(true)
-
-    try {
-      const data = await askOrca(userText, sessionId, {
-        language: lang,
-        history,
-        location: userLocation?.port_name,
-        user_location: userLocation ? {
-          latitude: userLocation.lat,
-          longitude: userLocation.lon,
-          port_id: userLocation.port_id,
-          port_name: userLocation.port_name,
-          is_coastal: userLocation.is_coastal,
-          distance_to_port_km: userLocation.distance_to_port_km
-        } : null
-      })
-      if (data && (data.explanation_text || data.recommendation)) {
-        let reply = data.explanation_text || ''
-
-        if (data.recommendation && data.recommendation.zone_id && data.recommendation.zone_id !== 'NONE') {
-          reply += `\n\n🎯 Recommendation: ${data.recommendation.zone_id} (Status: ${data.recommendation.status}, Risk Score: ${data.recommendation.risk_score}/100, Band: ${data.recommendation.risk_band})`
-          if (data.evidence && data.evidence.length > 0) {
-            reply += '\n\n📊 Evidence Trail:\n' + data.evidence.map(e => `• ${e.claim}`).join('\n')
-          }
-
-          // Automatically extract route and set active route
-          if (data.map_payload && data.map_payload.routes && data.map_payload.routes.length > 0) {
-            const r = data.map_payload.routes[0]
-            setActiveRoute({
-              ...r,
-              destination_name: data.recommendation.zone_id,
-              departure_name: userLocation?.port_name ? `📍 ${userLocation.port_name}` : 'Departure Port'
-            })
-            setSelectedZone(data.recommendation.zone_id)
-          }
-        }
-
-        setMessages(m => [
-          ...m,
-          {
-            role: 'orca',
-            text: reply,
-            hasRoute: !!(data.map_payload && data.map_payload.routes && data.map_payload.routes.length > 0),
-            zoneId: data.recommendation?.zone_id
-          }
-        ])
-      } else {
-        setMessages(m => [...m, { role: 'orca', text: 'I received your query and checked the marine database. Conditions are favourable with slight sea state.' }])
+  const renderInline = (str) => {
+    let clean = str.replace(/^#{1,6}\s*/, '')
+    const parts = clean.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g)
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
+        return <strong key={i}>{part.slice(2, -2)}</strong>
       }
-    } catch (err) {
-      setMessages(m => [...m, { role: 'orca', text: 'Encountered connection issue. Using cached marine parameters.' }])
-    } finally {
-      setLoading(false)
+      if (part.startsWith('*') && part.endsWith('*') && part.length >= 2) {
+        return <em key={i}>{part.slice(1, -1)}</em>
+      }
+      return part.replace(/\*{2,3}/g, '')
+    })
+  }
+
+  const flushList = () => {
+    if (currentList.length > 0) {
+      elements.push(
+        <ul key={`ul-${elements.length}`} className="chatList">
+          {currentList.map((item, idx) => (
+            <li key={idx}>{renderInline(item)}</li>
+          ))}
+        </ul>
+      )
+      currentList = []
     }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i].trim()
+    if (!rawLine) {
+      flushList()
+      continue
+    }
+    if (rawLine.startsWith('#')) {
+      flushList()
+      const headingText = rawLine.replace(/^#{1,6}\s*/, '')
+      elements.push(
+        <h4 key={`h-${i}`} className="chatHeading">
+          {renderInline(headingText)}
+        </h4>
+      )
+      continue
+    }
+    if (/^[-*•]\s+/.test(rawLine)) {
+      const itemText = rawLine.replace(/^[-*•]\s+/, '')
+      currentList.push(itemText)
+      continue
+    }
+    flushList()
+    elements.push(
+      <p key={`p-${i}`}>
+        {renderInline(rawLine)}
+      </p>
+    )
+  }
+  flushList()
+  return <div className="markdownContent">{elements}</div>
+}
+
+function getInitialAnswer(lang, userLocation) {
+  if (lang === 'mr') {
+    return userLocation
+      ? `नमस्कार कॅप्टन! मी ORCA - आपला सागरी AI निर्णय सहाय्यक. मी आपल्या ${userLocation.port_name} किनाऱ्याशी थेट जोडलेलो आहे. आज मी आपल्या सागरी प्रवासात कशी मदत करू? आपण मासेमारी क्षेत्र (PFZ), लाटा, हवामान किंवा सुरक्षित मार्गाबद्दल विचारू शकता.`
+      : 'नमस्कार कॅप्टन! मी ORCA आहे, आपला सागरी AI निर्णय सहाय्यक. मी आज आपल्या प्रवासासाठी कशी मदत करू? आपण मासेमारी क्षेत्र (PFZ), लाटा, हवामान किंवा सुरक्षित मार्गाबद्दल विचारू शकता.'
+  }
+  if (lang === 'hi') {
+    return userLocation
+      ? `नमस्ते कैप्टन! मैं ORCA हूँ - आपका समुद्री AI निर्णय सहायक। मैं आपके ${userLocation.port_name} तट से लाइव जुड़ा हुआ हूँ। आज मैं आपकी क्या सहायता कर सकता हूँ? आप PFZ क्षेत्र, मौसम, लहरें या सुरक्षित समुद्री मार्ग के बारे में पूछ सकते हैं।`
+      : 'नमस्ते कप्तान! मैं ORCA हूँ, आपका समुद्री AI निर्णय सहायक। मैं आपकी क्या मदद कर सकता हूँ?'
+  }
+  return userLocation
+    ? `Hello Captain! I am ORCA, connected live to your location near ${userLocation.port_name} (${userLocation.lat.toFixed(2)}°N, ${userLocation.lon.toFixed(2)}°E). How can I assist your voyage today? You can ask about PFZ zones, weather, wave conditions, or safe routes along the coast.`
+    : 'Hello Captain! I am ORCA, your Marine AI Decision Copilot. How can I assist your voyage today? You can ask about PFZ zones, weather, wave conditions, or safe routes along the coast.'
+}
+
+function Assistant({
+  lang,
+  navigate,
+  setActiveRoute,
+  setSelectedZone,
+  userLocation,
+  conversations = [],
+  activeConvId,
+  messages = [],
+  loading = false,
+  userInitial = 'C',
+  onSelectConversation,
+  onNewConversation,
+  onSendMessage
+}) {
+  const t = k => tr(lang, k)
+  const [input, setInput] = useState('')
+
+  const handleSend = () => {
+    if (!input.trim() || loading) return
+    onSendMessage(input.trim())
+    setInput('')
   }
 
   return (
@@ -1142,48 +1198,83 @@ function Assistant({ lang, navigate, setActiveRoute, setSelectedZone, userLocati
         <h2>{t('askSea')}</h2>
       </div>
 
-      <div className="chat">
-        <div className="messages">
-          {messages.map((m, i) => (
-            <div className={'message ' + m.role} key={i}>
-              <div className="msgAvatar">{m.role === 'orca' ? '⚓' : 'D'}</div>
-              <div className="bubble">
-                {m.text}
-                {m.hasRoute && (
-                  <div className="bubbleNavActions">
-                    <button className="bubbleNavBtn" onClick={() => navigate('/map')}>
-                      {t('viewOnMap')} →
-                    </button>
-                    <button className="bubbleNavBtn" onClick={() => navigate('/safety')}>
-                      {t('viewSafety')} →
-                    </button>
+      <div className="assistantLayout">
+        {/* Previous Chats / History Drawer (Requirement 7) */}
+        <aside className="chatHistorySidebar">
+          <div className="chatHistoryHead">
+            <h3>💬 {t('previousChats')}</h3>
+            <button className="newChatBtn" onClick={onNewConversation} title="Start fresh conversation">
+              + {t('newChat')}
+            </button>
+          </div>
+          <div className="chatHistoryList">
+            {conversations && conversations.length > 0 ? (
+              conversations.map(c => (
+                <button
+                  key={c.id}
+                  className={'historyItem ' + (c.id === activeConvId ? 'active' : '')}
+                  onClick={() => onSelectConversation(c.id)}
+                  title={c.title}
+                >
+                  <span>💬</span>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.title}</span>
+                </button>
+              ))
+            ) : (
+              <div className="emptyHistoryNotice">{t('noChatsYet')}</div>
+            )}
+          </div>
+        </aside>
+
+        {/* Chat Stream & Composer */}
+        <div className="chat">
+          <div className="messages">
+            {messages.map((m, i) => {
+              const role = m.role || m.sender || 'orca'
+              return (
+                <div className={'message ' + role} key={m.id || i}>
+                  <div className="msgAvatar">{role === 'orca' ? '⚓' : userInitial}</div>
+                  <div className="bubble">
+                    <MarkdownView text={m.text} />
+                    {m.hasRoute && (
+                      <div className="bubbleNavActions">
+                        <button className="bubbleNavBtn" onClick={() => navigate('/map')}>
+                          {t('viewOnMap')} →
+                        </button>
+                        <button className="bubbleNavBtn" onClick={() => navigate('/safety')}>
+                          {t('viewSafety')} →
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+              )
+            })}
+            {loading && (
+              <div className="message orca">
+                <div className="msgAvatar">⚓</div>
+                <div className="bubble typing">
+                  {lang === 'mr' ? 'सागरी व हवामान डेटा विश्लेषित करत आहे...' : (lang === 'hi' ? 'समुद्री व मौसम डेटा का विश्लेषण जारी है...' : 'Reasoning across ocean, weather & Supabase data...')}
+                </div>
               </div>
-            </div>
-          ))}
-          {loading && (
-            <div className="message orca">
-              <div className="msgAvatar">⚓</div>
-              <div className="bubble typing">Reasoning across ocean, weather & Supabase data...</div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        <div className="suggestions">
-          {['nearest', 'safeTomorrow', 'showHazards', 'findRoute'].map(k => (
-            <button key={k} onClick={() => send(t(k))}>{t(k)}</button>
-          ))}
-        </div>
+          <div className="suggestions">
+            {['nearest', 'safeTomorrow', 'showHazards', 'findRoute'].map(k => (
+              <button key={k} onClick={() => onSendMessage(t(k))}>{t(k)}</button>
+            ))}
+          </div>
 
-        <div className="composer">
-          <input
-            value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && send(input)}
-            placeholder={t('placeholder')}
-          />
-          <button className="primary" onClick={() => send(input)}>{t('send')} →</button>
+          <div className="composer">
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleSend()}
+              placeholder={t('placeholder')}
+            />
+            <button className="primary" onClick={handleSend}>{t('send')} →</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1389,6 +1480,181 @@ function App() {
   const path = loc.pathname
   const t = k => tr(lang, k)
 
+  // Chatbot State Lifted to App Level for Multi-Tab Persistence & History Drawer
+  const [conversations, setConversations] = useState([])
+  const [activeConvId, setActiveConvId] = useState(null)
+  const [messages, setMessages] = useState([])
+  const [chatLoading, setChatLoading] = useState(false)
+
+  const activeUserId = currentUser?.id || 'guest_user'
+  const userInitial = useMemo(() => {
+    const meta = currentUser?.user_metadata || {}
+    const name = meta.full_name || meta.name || currentUser?.email || 'Captain'
+    return name.trim().charAt(0).toUpperCase() || 'C'
+  }, [currentUser])
+
+  // Initialize or reload conversations when user changes (User-Specific Chat Isolation)
+  useEffect(() => {
+    let isMounted = true
+    const initChats = async () => {
+      try {
+        const convList = await getUserConversations(activeUserId)
+        if (!isMounted) return
+        if (convList && convList.length > 0) {
+          setConversations(convList)
+          const firstId = convList[0].id
+          setActiveConvId(firstId)
+          const msgs = await getConversationMessages(firstId)
+          if (!isMounted) return
+          if (msgs && msgs.length > 0) {
+            setMessages(msgs.map(m => ({
+              id: m.id,
+              role: m.sender,
+              sender: m.sender,
+              text: m.message_text,
+              time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              data: m.structured_data || null,
+              hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route)
+            })))
+          } else {
+            setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: getInitialAnswer(lang, userLocation), time: '10:00 AM' }])
+          }
+        } else {
+          // Create initial conversation for user
+          const newConv = await createNewConversation(activeUserId, 'Coastal Discussion')
+          if (!isMounted) return
+          if (newConv) {
+            setConversations([newConv])
+            setActiveConvId(newConv.id)
+            setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: getInitialAnswer(lang, userLocation), time: '10:00 AM' }])
+          }
+        }
+      } catch (err) {
+        console.warn('Could not initialize chat history:', err)
+        if (isMounted) {
+          setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: getInitialAnswer(lang, userLocation), time: '10:00 AM' }])
+        }
+      }
+    }
+    initChats()
+    return () => { isMounted = false }
+  }, [activeUserId])
+
+  const handleSelectConversation = async (convId) => {
+    if (convId === activeConvId) return
+    setActiveConvId(convId)
+    setChatLoading(true)
+    try {
+      const msgs = await getConversationMessages(convId)
+      if (msgs && msgs.length > 0) {
+        setMessages(msgs.map(m => ({
+          id: m.id,
+          role: m.sender,
+          sender: m.sender,
+          text: m.message_text,
+          time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          data: m.structured_data || null,
+          hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route)
+        })))
+      } else {
+        setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: getInitialAnswer(lang, userLocation), time: '10:00 AM' }])
+      }
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setChatLoading(false)
+    }
+  }
+
+  const handleNewConversation = async () => {
+    try {
+      const title = `Trip Chat ${new Date().toLocaleDateString([], { month: 'short', day: 'numeric' })}`
+      const newConv = await createNewConversation(activeUserId, title)
+      if (newConv) {
+        setConversations(prev => [newConv, ...prev])
+        setActiveConvId(newConv.id)
+        setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: getInitialAnswer(lang, userLocation), time: '10:00 AM' }])
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleSendChatMessage = async (textToSend) => {
+    if (!textToSend || !textToSend.trim() || chatLoading) return
+    const queryText = textToSend.trim()
+    const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    const userMsg = { id: `u_${Date.now()}`, role: 'user', sender: 'user', text: queryText, time: nowTime }
+
+    setMessages(prev => [...prev, userMsg])
+    setChatLoading(true)
+
+    // Save user message to database/cache
+    if (activeConvId) {
+      saveChatMessage(activeConvId, 'user', queryText).catch(console.warn)
+    }
+
+    try {
+      // Build location payload
+      const userLocPayload = userLocation ? {
+        latitude: userLocation.lat,
+        longitude: userLocation.lon,
+        port_id: userLocation.port_id,
+        port_name: userLocation.port_name,
+        state: userLocation.state,
+        is_coastal: userLocation.is_coastal
+      } : null
+
+      const res = await askOrca(queryText, lang, userLocPayload)
+      let botAnswer = ''
+      let botData = null
+
+      if (res && res.answer) {
+        botAnswer = res.answer
+        botData = res
+      } else if (typeof res === 'string') {
+        botAnswer = res
+      } else {
+        botAnswer = lang === 'mr' ? 'मला क्षमस्व, उत्तर तयार करण्यात अडचण आली. कृपया पुन्हा प्रयत्न करा.' :
+                    lang === 'hi' ? 'क्षमा करें, उत्तर तैयार करने में समस्या आई। कृपया पुनः प्रयास करें।' :
+                    'Sorry, I could not generate a response right now. Please try again.'
+      }
+
+      // CRITICAL: Strict language matching - DO NOT append any English trails or recommendation text
+      const hasRoute = Boolean(res?.navigation || res?.route || res?.pfz_recommendation)
+      const botMsg = {
+        id: `o_${Date.now()}`,
+        role: 'orca',
+        sender: 'orca',
+        text: botAnswer,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        data: botData,
+        hasRoute: hasRoute
+      }
+
+      setMessages(prev => [...prev, botMsg])
+
+      // Save bot response to database/cache
+      if (activeConvId) {
+        saveChatMessage(activeConvId, 'orca', botAnswer, botData).catch(console.warn)
+      }
+    } catch (err) {
+      console.error('Chat error:', err)
+      const errAnswer = lang === 'mr' ? 'सर्व्हर त्रुटी. कृपया आपले कनेक्शन तपासा.' :
+                         lang === 'hi' ? 'सर्वर त्रुटि। कृपया अपना कनेक्शन जांचें।' :
+                         'Connection error. Please check backend services.'
+      setMessages(prev => [...prev, {
+        id: `err_${Date.now()}`,
+        role: 'orca',
+        sender: 'orca',
+        text: errAnswer,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      }])
+    } finally {
+      setChatLoading(false)
+    }
+  }
+
   // Geolocation resolution function
   const handleRequestLocation = (force = false) => {
     if (!navigator.geolocation) {
@@ -1591,6 +1857,9 @@ function App() {
   const handleSignOut = async () => {
     await signOutUser()
     setCurrentUser(null)
+    setConversations([])
+    setActiveConvId(null)
+    setMessages([])
   }
 
   const nav = [
@@ -1700,6 +1969,14 @@ function App() {
         setActiveRoute={setActiveRoute}
         setSelectedZone={setSelected}
         userLocation={userLocation}
+        conversations={conversations}
+        activeConvId={activeConvId}
+        messages={messages}
+        loading={chatLoading}
+        userInitial={userInitial}
+        onSelectConversation={handleSelectConversation}
+        onNewConversation={handleNewConversation}
+        onSendMessage={handleSendChatMessage}
       />
     )
   }
