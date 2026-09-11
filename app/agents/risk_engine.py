@@ -17,33 +17,44 @@ class RiskEngine:
         # 1. Wave Risk (30%)
         # Buckets: <0.5m -> 5, 0.5-1.25m -> 20, 1.25-2m -> 50, 2-4m -> 80, >4m -> 100
         wh = input_data.wave_height_m
-        if wh < 0.5:
-            wave_score = 5.0
-        elif wh <= 1.25:
-            wave_score = 20.0
-        elif wh <= 2.0:
-            wave_score = 50.0
-        elif wh <= 4.0:
-            wave_score = 80.0
+        if wh < 0.8:
+            wave_score = 10.0
+        elif wh <= 1.5:
+            wave_score = 25.0
+        elif wh <= 2.2:
+            wave_score = 55.0
+        elif wh <= 3.2:
+            wave_score = 85.0
         else:
             wave_score = 100.0
 
-        # 2. Wind Risk (20%)
-        # Buckets: <15 -> 5, 15-25 -> 25, 25-40 -> 60, >40 -> 100
+        # 2. Wind & Squall Risk (incorporating rain intensity)
         ws = input_data.wind_speed_kmh
+        rain_mm = getattr(input_data, "rain_mm", 0.0) or 0.0
+        rain_prob = getattr(input_data, "rain_probability_pct", 0.0) or 0.0
+        flags = []
+
+        rain_penalty = 0.0
+        if rain_mm >= 5.0 or rain_prob >= 70.0:
+            rain_penalty = 25.0
+            flags.append("heavy_precipitation_squall_risk")
+        elif rain_mm >= 1.5 or rain_prob >= 40.0:
+            rain_penalty = 12.0
+            flags.append("moderate_rain_showers")
+
         if ws < 15.0:
-            wind_score = 5.0
+            wind_score = 10.0 + (rain_penalty * 0.4)
         elif ws <= 25.0:
-            wind_score = 25.0
+            wind_score = 30.0 + (rain_penalty * 0.8)
         elif ws <= 40.0:
-            wind_score = 60.0
+            wind_score = 65.0 + rain_penalty
         else:
             wind_score = 100.0
+        wind_score = min(100.0, wind_score)
 
         # 3. Hazard Risk (30%)
         # Max severity across active hazards: none->0, low->30, moderate->60, high->85, severe->100
         hazard_score = 0.0
-        flags = []
         if input_data.hazards:
             severity_map = {
                 SeverityEnum.LOW: 30.0,
@@ -58,7 +69,6 @@ class RiskEngine:
                 flags.append(f"active_{hz.hazard_type.value}_advisory_{hz.severity.value}")
 
         # 4. Distance & Duration Risk (10%)
-        # Scales with distance and trip duration
         dist_score = min(100.0, (input_data.distance_km / 50.0) * 50.0 + (input_data.trip_duration_hours / 12.0) * 50.0)
 
         # 5. Geofence Risk (10%)
@@ -73,7 +83,7 @@ class RiskEngine:
         else:
             geofence_score = 0.0
 
-        # Weighted calculation
+        # Base weighted calculation
         total_risk = round(
             (weights.wave * wave_score) +
             (weights.wind * wind_score) +
@@ -82,14 +92,21 @@ class RiskEngine:
             (weights.geofence * geofence_score),
             1
         )
+
+        # Override floor: severe wave (>=2.4m) or gale wind (>=42 km/h) or critical hazard MUST reach HIGH risk (>=60)
+        if wh >= 2.4 or ws >= 42.0 or hazard_score >= 85.0:
+            total_risk = max(total_risk, 65.0)
+        elif wh >= 1.7 or ws >= 28.0 or hazard_score >= 60.0 or rain_mm >= 5.0:
+            total_risk = max(total_risk, 42.0)
+
         total_risk = min(100.0, max(0.0, total_risk))
 
-        # Risk Band assignment
-        if total_risk <= 25.0:
+        # Objective Risk Band assignment
+        if total_risk <= 35.0:
             band = RiskBandEnum.LOW
-        elif total_risk <= 50.0:
-            band = RiskBandEnum.MODERATE
-        elif total_risk <= 75.0:
+        elif total_risk <= 60.0:
+            band = RiskBandEnum.MODERATE  # CAUTION
+        elif total_risk <= 80.0:
             band = RiskBandEnum.HIGH
         else:
             band = RiskBandEnum.VERY_HIGH
@@ -116,7 +133,8 @@ class RiskEngine:
     def compute_risk_from_dicts(
         self, zone_id: str, distance_km: float, wave_height_m: float,
         wind_speed_kmh: float, hazards: List[Any], geofence_status: str,
-        trip_duration_hours: float = 6.0
+        trip_duration_hours: float = 6.0, rain_mm: float = 0.0,
+        rain_probability_pct: float = 0.0
     ) -> RiskResult:
         hz_alerts = []
         for h in hazards:
@@ -132,6 +150,8 @@ class RiskEngine:
             distance_km=distance_km,
             wave_height_m=wave_height_m,
             wind_speed_kmh=wind_speed_kmh,
+            rain_mm=rain_mm,
+            rain_probability_pct=rain_probability_pct,
             hazards=hz_alerts,
             geofence_status=g_status,
             trip_duration_hours=trip_duration_hours

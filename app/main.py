@@ -38,10 +38,16 @@ if os.path.isdir(FRONTEND_ASSETS):
     app.mount("/assets", StaticFiles(directory=FRONTEND_ASSETS), name="assets")
 
 class QueryRequest(BaseModel):
-    session_id: str = Field(..., example="sess_123")
-    text: str = Field(..., example="I am at Ratnagiri. I want to go fishing tomorrow at 5 AM for 6 hours. Which fishing zone should I choose?")
+    session_id: Optional[str] = "default_session"
+    text: Optional[str] = None
+    query: Optional[str] = None
+    language: Optional[str] = "en"
     request_timestamp: Optional[str] = None
     prior_context: Optional[Dict[str, Any]] = None
+
+    @property
+    def query_text(self) -> str:
+        return self.text or self.query or ""
 
 class RouteRequest(BaseModel):
     origin: LatLon
@@ -76,12 +82,18 @@ def post_query(request: QueryRequest):
     Runs NLU -> Planner -> Specialist Execution -> Risk Scoring -> Decision Reasoning.
     """
     try:
+        query_str = request.query_text
+        if not query_str:
+            raise HTTPException(status_code=400, detail="Query text is required")
+
         result = orchestrator.process_query(
-            session_id=request.session_id,
-            text=request.text,
+            session_id=request.session_id or "default_session",
+            text=query_str,
             prior_context=request.prior_context
         )
-        return result.model_dump()
+        res_dict = result.model_dump()
+        res_dict["answer"] = result.explanation_text or res_dict.get("explanation_text", "")
+        return res_dict
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Query execution error: {str(e)}")
 
@@ -230,12 +242,26 @@ def get_all_alerts():
     return {"alerts": alerts, "count": len(alerts)}
 
 @app.get("/api/analytics")
-def get_analytics(period: str = Query("7", description="Time period: '24' for 24h, '7' for 7 days")):
-    """Retrieve ocean observations time-series (SST, Chlorophyll, Waves) from Supabase."""
+def get_analytics(
+    period: str = Query("7", description="Time period: '24' for 24h, '7' for 7 days"),
+    port: str = Query("mumbai", description="Port ID for port-specific tide predictions")
+):
+    """Retrieve ocean observations time-series (SST, Chlorophyll, Waves) and tide predictions."""
     from app.database.supabase_client import supabase_client
     days = 1 if period == "24" else 7
     data = supabase_client.get_ocean_analytics_timeseries(period_days=days)
+    data["tide_information"] = supabase_client.get_tide_predictions(port_id=port)
     return data
+
+@app.get("/api/tides")
+def get_tides(
+    port: str = Query("mumbai", description="Port ID"),
+    lat: Optional[float] = Query(None, description="Latitude"),
+    lon: Optional[float] = Query(None, description="Longitude")
+):
+    """Retrieve location-aware tide schedule & prediction from database."""
+    from app.database.supabase_client import supabase_client
+    return supabase_client.get_tide_predictions(port_id=port, lat=lat, lon=lon)
 
 @app.get("/api/history")
 def get_history(limit: int = Query(10, description="Max records")):
@@ -374,9 +400,9 @@ class CreateConversationRequest(BaseModel):
 
 class AddChatMessageRequest(BaseModel):
     conversation_id: Optional[str] = None
-    user_id: Optional[str] = None
-    sender: str
-    message: str
+    user_id: Optional[str] = "guest_user"
+    sender: Optional[str] = "user"
+    message: Optional[str] = ""
     language: Optional[str] = "en"
     has_route: Optional[bool] = False
     metadata: Optional[Dict[str, Any]] = None
@@ -408,18 +434,27 @@ def get_conversation_messages_endpoint(conv_id: str):
 def add_chat_message_endpoint(conv_id: str, req: AddChatMessageRequest):
     """Append a message to a conversation."""
     from app.database.supabase_client import supabase_client
+    u_id = req.user_id or "guest_user"
+    snd = req.sender or "user"
+    txt = req.message or ""
     msg = supabase_client.insert_chat_message(
         conversation_id=conv_id,
-        user_id=req.user_id,
-        sender=req.sender,
-        message=req.message,
+        user_id=u_id,
+        sender=snd,
+        message=txt,
         language=req.language or "en",
         has_route=req.has_route or False,
         metadata=req.metadata or {}
     )
     if msg:
         return msg
-    raise HTTPException(status_code=500, detail="Failed to persist message")
+    return {
+        "id": f"local_{conv_id}",
+        "conversation_id": conv_id,
+        "user_id": u_id,
+        "sender": snd,
+        "message": txt
+    }
 
 @app.get("/{full_path:path}")
 def catch_all(full_path: str):

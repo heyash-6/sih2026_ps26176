@@ -285,14 +285,21 @@ class SupabaseClient:
 
         # Ensure healthy baseline if database has fewer points
         if len(temp_series) < 5:
-            temp_series = [27.6, 27.8, 28.0, 28.2, 28.4, 28.6, 28.8, 28.5] if period_days <= 1 else [27.2, 27.5, 27.8, 28.1, 28.4, 28.6, 28.8, 29.0]
+            temp_series = [27.6, 27.8, 28.0, 28.2, 28.4, 28.6, 28.8] if period_days <= 1 else [27.2, 27.5, 27.8, 28.1, 28.4, 28.6, 28.8]
         if len(chl_series) < 4:
-            chl_series = [0.52, 0.56, 0.59, 0.62, 0.64, 0.61, 0.65, 0.62] if period_days <= 1 else [0.44, 0.48, 0.52, 0.56, 0.60, 0.63, 0.66, 0.68]
-        if not labels:
-            labels = ["Day -6", "Day -5", "Day -4", "Day -3", "Day -2", "Yesterday", "Today"]
+            chl_series = [0.52, 0.56, 0.59, 0.62, 0.64, 0.61, 0.65] if period_days <= 1 else [0.44, 0.48, 0.52, 0.56, 0.60, 0.63, 0.66]
+        
+        target_len = min(len(temp_series), len(chl_series))
+        if not labels or len(labels) < target_len:
+            labels = [f"Day -{target_len - 1 - i}" if i < target_len - 2 else ("Yesterday" if i == target_len - 2 else "Today") for i in range(target_len)]
+        else:
+            labels = labels[-target_len:]
+            
+        temp_series = temp_series[-target_len:]
+        chl_series = chl_series[-target_len:]
 
-        wave_series = [1.1, 1.2, 1.4, 1.3, 1.2, 1.0, 1.2, 1.3]
-        wind_series = [14, 16, 18, 17, 20, 22, 19, 18]
+        wave_series = [1.1, 1.2, 1.4, 1.3, 1.2, 1.0, 1.2][-target_len:]
+        wind_series = [14, 16, 18, 17, 20, 22, 19][-target_len:]
 
         current_sst = temp_series[-1]
         current_chl = chl_series[-1]
@@ -302,7 +309,7 @@ class SupabaseClient:
 
         return {
             "period_days": period_days,
-            "labels": labels[-len(temp_series):],
+            "labels": labels,
             "sea_surface_temp": {
                 "values": temp_series,
                 "current": current_sst,
@@ -330,6 +337,78 @@ class SupabaseClient:
             "productivity_index": productivity_index,
             "data_confidence": 94
         }
+
+    def get_tide_predictions(self, port_id: str = "mumbai", lat: Optional[float] = None, lon: Optional[float] = None) -> Dict[str, Any]:
+        """
+        Query tide predictions from Supabase tide_observations.
+        Sourced directly from the 'prediction' column and water levels.
+        Falls back to the Survey of India harmonic model registry.
+        """
+        from app.database.indian_coastal_registry import get_port_tide_info
+        fallback = get_port_tide_info(port_id)
+        
+        if not self._is_configured:
+            return fallback
+
+        try:
+            with httpx.Client(timeout=4.0) as client:
+                res = client.get(
+                    f"{self.rest_url}/tide_observations?order=observed_at.desc&limit=25",
+                    headers=self.headers
+                )
+                if res.status_code == 200:
+                    rows = res.json()
+                    if rows:
+                        # Find closest coordinate match if lat/lon provided
+                        best_row = rows[0]
+                        if lat is not None and lon is not None:
+                            best_dist = float("inf")
+                            for r in rows:
+                                r_lat = float(r.get("latitude", 0))
+                                r_lon = float(r.get("longitude", 0))
+                                d = (r_lat - lat)**2 + (r_lon - lon)**2
+                                if d < best_dist:
+                                    best_dist = d
+                                    best_row = r
+                        
+                        pred_str = best_row.get("prediction", "")
+                        wl = best_row.get("water_level", fallback["high_tide"]["water_level_m"])
+                        
+                        # Parse high and low tide if present in prediction string
+                        high_time = fallback["high_tide"]["time"]
+                        low_time = fallback["low_tide"]["time"]
+                        if "High Tide at " in pred_str:
+                            try:
+                                high_time = pred_str.split("High Tide at ")[1].split(" ")[0].strip()
+                            except Exception:
+                                pass
+                        if "Low Tide at " in pred_str:
+                            try:
+                                low_time = pred_str.split("Low Tide at ")[1].split(" ")[0].strip()
+                            except Exception:
+                                pass
+                                
+                        return {
+                            "port_name": fallback.get("port_name", port_id.title()),
+                            "source": best_row.get("source", "Survey of India Tide Gauge"),
+                            "status": best_row.get("status", "prediction"),
+                            "raw_prediction": pred_str,
+                            "high_tide": {
+                                "time": high_time,
+                                "water_level_m": round(float(wl), 1),
+                                "type": "HIGH TIDE"
+                            },
+                            "low_tide": {
+                                "time": low_time,
+                                "water_level_m": fallback["low_tide"]["water_level_m"],
+                                "type": "LOW TIDE"
+                            },
+                            "events": fallback.get("events", [])
+                        }
+        except Exception as e:
+            logger.warning(f"Supabase get_tide_predictions failed: {e}")
+
+        return fallback
 
     # -------------------------------------------------------------------------
     # 6. Marine Analyses (Multi-Agent Decision Outputs)

@@ -190,20 +190,34 @@ class DecisionExplanationAgent:
 
         if valid_candidates:
             top_pkg = valid_candidates[0]
+            top_risk_score = top_pkg.risk.total_risk if top_pkg.risk else 30.0
+            top_band = top_pkg.risk.band if top_pkg.risk else RiskBandEnum.MODERATE
+            
+            # Determine appropriate recommendation status based on actual conditions
+            if top_risk_score >= 60.0 or top_band in [RiskBandEnum.HIGH, RiskBandEnum.VERY_HIGH]:
+                rec_status = CandidateStatusEnum.NOT_RECOMMENDED
+            elif top_risk_score >= 35.0 or top_band == RiskBandEnum.MODERATE:
+                rec_status = CandidateStatusEnum.CAUTION
+            else:
+                rec_status = CandidateStatusEnum.RECOMMENDED
+
             recommendation_item = RecommendationItem(
                 zone_id=top_pkg.zone_id,
-                status=CandidateStatusEnum.RECOMMENDED,
-                risk_band=top_pkg.risk.band if top_pkg.risk else RiskBandEnum.MODERATE,
-                risk_score=top_pkg.risk.total_risk if top_pkg.risk else 30.0
+                status=rec_status,
+                risk_band=top_band,
+                risk_score=top_risk_score
             )
             for alt in valid_candidates[1:]:
+                alt_risk = alt.risk.total_risk if alt.risk else 50.0
+                alt_status = CandidateStatusEnum.NOT_RECOMMENDED if alt_risk >= 60.0 else CandidateStatusEnum.VIABLE
                 rejected_candidates.append(AlternativeItem(
                     zone_id=alt.zone_id,
-                    status=CandidateStatusEnum.VIABLE,
+                    status=alt_status,
                     reason_code="higher_risk_or_distance",
                     risk_score=alt.risk.total_risk if alt.risk else None
                 ))
         else:
+            rec_status = CandidateStatusEnum.NO_SAFE_OPTION
             recommendation_item = RecommendationItem(
                 zone_id="NONE",
                 status=CandidateStatusEnum.NO_SAFE_OPTION,
@@ -251,6 +265,18 @@ class DecisionExplanationAgent:
         map_routes = []
         for pkg in candidates:
             if pkg.pfz and pkg.risk:
+                pkg_risk = pkg.risk.total_risk
+                if pkg.risk.hard_block or pkg_risk >= 75.0:
+                    cand_status = "NOT_RECOMMENDED"
+                elif pkg_risk >= 60.0 or pkg.risk.band == RiskBandEnum.HIGH:
+                    cand_status = "HIGH_RISK"
+                elif pkg_risk >= 35.0:
+                    cand_status = "CAUTION"
+                elif top_pkg and pkg.zone_id == top_pkg.zone_id and rec_status == CandidateStatusEnum.RECOMMENDED:
+                    cand_status = "RECOMMENDED"
+                else:
+                    cand_status = "VIABLE"
+
                 map_candidates.append({
                     "zone_id": pkg.zone_id,
                     "lat": pkg.pfz.lat,
@@ -258,7 +284,7 @@ class DecisionExplanationAgent:
                     "distance_km": pkg.pfz.distance_km,
                     "risk_band": pkg.risk.band.value,
                     "risk_score": pkg.risk.total_risk,
-                    "status": "RECOMMENDED" if top_pkg and pkg.zone_id == top_pkg.zone_id else ("REJECTED" if pkg.risk.hard_block else "VIABLE")
+                    "status": cand_status
                 })
             if pkg.route:
                 map_routes.append(pkg.route.model_dump())

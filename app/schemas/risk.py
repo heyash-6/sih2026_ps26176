@@ -15,6 +15,8 @@ class RiskInput(BaseModel):
     distance_km: float
     wave_height_m: float
     wind_speed_kmh: float
+    rain_mm: Optional[float] = 0.0
+    rain_probability_pct: Optional[float] = 0.0
     hazards: List[HazardAlert] = []
     geofence_status: GeofenceStatusEnum = GeofenceStatusEnum.CLEAR
     trip_duration_hours: float = 6.0

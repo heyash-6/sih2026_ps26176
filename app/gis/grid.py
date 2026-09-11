@@ -30,8 +30,8 @@ def create_marine_grid(
     lat_step = (max_lat - min_lat) / max(rows, 1)
     lon_step = (max_lon - min_lon) / max(cols, 1)
 
-    # Higher wave height raises base marine navigation risk
-    wave_risk_base = min(40.0, base_wave_height * 18.0)
+    # Higher wave height raises base marine navigation risk proportionally
+    wave_risk_base = min(85.0, max(10.0, base_wave_height * 24.0))
 
     grid = []
     for r in range(rows):

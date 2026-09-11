@@ -175,11 +175,14 @@ class MarineNavigator:
         direct_dist = haversine_km(start_lat, start_lon, end_lat, end_lon)
         initial_heading = calculate_bearing(start_lat, start_lon, end_lat, end_lon)
 
-        avg_risk = res.get("average_risk", 35.0)
-        if avg_risk <= 30.0:
+        avg_risk = res.get("average_risk", round(base_wave * 22.0, 1))
+        if base_wave >= 2.4:
+            avg_risk = max(avg_risk, 65.0)
+
+        if avg_risk <= 35.0:
             risk_band = "LOW"
         elif avg_risk <= 60.0:
-            risk_band = "MODERATE"
+            risk_band = "CAUTION"
         elif avg_risk <= 80.0:
             risk_band = "HIGH"
         else:

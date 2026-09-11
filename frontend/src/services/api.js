@@ -25,23 +25,35 @@ export async function checkBackendHealth() {
  * Primary Conversational Agent Pipeline
  * Calls FastAPI POST /api/query (NLU -> Planner -> Specialist Execution -> Risk Scoring -> Decision Explanation).
  */
-export async function askOrca(queryText, sessionId = 'web_session_' + Date.now(), priorContext = null) {
+export async function askOrca(queryText, langOrSession = 'en', priorContext = null, sessionId = null) {
+  const isLangCode = ['en', 'hi', 'mr'].includes(langOrSession);
+  const effectiveLang = isLangCode ? langOrSession : 'en';
+  const effectiveSessionId = sessionId || (!isLangCode ? langOrSession : `sess_${Date.now()}`);
+  const mergedContext = {
+    ...(priorContext || {}),
+    language: effectiveLang
+  };
+
   try {
     const res = await fetch(`${API_BASE_URL}/api/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        session_id: sessionId,
+        session_id: effectiveSessionId,
         text: queryText,
-        prior_context: priorContext
+        prior_context: mergedContext
       })
     });
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}: ${await res.text()}`);
     }
-    return await res.json();
+    const data = await res.json();
+    if (data && !data.answer && data.explanation_text) {
+      data.answer = data.explanation_text;
+    }
+    return data;
   } catch (err) {
-    console.warn('[ORCA API] askOrca backend request failed, falling back to local reasoning:', err);
+    console.warn('[ORCA API] askOrca backend request failed:', err);
     return null;
   }
 }
@@ -371,18 +383,36 @@ export async function getConversationMessages(convId) {
   }
 }
 
-export async function saveChatMessage(convId, userId, sender, text, language = 'en', hasRoute = false, metadata = {}) {
+export async function saveChatMessage(convId, userIdOrSender, senderOrText, textOrMeta = null, language = 'en', hasRoute = false, metadata = {}) {
   if (!convId) return null;
   const storageKey = `orca_msgs_${convId}`;
+
+  // Flexible argument normalization
+  let actualUserId = 'guest_user';
+  let actualSender = 'user';
+  let actualText = '';
+  let actualMeta = {};
+
+  if (userIdOrSender === 'user' || userIdOrSender === 'orca') {
+    actualSender = userIdOrSender;
+    actualText = typeof senderOrText === 'string' ? senderOrText : '';
+    actualMeta = (typeof textOrMeta === 'object' && textOrMeta !== null) ? textOrMeta : {};
+  } else {
+    actualUserId = userIdOrSender || 'guest_user';
+    actualSender = senderOrText || 'user';
+    actualText = typeof textOrMeta === 'string' ? textOrMeta : (typeof senderOrText === 'string' ? senderOrText : '');
+    actualMeta = (typeof metadata === 'object' && metadata !== null) ? metadata : {};
+  }
+
   const msgObj = {
     id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
     conversation_id: convId,
-    user_id: userId,
-    sender,
-    message: text,
+    user_id: actualUserId,
+    sender: actualSender,
+    message: actualText,
     language,
     has_route: hasRoute,
-    metadata,
+    metadata: actualMeta,
     created_at: new Date().toISOString()
   };
 
@@ -400,12 +430,12 @@ export async function saveChatMessage(convId, userId, sender, text, language = '
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         conversation_id: convId,
-        user_id: userId,
-        sender,
-        message: text,
+        user_id: actualUserId,
+        sender: actualSender,
+        message: actualText,
         language,
         has_route: hasRoute,
-        metadata
+        metadata: actualMeta
       })
     }).catch(() => {});
   } catch {}
@@ -428,5 +458,17 @@ export async function getPortContext(portId = 'mumbai') {
   return null;
 }
 
-
-
+/**
+ * Location-Aware Tide Predictions & Schedule
+ */
+export async function getTides(portId = 'mumbai') {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/tides?port=${encodeURIComponent(portId)}`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Tides API error:', err);
+  }
+  return null;
+}

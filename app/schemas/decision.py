@@ -9,7 +9,10 @@ from app.schemas.risk import RiskResult, RiskBandEnum
 
 class CandidateStatusEnum(str, Enum):
     RECOMMENDED = "RECOMMENDED"
+    CAUTION = "CAUTION"
     VIABLE = "VIABLE"
+    HIGH_RISK = "HIGH_RISK"
+    NOT_RECOMMENDED = "NOT_RECOMMENDED"
     REJECTED = "REJECTED"
     NO_SAFE_OPTION = "NO_SAFE_OPTION"
 
