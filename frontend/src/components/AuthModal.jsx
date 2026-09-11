@@ -168,7 +168,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         </div>
 
         <div className="authFooter">
-          <small>Protected by Supabase Auth (PostgreSQL Row Level Security)</small>
+          <small>Protected by Encrypted Maritime Identity & Row Level Security</small>
         </div>
       </div>
     </div>

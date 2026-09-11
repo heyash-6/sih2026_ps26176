@@ -413,5 +413,20 @@ export async function saveChatMessage(convId, userId, sender, text, language = '
   return msgObj;
 }
 
+/**
+ * Port-Specific Dashboard Context, Marine Conditions, Advisories & Active/Inactive PFZs
+ */
+export async function getPortContext(portId = 'mumbai') {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/ports/${encodeURIComponent(portId)}/context`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('Port context API error:', err);
+  }
+  return null;
+}
+
 
 

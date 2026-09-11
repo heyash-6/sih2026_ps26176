@@ -102,6 +102,13 @@ def get_ports():
         })
     return {"ports": ports_summary, "count": len(ports_summary)}
 
+@app.get("/api/ports/{port_id}/context")
+@app.get("/api/ports/{port_id}")
+def get_port_context_endpoint(port_id: str):
+    """Retrieve port-specific marine dashboard context, conditions, advisories, and active/inactive PFZs."""
+    from app.database.indian_coastal_registry import get_port_dashboard_context
+    return get_port_dashboard_context(port_id)
+
 @app.get("/api/pfz")
 def get_pfz(
     lat: Optional[float] = Query(None, description="Latitude"),

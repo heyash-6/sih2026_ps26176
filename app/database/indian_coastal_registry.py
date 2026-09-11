@@ -1,42 +1,87 @@
 """
 Indian Coastal Ports and Offshore Potential Fishing Zones (PFZ) Registry.
 Covers both West and East coasts: Gujarat, Maharashtra, Goa, Karnataka, Kerala, Tamil Nadu, Andhra Pradesh, Odisha, West Bengal.
+Includes port-specific marine conditions, localized advisories, and active/inactive PFZ candidates.
 """
 from typing import List, Dict, Any
 
 INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
-    # --- GUJARAT (North-West) ---
     {
         "id": "veraval",
         "name": "Veraval Fishery Port",
         "state": "Gujarat",
         "sector": "North-West (Gujarat)",
-        "lat": 20.9000,
+        "lat": 20.9,
         "lon": 70.3667,
         "pfz_candidates": [
             {
                 "id": "PFZ-VER-01",
                 "zone_code": "VER-01",
                 "name": "Veraval Southwest Shelf Break",
-                "lat": 20.7200,
-                "lon": 70.1500,
+                "lat": 20.72,
+                "lon": 70.15,
                 "bearing_deg": 230.0,
                 "distance_km": 28.4,
                 "depth_m": 45.0,
                 "target_species": "Silver Pomfret, Ribbonfish, Croakers",
-                "description": "High thermal gradient along the 50m isobath shelf break."
+                "description": "High thermal gradient along the 50m isobath shelf break.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 27.2,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-VER-02",
                 "zone_code": "VER-02",
                 "name": "Saurashtra Offshore Pelagic Front",
-                "lat": 20.8100,
-                "lon": 69.9800,
+                "lat": 20.81,
+                "lon": 69.98,
                 "bearing_deg": 250.0,
                 "distance_km": 41.5,
                 "depth_m": 68.0,
                 "target_species": "Indian Mackerel, Seer Fish, Squid",
-                "description": "Chlorophyll-a aggregation zone driven by coastal upwelling."
+                "description": "Chlorophyll-a aggregation zone driven by coastal upwelling.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 27.2,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-VER-03",
+                "zone_code": "VER-03",
+                "name": "Somnath Outer Shoal (Inactive)",
+                "lat": 20.65,
+                "lon": 70.42,
+                "bearing_deg": 195.0,
+                "distance_km": 31.0,
+                "depth_m": 42.0,
+                "target_species": "Croakers",
+                "description": "Thermal boundary dissipated; temperature gradient dropped below 0.3\u00b0C threshold.",
+                "status": "INACTIVE",
+                "inactive_reason": "Thermal boundary dissipated; temperature gradient <0.3\u00b0C",
+                "sst": 27.1,
+                "chlorophyll": 0.31,
+                "confidence": 38
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.7,
+            "wind_speed_kmh": 22.0,
+            "wind_direction": "NW (310\u00b0) \u2022 brisk wind",
+            "sst_celsius": 27.2,
+            "confidence_pct": 91,
+            "departure_recommendation": "04:30\u201307:30 \u2022 Morning ebb tide window",
+            "best_fishing_summary": "High thermal gradient along 50m isobath shelf break (PFZ-VER-01)"
+        },
+        "advisories": [
+            {
+                "id": "adv-ver-1",
+                "type": "Weather",
+                "severity": "Caution",
+                "risk_level": "CAUTION",
+                "title": "Brisk Wind Advisory",
+                "description": "Sustained NW winds 22 km/h; small craft exercise caution beyond 20 nm."
             }
         ]
     },
@@ -52,25 +97,70 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-POR-01",
                 "zone_code": "POR-01",
                 "name": "Porbandar Offshore Front",
-                "lat": 21.4800,
-                "lon": 69.4100,
+                "lat": 21.48,
+                "lon": 69.41,
                 "bearing_deg": 232.0,
                 "distance_km": 28.5,
                 "depth_m": 52.0,
                 "target_species": "Hilsa, Black Pomfret, Ribbonfish",
-                "description": "Strong thermal front observed between 26°C coastal and 28°C open sea waters."
+                "description": "Strong thermal front observed between 26\u00b0C coastal and 28\u00b0C open sea waters.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 26.8,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-POR-02",
                 "zone_code": "POR-02",
                 "name": "Dwarka-Porbandar Deep Trench",
-                "lat": 21.3600,
-                "lon": 69.2400,
+                "lat": 21.36,
+                "lon": 69.24,
                 "bearing_deg": 240.0,
                 "distance_km": 50.5,
                 "depth_m": 85.0,
                 "target_species": "Yellowfin Tuna, Skipjack, Barracuda",
-                "description": "Deep pelagic chlorophyll eddy."
+                "description": "Deep pelagic chlorophyll eddy.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 26.8,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-POR-03",
+                "zone_code": "POR-03",
+                "name": "Miyani Creek Marine Outflow (Inactive)",
+                "lat": 21.72,
+                "lon": 69.45,
+                "bearing_deg": 315.0,
+                "distance_km": 24.0,
+                "depth_m": 35.0,
+                "target_species": "Hilsa, Ribbonfish",
+                "description": "High coastal turbidity reducing satellite optical penetration.",
+                "status": "INACTIVE",
+                "inactive_reason": "High coastal sediment resuspension masking chlorophyll signals",
+                "sst": 26.4,
+                "chlorophyll": 0.28,
+                "confidence": 41
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate to Rough",
+            "wave_height_m": 1.9,
+            "wind_speed_kmh": 24.5,
+            "wind_direction": "WNW (290\u00b0) \u2022 active swell",
+            "sst_celsius": 26.8,
+            "confidence_pct": 89,
+            "departure_recommendation": "05:00\u201308:00 \u2022 Pre-afternoon gust window",
+            "best_fishing_summary": "Strong thermal front between 26\u00b0C coastal and 28\u00b0C open sea waters"
+        },
+        "advisories": [
+            {
+                "id": "adv-por-1",
+                "type": "Caution",
+                "severity": "Caution",
+                "risk_level": "CAUTION",
+                "title": "Rough Outer Swell",
+                "description": "Wave crests approaching 2.0m near deep trench boundary."
             }
         ]
     },
@@ -86,49 +176,133 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-OKH-01",
                 "zone_code": "OKH-01",
                 "name": "Gulf of Kutch Outer Mouth",
-                "lat": 22.3800,
-                "lon": 68.7900,
+                "lat": 22.38,
+                "lon": 68.79,
                 "bearing_deg": 255.0,
                 "distance_km": 30.1,
                 "depth_m": 42.0,
                 "target_species": "Jewfish, Threadfin, Prawns",
-                "description": "Tidal convergence and nutrient-rich estuarine plume."
+                "description": "Tidal convergence and nutrient-rich estuarine plume.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 26.5,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-OKH-02",
+                "zone_code": "OKH-02",
+                "name": "Bet Dwarka Reef Edge (Inactive)",
+                "lat": 22.45,
+                "lon": 69.21,
+                "bearing_deg": 75.0,
+                "distance_km": 16.5,
+                "depth_m": 22.0,
+                "target_species": "Threadfin",
+                "description": "Marine National Park conservation boundary and low pelagic aggregation index.",
+                "status": "INACTIVE",
+                "inactive_reason": "Ecological conservation boundary in effect; low offshore pelagic gradient",
+                "sst": 26.7,
+                "chlorophyll": 0.4,
+                "confidence": 35
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Rough",
+            "wave_height_m": 2.1,
+            "wind_speed_kmh": 26.0,
+            "wind_direction": "W (270\u00b0) \u2022 strong breeze",
+            "sst_celsius": 26.5,
+            "confidence_pct": 88,
+            "departure_recommendation": "06:00\u201308:30 \u2022 High-tide slack passage",
+            "best_fishing_summary": "Tidal convergence and estuarine plume at Gulf of Kutch outer mouth"
+        },
+        "advisories": [
+            {
+                "id": "adv-okh-1",
+                "type": "Warning",
+                "severity": "Warning",
+                "risk_level": "HIGH",
+                "title": "Tidal Rip & High Waves",
+                "description": "Strong 2.1m waves and rip currents at Kutch entrance. Monitor VHF channel 16."
             }
         ]
     },
-
-    # --- MAHARASHTRA (West Coast) ---
     {
         "id": "mumbai",
         "name": "Mumbai Harbour (Sassoon Docks)",
         "state": "Maharashtra",
         "sector": "West Coast (Maharashtra)",
-        "lat": 18.9400,
-        "lon": 72.8300,
+        "lat": 18.94,
+        "lon": 72.83,
         "pfz_candidates": [
             {
                 "id": "PFZ-MUM-01",
                 "zone_code": "MUM-01",
                 "name": "Mumbai Continental Shelf Edge",
-                "lat": 18.9800,
-                "lon": 72.5800,
+                "lat": 18.98,
+                "lon": 72.58,
                 "bearing_deg": 280.0,
                 "distance_km": 26.7,
                 "depth_m": 38.0,
                 "target_species": "Bombay Duck, Mackerel, Pomfret",
-                "description": "Persistent thermal boundary with high chlorophyll density."
+                "description": "Persistent thermal boundary with high chlorophyll density.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 27.8,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-MUM-02",
                 "zone_code": "MUM-02",
                 "name": "Alibaug-Mumbai South Bank",
-                "lat": 18.8200,
-                "lon": 72.6200,
+                "lat": 18.82,
+                "lon": 72.62,
                 "bearing_deg": 235.0,
                 "distance_km": 25.8,
                 "depth_m": 44.0,
                 "target_species": "Seer Fish, Croakers, Squid",
-                "description": "Meandering SST filament indicating productive feeding zone."
+                "description": "Meandering SST filament indicating productive feeding zone.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 27.8,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-MUM-03",
+                "zone_code": "MUM-03",
+                "name": "Thane Creek Outer Eddy (Inactive)",
+                "lat": 18.88,
+                "lon": 72.71,
+                "bearing_deg": 245.0,
+                "distance_km": 21.5,
+                "depth_m": 28.0,
+                "target_species": "Mullet, Perches",
+                "description": "Thermal boundary dissipated; temperature gradient dropped below 0.35\u00b0C threshold.",
+                "status": "INACTIVE",
+                "inactive_reason": "Thermal front dissipated; temperature gradient <0.35\u00b0C",
+                "sst": 28.5,
+                "chlorophyll": 0.32,
+                "confidence": 42
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.2,
+            "wind_speed_kmh": 16.0,
+            "wind_direction": "NE (045\u00b0) \u2022 steady",
+            "sst_celsius": 27.8,
+            "confidence_pct": 94,
+            "departure_recommendation": "05:00\u201308:30 \u2022 Favourable low-swell window",
+            "best_fishing_summary": "Continental shelf edge with high chlorophyll density (PFZ-MUM-01)"
+        },
+        "advisories": [
+            {
+                "id": "adv-mum-1",
+                "type": "Safety",
+                "severity": "Moderate",
+                "risk_level": "MODERATE",
+                "title": "Moderate Sea State",
+                "description": "Waves around 1.2 m expected along Mumbai outer shelf. Favourable for mechanised craft."
             }
         ]
     },
@@ -144,13 +318,54 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-ALI-01",
                 "zone_code": "ALI-01",
                 "name": "Kundalika Estuary Outflow PFZ",
-                "lat": 18.5800,
-                "lon": 72.6400,
+                "lat": 18.58,
+                "lon": 72.64,
                 "bearing_deg": 255.0,
                 "distance_km": 25.5,
                 "depth_m": 35.0,
                 "target_species": "Ribbonfish, White Prawns, Sardines",
-                "description": "Plankton bloom supported by estuarine nutrient runoff."
+                "description": "Plankton bloom supported by estuarine nutrient runoff.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 27.6,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-ALI-02",
+                "zone_code": "ALI-02",
+                "name": "Chaul Pelagic Bank (Inactive)",
+                "lat": 18.52,
+                "lon": 72.78,
+                "bearing_deg": 210.0,
+                "distance_km": 18.0,
+                "depth_m": 24.0,
+                "target_species": "Anchovies, Small Prawns",
+                "description": "Front moved into nearshore shoal; inadequate vessel keel clearance.",
+                "status": "INACTIVE",
+                "inactive_reason": "Nearshore shoal shift; inadequate vessel clearance",
+                "sst": 27.4,
+                "chlorophyll": 0.35,
+                "confidence": 43
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.1,
+            "wind_speed_kmh": 15.0,
+            "wind_direction": "NE (050\u00b0) \u2022 gentle",
+            "sst_celsius": 27.6,
+            "confidence_pct": 93,
+            "departure_recommendation": "05:00\u201308:30 \u2022 Morning slack tide",
+            "best_fishing_summary": "Kundalika estuary nutrient outflow with rich white prawn and ribbonfish"
+        },
+        "advisories": [
+            {
+                "id": "adv-ali-1",
+                "type": "Info",
+                "severity": "Favourable",
+                "risk_level": "INFO",
+                "title": "Manageable Swell Conditions",
+                "description": "Manageable sea conditions across Alibaug coastal corridor."
             }
         ]
     },
@@ -160,31 +375,76 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
         "state": "Maharashtra",
         "sector": "West Coast (Maharashtra)",
         "lat": 16.9902,
-        "lon": 73.3120,
+        "lon": 73.312,
         "pfz_candidates": [
             {
                 "id": "PFZ-RAT-01",
                 "zone_code": "RAT-01",
                 "name": "Mirkarwada West Pelagic Belt",
-                "lat": 16.9200,
-                "lon": 73.0800,
+                "lat": 16.92,
+                "lon": 73.08,
                 "bearing_deg": 252.0,
                 "distance_km": 26.0,
                 "depth_m": 48.0,
                 "target_species": "Kingfish, Horse Mackerel, Squid",
-                "description": "Well-defined cyclonic eddy with optimal 28.1°C surface temperature."
+                "description": "Well-defined cyclonic eddy with optimal 28.1\u00b0C surface temperature.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.1,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-RAT-02",
                 "zone_code": "RAT-02",
                 "name": "Jaigad Deep Slope PFZ",
-                "lat": 17.1000,
-                "lon": 73.0200,
+                "lat": 17.1,
+                "lon": 73.02,
                 "bearing_deg": 295.0,
                 "distance_km": 33.4,
                 "depth_m": 72.0,
                 "target_species": "Tuna, Seer Fish, Barracuda",
-                "description": "Sharp boundary of oceanic chlorophyll-a front."
+                "description": "Sharp boundary of oceanic chlorophyll-a front.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.1,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-RAT-03",
+                "zone_code": "RAT-03",
+                "name": "Rajapur Bay Shelf Margin (Inactive)",
+                "lat": 16.65,
+                "lon": 73.12,
+                "bearing_deg": 230.0,
+                "distance_km": 38.0,
+                "depth_m": 58.0,
+                "target_species": "Carangids, Anchovies",
+                "description": "Seasonal thermocline deepening; pelagic schools shifted into deeper waters (>90m).",
+                "status": "INACTIVE",
+                "inactive_reason": "Seasonal thermocline deepening; schools shifted to deep water",
+                "sst": 27.9,
+                "chlorophyll": 0.38,
+                "confidence": 45
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Slight to Moderate",
+            "wave_height_m": 1.4,
+            "wind_speed_kmh": 14.5,
+            "wind_direction": "NW (315\u00b0) \u2022 steady breeze",
+            "sst_celsius": 28.1,
+            "confidence_pct": 92,
+            "departure_recommendation": "05:30\u201309:00 \u2022 Clear coastal passage",
+            "best_fishing_summary": "Mirkarwada pelagic belt with optimal 28.1\u00b0C surface thermal boundary"
+        },
+        "advisories": [
+            {
+                "id": "adv-rat-1",
+                "type": "Info",
+                "severity": "Favourable",
+                "risk_level": "INFO",
+                "title": "Favourable Pelagic Window",
+                "description": "Stable sea conditions with high mackerel and kingfish signals."
             }
         ]
     },
@@ -200,18 +460,57 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-MAL-01",
                 "zone_code": "MAL-01",
                 "name": "Sindhudurg Outer Reef Shelf",
-                "lat": 15.9800,
-                "lon": 73.2800,
+                "lat": 15.98,
+                "lon": 73.28,
                 "bearing_deg": 246.0,
                 "distance_km": 22.0,
                 "depth_m": 50.0,
                 "target_species": "Indian Mackerel, Rock Cod, Reef Snappers",
-                "description": "Clear water convergence zone adjacent to coral shelf."
+                "description": "Clear water convergence zone adjacent to coral shelf.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.3,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-MAL-02",
+                "zone_code": "MAL-02",
+                "name": "Tarkarli Deep Ridge (Inactive)",
+                "lat": 15.98,
+                "lon": 73.32,
+                "bearing_deg": 220.0,
+                "distance_km": 25.0,
+                "depth_m": 48.0,
+                "target_species": "Squid, Pomfret",
+                "description": "SST gradient flattened following uniform surface solar warming.",
+                "status": "INACTIVE",
+                "inactive_reason": "SST gradient flattened following uniform solar warming",
+                "sst": 28.8,
+                "chlorophyll": 0.39,
+                "confidence": 44
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Calm to Slight",
+            "wave_height_m": 0.9,
+            "wind_speed_kmh": 12.0,
+            "wind_direction": "NW (315\u00b0) \u2022 light breeze",
+            "sst_celsius": 28.3,
+            "confidence_pct": 95,
+            "departure_recommendation": "05:15\u201309:00 \u2022 Clear sunrise departure",
+            "best_fishing_summary": "Sindhudurg rock shelf upwelling with rich seer fish and squids"
+        },
+        "advisories": [
+            {
+                "id": "adv-mal-1",
+                "type": "Info",
+                "severity": "Favourable",
+                "risk_level": "INFO",
+                "title": "Clear Sea Conditions",
+                "description": "Under 1.0 m waves; optimal coastal fishing environment."
             }
         ]
     },
-
-    # --- GOA (South-West) ---
     {
         "id": "goa",
         "name": "Goa Mormugao Port",
@@ -224,49 +523,133 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-GOA-01",
                 "zone_code": "GOA-01",
                 "name": "Zuari Offshore Upwelling Zone",
-                "lat": 15.4200,
-                "lon": 73.5600,
+                "lat": 15.42,
+                "lon": 73.56,
                 "bearing_deg": 252.0,
                 "distance_km": 30.0,
                 "depth_m": 54.0,
                 "target_species": "Oil Sardine, Mackerel, Squid",
-                "description": "High chlorophyll density from sustained seasonal upwelling."
+                "description": "High chlorophyll density from sustained seasonal upwelling.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.6,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-GOA-02",
                 "zone_code": "GOA-02",
                 "name": "Aguada-Anjuna Deep Slope",
-                "lat": 15.6100,
-                "lon": 73.5100,
+                "lat": 15.61,
+                "lon": 73.51,
                 "bearing_deg": 291.0,
                 "distance_km": 36.2,
                 "depth_m": 65.0,
                 "target_species": "Tuna, Seer Fish, Solenocera Prawns",
-                "description": "Distinct thermal divergence supporting pelagic schools."
+                "description": "Distinct thermal divergence supporting pelagic schools.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.6,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-GOA-03",
+                "zone_code": "GOA-03",
+                "name": "Cabo de Rama Trench (Inactive)",
+                "lat": 15.15,
+                "lon": 73.68,
+                "bearing_deg": 215.0,
+                "distance_km": 42.0,
+                "depth_m": 62.0,
+                "target_species": "Ribbonfish, Sole",
+                "description": "Plankton plume dispersed by offshore subsurface counter-current.",
+                "status": "INACTIVE",
+                "inactive_reason": "Plankton plume dispersed by offshore counter-current",
+                "sst": 29.0,
+                "chlorophyll": 0.35,
+                "confidence": 40
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Calm",
+            "wave_height_m": 0.8,
+            "wind_speed_kmh": 11.0,
+            "wind_direction": "W (260\u00b0) \u2022 gentle breeze",
+            "sst_celsius": 28.6,
+            "confidence_pct": 96,
+            "departure_recommendation": "05:00\u201309:30 \u2022 Calm sea state & high visibility",
+            "best_fishing_summary": "Aguada outer thermal gradient with high sardine & mackerel aggregation"
+        },
+        "advisories": [
+            {
+                "id": "adv-goa-1",
+                "type": "Info",
+                "severity": "Favourable",
+                "risk_level": "INFO",
+                "title": "Optimal Operating Conditions",
+                "description": "Calm inshore waters under 1.0 m waves across Mormugao approaches."
             }
         ]
     },
-
-    # --- KARNATAKA (South-West) ---
     {
         "id": "karwar",
         "name": "Karwar Fishery Port (Baithkol)",
         "state": "Karnataka",
         "sector": "South-West (Karnataka)",
-        "lat": 14.8050,
-        "lon": 74.1240,
+        "lat": 14.805,
+        "lon": 74.124,
         "pfz_candidates": [
             {
                 "id": "PFZ-KAR-01",
                 "zone_code": "KAR-01",
                 "name": "Kali Estuary Convergence PFZ",
-                "lat": 14.7200,
-                "lon": 73.9100,
+                "lat": 14.72,
+                "lon": 73.91,
                 "bearing_deg": 246.0,
                 "distance_km": 25.0,
                 "depth_m": 42.0,
                 "target_species": "Oil Sardine, Silver Belly, Cuttlefish",
-                "description": "Sub-surface cold tongue with rich zooplankton abundance."
+                "description": "Sub-surface cold tongue with rich zooplankton abundance.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.4,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-KAR-02",
+                "zone_code": "KAR-02",
+                "name": "Anjadip Island Shoal (Inactive)",
+                "lat": 14.72,
+                "lon": 74.02,
+                "bearing_deg": 215.0,
+                "distance_km": 15.0,
+                "depth_m": 30.0,
+                "target_species": "Sardines",
+                "description": "Naval boundary security exclusion zone in effect.",
+                "status": "INACTIVE",
+                "inactive_reason": "Security corridor exclusion in effect",
+                "sst": 28.1,
+                "chlorophyll": 0.45,
+                "confidence": 36
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Slight",
+            "wave_height_m": 1.0,
+            "wind_speed_kmh": 13.5,
+            "wind_direction": "W (265\u00b0) \u2022 steady",
+            "sst_celsius": 28.4,
+            "confidence_pct": 94,
+            "departure_recommendation": "05:00\u201308:45 \u2022 Early morning calm",
+            "best_fishing_summary": "Kali River confluence front with abundant mackerel and oil sardines"
+        },
+        "advisories": [
+            {
+                "id": "adv-kar-1",
+                "type": "Info",
+                "severity": "Favourable",
+                "risk_level": "INFO",
+                "title": "Steady Marine State",
+                "description": "Waves around 1.0m, good visibility along Baithkol fairway."
             }
         ]
     },
@@ -275,68 +658,156 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
         "name": "Mangalore Fishery Port (Old Port / Bunder)",
         "state": "Karnataka",
         "sector": "South-West (Karnataka)",
-        "lat": 12.8580,
-        "lon": 74.8360,
+        "lat": 12.858,
+        "lon": 74.836,
         "pfz_candidates": [
             {
                 "id": "PFZ-MNG-01",
                 "zone_code": "MNG-01",
                 "name": "Netravati Offshore Shelf PFZ",
-                "lat": 12.7800,
-                "lon": 74.5800,
+                "lat": 12.78,
+                "lon": 74.58,
                 "bearing_deg": 252.0,
                 "distance_km": 29.2,
                 "depth_m": 50.0,
                 "target_species": "Indian Mackerel, Ribbonfish, Sole Fish",
-                "description": "Sustained high primary productivity along 40-50m depth contour."
+                "description": "Sustained high primary productivity along 40-50m depth contour.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.5,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-MNG-02",
                 "zone_code": "MNG-02",
                 "name": "Malpe-Mangalore Outer Trench",
-                "lat": 12.9600,
-                "lon": 74.5200,
+                "lat": 12.96,
+                "lon": 74.52,
                 "bearing_deg": 290.0,
                 "distance_km": 36.1,
                 "depth_m": 78.0,
                 "target_species": "Yellowfin Tuna, Bonito, Queenfish",
-                "description": "Deep-water thermal front with active baitfish aggregations."
+                "description": "Deep-water thermal front with active baitfish aggregations.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.5,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-MAN-03",
+                "zone_code": "MAN-03",
+                "name": "Surathkal Outer Trench (Inactive)",
+                "lat": 12.98,
+                "lon": 74.62,
+                "bearing_deg": 310.0,
+                "distance_km": 28.0,
+                "depth_m": 52.0,
+                "target_species": "Horse Mackerel",
+                "description": "Thermal boundary shifted northwards beyond single-day voyage radius.",
+                "status": "INACTIVE",
+                "inactive_reason": "Thermal boundary shifted northwards beyond single-day range",
+                "sst": 28.7,
+                "chlorophyll": 0.35,
+                "confidence": 42
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.3,
+            "wind_speed_kmh": 17.0,
+            "wind_direction": "NW (305\u00b0) \u2022 moderate",
+            "sst_celsius": 28.5,
+            "confidence_pct": 93,
+            "departure_recommendation": "05:00\u201308:30 \u2022 Low-swell fairway passage",
+            "best_fishing_summary": "Netravati estuary plume meeting Arabian Sea pelagic current"
+        },
+        "advisories": [
+            {
+                "id": "adv-man-1",
+                "type": "Caution",
+                "severity": "Caution",
+                "risk_level": "CAUTION",
+                "title": "Bar Mouth Swell",
+                "description": "Breaking swells up to 1.4m across Netravati river mouth."
             }
         ]
     },
-
-    # --- KERALA (South-West) ---
     {
         "id": "kochi",
         "name": "Cochin Fishery Harbour (Thoppumpady)",
         "state": "Kerala",
         "sector": "South-West (Kerala)",
-        "lat": 9.9650,
-        "lon": 76.2620,
+        "lat": 9.965,
+        "lon": 76.262,
         "pfz_candidates": [
             {
                 "id": "PFZ-KCH-01",
                 "zone_code": "KCH-01",
                 "name": "Cochin Mud Bank Outer Fringe",
-                "lat": 9.8800,
-                "lon": 76.0100,
+                "lat": 9.88,
+                "lon": 76.01,
                 "bearing_deg": 252.0,
                 "distance_km": 29.2,
                 "depth_m": 36.0,
                 "target_species": "Oil Sardine, Indian Mackerel, Karikkadi Prawns",
-                "description": "Traditional high-yield mud bank zone with massive plankton density."
+                "description": "Traditional high-yield mud bank zone with massive plankton density.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.9,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-KCH-02",
                 "zone_code": "KCH-02",
                 "name": "Vypin Deep Continental Slope",
-                "lat": 10.0800,
-                "lon": 75.9800,
+                "lat": 10.08,
+                "lon": 75.98,
                 "bearing_deg": 293.0,
                 "distance_km": 33.4,
                 "depth_m": 70.0,
                 "target_species": "Yellowfin Tuna, Skipjack, Threadfin Bream",
-                "description": "Clear thermal gradient with high chlorophyll-a concentration."
+                "description": "Clear thermal gradient with high chlorophyll-a concentration.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.9,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-KOC-03",
+                "zone_code": "KOC-03",
+                "name": "Vypin Nearshore Bank (Inactive)",
+                "lat": 10.05,
+                "lon": 76.12,
+                "bearing_deg": 320.0,
+                "distance_km": 18.0,
+                "depth_m": 22.0,
+                "target_species": "Anchovy, Mullet",
+                "description": "Salinity drop due to heavy monsoonal sluice discharge.",
+                "status": "INACTIVE",
+                "inactive_reason": "Salinity drop due to monsoonal sluice outflow",
+                "sst": 27.6,
+                "chlorophyll": 0.3,
+                "confidence": 40
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Slight",
+            "wave_height_m": 1.1,
+            "wind_speed_kmh": 15.2,
+            "wind_direction": "WNW (295\u00b0) \u2022 favourable",
+            "sst_celsius": 28.9,
+            "confidence_pct": 95,
+            "departure_recommendation": "04:45\u201308:15 \u2022 Favourable low-swell window",
+            "best_fishing_summary": "Intense coastal upwelling and mud-bank nutrient enrichment zone"
+        },
+        "advisories": [
+            {
+                "id": "adv-koc-1",
+                "type": "Info",
+                "severity": "Favourable",
+                "risk_level": "FAVOURABLE",
+                "title": "Favourable Upwelling Window",
+                "description": "High biological productivity across Cochin approaches."
             }
         ]
     },
@@ -345,25 +816,64 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
         "name": "Kollam Neendakara Harbour",
         "state": "Kerala",
         "sector": "South-West (Kerala)",
-        "lat": 8.9440,
-        "lon": 76.5360,
+        "lat": 8.944,
+        "lon": 76.536,
         "pfz_candidates": [
             {
                 "id": "PFZ-KLM-01",
                 "zone_code": "KLM-01",
                 "name": "Ashtamudi Deep Offshore PFZ",
-                "lat": 8.8600,
-                "lon": 76.3200,
+                "lat": 8.86,
+                "lon": 76.32,
                 "bearing_deg": 247.0,
                 "distance_km": 25.5,
                 "depth_m": 45.0,
                 "target_species": "Deep-sea Prawns, Cephalopods, Anchovies",
-                "description": "Nutrient plume converging with coastal south-flowing current."
+                "description": "Nutrient plume converging with coastal south-flowing current.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.8,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-KOL-02",
+                "zone_code": "KOL-02",
+                "name": "Tangasseri Reef Ridge (Inactive)",
+                "lat": 8.85,
+                "lon": 76.42,
+                "bearing_deg": 235.0,
+                "distance_km": 20.0,
+                "depth_m": 35.0,
+                "target_species": "Deep-sea shrimp",
+                "description": "Thermal gradient dissipated below 0.35\u00b0C threshold.",
+                "status": "INACTIVE",
+                "inactive_reason": "Thermal gradient dissipated below threshold",
+                "sst": 29.0,
+                "chlorophyll": 0.33,
+                "confidence": 43
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.3,
+            "wind_speed_kmh": 16.5,
+            "wind_direction": "NW (310\u00b0) \u2022 brisk",
+            "sst_celsius": 28.8,
+            "confidence_pct": 92,
+            "departure_recommendation": "05:00\u201308:30 \u2022 Morning harbour clearing",
+            "best_fishing_summary": "Ashtamudi estuary outflow front with prime deep-sea shrimp & squid"
+        },
+        "advisories": [
+            {
+                "id": "adv-kol-1",
+                "type": "Caution",
+                "severity": "Caution",
+                "risk_level": "CAUTION",
+                "title": "Moderate Coastal Swell",
+                "description": "1.3m swells around Neendakara entrance."
             }
         ]
     },
-
-    # --- TAMIL NADU (South Coast & Coromandel) ---
     {
         "id": "kanyakumari",
         "name": "Kanyakumari Cape Port",
@@ -376,25 +886,70 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-KAN-01",
                 "zone_code": "KAN-01",
                 "name": "Wadge Bank Oceanic Upwelling",
-                "lat": 7.9200,
-                "lon": 77.4200,
+                "lat": 7.92,
+                "lon": 77.42,
                 "bearing_deg": 215.0,
                 "distance_km": 22.8,
                 "depth_m": 55.0,
                 "target_species": "Skipjack Tuna, Perches, Rock Cod",
-                "description": "Tri-sea confluence zone creating one of India's richest fishing grounds."
+                "description": "Tri-sea confluence zone creating one of India's richest fishing grounds.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 27.5,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-KAN-02",
                 "zone_code": "KAN-02",
                 "name": "Cape Comorin East Ledge",
-                "lat": 8.0100,
-                "lon": 77.7200,
+                "lat": 8.01,
+                "lon": 77.72,
                 "bearing_deg": 115.0,
                 "distance_km": 22.1,
                 "depth_m": 48.0,
                 "target_species": "Seer Fish, Carangids, Flying Fish",
-                "description": "SST frontal zone between Arabian Sea and Gulf of Mannar."
+                "description": "SST frontal zone between Arabian Sea and Gulf of Mannar.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 27.5,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-KAN-03",
+                "zone_code": "KAN-03",
+                "name": "Wadge Bank Outer Shelf (Inactive)",
+                "lat": 7.82,
+                "lon": 77.38,
+                "bearing_deg": 205.0,
+                "distance_km": 35.0,
+                "depth_m": 60.0,
+                "target_species": "Reef Cod, Perches",
+                "description": "High wave turbulence disrupting surface drift nets.",
+                "status": "INACTIVE",
+                "inactive_reason": "High sea turbulence disrupting operational safety",
+                "sst": 27.2,
+                "chlorophyll": 0.41,
+                "confidence": 45
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Rough",
+            "wave_height_m": 2.0,
+            "wind_speed_kmh": 27.0,
+            "wind_direction": "SW (220\u00b0) \u2022 strong cross-current",
+            "sst_celsius": 27.5,
+            "confidence_pct": 90,
+            "departure_recommendation": "04:30\u201307:00 \u2022 Pre-wind surge window",
+            "best_fishing_summary": "Tri-sea convergence (Arabian Sea, Bay of Bengal, Indian Ocean)"
+        },
+        "advisories": [
+            {
+                "id": "adv-kan-1",
+                "type": "Warning",
+                "severity": "Warning",
+                "risk_level": "HIGH",
+                "title": "Tri-Sea Cross-Swell Warning",
+                "description": "Strong 2.0m cross-swells and 27 km/h winds off Cape Comorin."
             }
         ]
     },
@@ -410,25 +965,70 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-TUT-01",
                 "zone_code": "TUT-01",
                 "name": "Gulf of Mannar Deep Basin PFZ",
-                "lat": 8.7100,
-                "lon": 78.3600,
+                "lat": 8.71,
+                "lon": 78.36,
                 "bearing_deg": 105.0,
                 "distance_km": 25.6,
                 "depth_m": 52.0,
                 "target_species": "Lethrinids (Pig-face Bream), Barracuda, Prawns",
-                "description": "Biosphere-fringe oceanic trench with rich phytoplankton density."
+                "description": "Biosphere-fringe oceanic trench with rich phytoplankton density.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.2,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-TUT-02",
                 "zone_code": "TUT-02",
                 "name": "Pearl Bank Offshore Ridge",
-                "lat": 8.8900,
-                "lon": 78.4200,
+                "lat": 8.89,
+                "lon": 78.42,
                 "bearing_deg": 65.0,
                 "distance_km": 34.3,
                 "depth_m": 64.0,
                 "target_species": "Seer Fish, Tuna, Snappers",
-                "description": "Reef-edge convergence front."
+                "description": "Reef-edge convergence front.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.2,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-TUT-03",
+                "zone_code": "TUT-03",
+                "name": "Hare Island Outer Shoal (Inactive)",
+                "lat": 8.78,
+                "lon": 78.25,
+                "bearing_deg": 70.0,
+                "distance_km": 14.0,
+                "depth_m": 22.0,
+                "target_species": "Crabs, Mullet",
+                "description": "Marine biosphere reserve boundary restriction.",
+                "status": "INACTIVE",
+                "inactive_reason": "Marine biosphere reserve conservation boundary",
+                "sst": 28.5,
+                "chlorophyll": 0.38,
+                "confidence": 35
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.2,
+            "wind_speed_kmh": 18.0,
+            "wind_direction": "NE (040\u00b0) \u2022 steady",
+            "sst_celsius": 28.2,
+            "confidence_pct": 92,
+            "departure_recommendation": "05:30\u201309:00 \u2022 Morning calm sea state",
+            "best_fishing_summary": "Gulf of Mannar protected reef-adjacent biological corridor"
+        },
+        "advisories": [
+            {
+                "id": "adv-tut-1",
+                "type": "Info",
+                "severity": "Favourable",
+                "risk_level": "INFO",
+                "title": "Gulf of Mannar Advisory",
+                "description": "Sheltered waters with steady 1.2m wave regime."
             }
         ]
     },
@@ -444,13 +1044,54 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-NAG-01",
                 "zone_code": "NAG-01",
                 "name": "Cauvery Delta Marine Outflow PFZ",
-                "lat": 10.7200,
-                "lon": 80.1200,
+                "lat": 10.72,
+                "lon": 80.12,
                 "bearing_deg": 99.0,
                 "distance_km": 30.8,
                 "depth_m": 42.0,
                 "target_species": "Hilsa, Pomfret, Tiger Prawns",
-                "description": "Chlorophyll plume generated by Cauvery river basin discharge."
+                "description": "Chlorophyll plume generated by Cauvery river basin discharge.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.6,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-NAG-02",
+                "zone_code": "NAG-02",
+                "name": "Point Calimere Shoal (Inactive)",
+                "lat": 10.35,
+                "lon": 80.02,
+                "bearing_deg": 155.0,
+                "distance_km": 32.0,
+                "depth_m": 25.0,
+                "target_species": "Prawns, Whiting",
+                "description": "Shallow bank sediment resuspension masking optical signals.",
+                "status": "INACTIVE",
+                "inactive_reason": "Sediment resuspension masking optical signals",
+                "sst": 28.3,
+                "chlorophyll": 0.26,
+                "confidence": 39
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.4,
+            "wind_speed_kmh": 19.5,
+            "wind_direction": "ENE (065\u00b0) \u2022 moderate",
+            "sst_celsius": 28.6,
+            "confidence_pct": 91,
+            "departure_recommendation": "05:00\u201308:30 \u2022 Low-swell window",
+            "best_fishing_summary": "Cauvery delta shelf front with prime pomfret and mackerel"
+        },
+        "advisories": [
+            {
+                "id": "adv-nag-1",
+                "type": "Caution",
+                "severity": "Caution",
+                "risk_level": "CAUTION",
+                "title": "Coromandel Coastal Swell",
+                "description": "1.4m waves from east-northeast."
             }
         ]
     },
@@ -459,37 +1100,80 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
         "name": "Chennai Kasimedu Fishery Harbour",
         "state": "Tamil Nadu",
         "sector": "South-East (Coromandel)",
-        "lat": 13.1250,
-        "lon": 80.2980,
+        "lat": 13.125,
+        "lon": 80.298,
         "pfz_candidates": [
             {
                 "id": "PFZ-CHN-01",
                 "zone_code": "CHN-01",
                 "name": "Kasimedu Offshore Pelagic Front",
-                "lat": 13.1800,
-                "lon": 80.5600,
+                "lat": 13.18,
+                "lon": 80.56,
                 "bearing_deg": 76.0,
                 "distance_km": 29.0,
                 "depth_m": 48.0,
                 "target_species": "Seer Fish, Ribbonfish, Trevally",
-                "description": "Pronounced thermal boundary between nearshore and Bay of Bengal shelf."
+                "description": "Pronounced thermal boundary between nearshore and Bay of Bengal shelf.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.8,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-CHN-02",
                 "zone_code": "CHN-02",
                 "name": "Coromandel Deep Continental Slope",
-                "lat": 13.0100,
-                "lon": 80.5900,
+                "lat": 13.01,
+                "lon": 80.59,
                 "bearing_deg": 113.0,
                 "distance_km": 34.2,
                 "depth_m": 85.0,
                 "target_species": "Yellowfin Tuna, Sailfish, Barracuda",
-                "description": "Deep blue water thermal front with high chlorophyll boundary."
+                "description": "Deep blue water thermal front with high chlorophyll boundary.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.8,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-CHE-03",
+                "zone_code": "CHE-03",
+                "name": "Pulicat Lake Outflow Zone (Inactive)",
+                "lat": 13.45,
+                "lon": 80.45,
+                "bearing_deg": 25.0,
+                "distance_km": 36.0,
+                "depth_m": 35.0,
+                "target_species": "Pomfret, Croakers",
+                "description": "Thermal contrast subsided; temperature gradient dropped under 0.3\u00b0C.",
+                "status": "INACTIVE",
+                "inactive_reason": "Thermal contrast subsided; gradient <0.3\u00b0C",
+                "sst": 29.1,
+                "chlorophyll": 0.31,
+                "confidence": 43
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate to Rough",
+            "wave_height_m": 1.5,
+            "wind_speed_kmh": 21.0,
+            "wind_direction": "E (090\u00b0) \u2022 easterly swell",
+            "sst_celsius": 28.8,
+            "confidence_pct": 91,
+            "departure_recommendation": "04:30\u201308:00 \u2022 Early morning departure",
+            "best_fishing_summary": "Kasimedu offshore submarine canyon and thermal filament"
+        },
+        "advisories": [
+            {
+                "id": "adv-che-1",
+                "type": "Caution",
+                "severity": "Caution",
+                "risk_level": "CAUTION",
+                "title": "Easterly Swell Caution",
+                "description": "Long-period easterly swells 1.5m. Keep clear of harbor shipping channel."
             }
         ]
     },
-
-    # --- ANDHRA PRADESH (East Coast) ---
     {
         "id": "kakinada",
         "name": "Kakinada Deepwater Port",
@@ -502,13 +1186,54 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-KAK-01",
                 "zone_code": "KAK-01",
                 "name": "Godavari Estuary Marine Front",
-                "lat": 16.8900,
-                "lon": 82.5200,
+                "lat": 16.89,
+                "lon": 82.52,
                 "bearing_deg": 112.0,
                 "distance_km": 31.1,
                 "depth_m": 46.0,
                 "target_species": "Croakers, Ribbonfish, Tiger Prawns",
-                "description": "Rich nutrient confluence from Godavari river delta."
+                "description": "Rich nutrient confluence from Godavari river delta.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.7,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-KAK-02",
+                "zone_code": "KAK-02",
+                "name": "Hope Island Pelagic Bank (Inactive)",
+                "lat": 16.92,
+                "lon": 82.42,
+                "bearing_deg": 120.0,
+                "distance_km": 21.0,
+                "depth_m": 32.0,
+                "target_species": "Tiger Prawns, Sole",
+                "description": "Current vector shifted sedimentation plume away from shelf edge.",
+                "status": "INACTIVE",
+                "inactive_reason": "Current shifted sedimentation plume away from shelf",
+                "sst": 28.5,
+                "chlorophyll": 0.36,
+                "confidence": 41
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.3,
+            "wind_speed_kmh": 17.5,
+            "wind_direction": "ESE (110\u00b0) \u2022 steady",
+            "sst_celsius": 28.7,
+            "confidence_pct": 93,
+            "departure_recommendation": "05:00\u201308:30 \u2022 Favourable tide passage",
+            "best_fishing_summary": "Godavari river delta plume confluence with rich tiger prawns"
+        },
+        "advisories": [
+            {
+                "id": "adv-kak-1",
+                "type": "Info",
+                "severity": "Favourable",
+                "risk_level": "INFO",
+                "title": "Delta Estuary Confluence",
+                "description": "Moderate wave activity under 1.4m across Godavari coastal basin."
             }
         ]
     },
@@ -524,30 +1249,73 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-VIZ-01",
                 "zone_code": "VIZ-01",
                 "name": "Vizag Submarine Canyon Front",
-                "lat": 17.6200,
-                "lon": 83.4900,
+                "lat": 17.62,
+                "lon": 83.49,
                 "bearing_deg": 105.0,
                 "distance_km": 29.8,
                 "depth_m": 60.0,
                 "target_species": "Yellowfin Tuna, Skipjack, Threadfin Bream",
-                "description": "Submarine canyon upwelling bringing nutrient-rich deep water to surface."
+                "description": "Submarine canyon upwelling bringing nutrient-rich deep water to surface.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.4,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-VIZ-02",
                 "zone_code": "VIZ-02",
                 "name": "Bheemunipatnam Offshore Ridge",
-                "lat": 17.8100,
-                "lon": 83.5200,
+                "lat": 17.81,
+                "lon": 83.52,
                 "bearing_deg": 61.0,
                 "distance_km": 35.0,
                 "depth_m": 92.0,
                 "target_species": "Seer Fish, Billfish, Carangids",
-                "description": "Persistent chlorophyll front along the 100m contour line."
+                "description": "Persistent chlorophyll front along the 100m contour line.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.4,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-VIZ-03",
+                "zone_code": "VIZ-03",
+                "name": "Gangavaram Deep Trench (Inactive)",
+                "lat": 17.55,
+                "lon": 83.38,
+                "bearing_deg": 140.0,
+                "distance_km": 26.0,
+                "depth_m": 75.0,
+                "target_species": "Skipjack Tuna",
+                "description": "Thermal front dissipated below threshold following local wind shift.",
+                "status": "INACTIVE",
+                "inactive_reason": "Thermal front dissipated below threshold following wind shift",
+                "sst": 28.7,
+                "chlorophyll": 0.34,
+                "confidence": 44
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.4,
+            "wind_speed_kmh": 18.5,
+            "wind_direction": "E (085\u00b0) \u2022 steady",
+            "sst_celsius": 28.4,
+            "confidence_pct": 94,
+            "departure_recommendation": "05:15\u201308:45 \u2022 Morning offshore window",
+            "best_fishing_summary": "Submarine canyon upwelling bringing yellowfin tuna & seer fish"
+        },
+        "advisories": [
+            {
+                "id": "adv-viz-1",
+                "type": "Info",
+                "severity": "Favourable",
+                "risk_level": "INFO",
+                "title": "Canyon Upwelling Favourable",
+                "description": "High yellowfin tuna pelagic activity along 100m contour."
             }
         ]
     },
-
-    # --- ODISHA (East Coast) ---
     {
         "id": "paradip",
         "name": "Paradip Fishery Port",
@@ -560,30 +1328,73 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-PAR-01",
                 "zone_code": "PAR-01",
                 "name": "Mahanadi Plume Convergence PFZ",
-                "lat": 20.1200,
-                "lon": 86.9400,
+                "lat": 20.12,
+                "lon": 86.94,
                 "bearing_deg": 116.0,
                 "distance_km": 32.8,
                 "depth_m": 38.0,
                 "target_species": "Hilsa, Silver Pomfret, Catfish",
-                "description": "Mahanadi estuarine discharge meeting coastal current creating massive plankton bloom."
+                "description": "Mahanadi estuarine discharge meeting coastal current creating massive plankton bloom.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 27.9,
+                "chlorophyll": 1.4
             },
             {
                 "id": "PFZ-PAR-02",
                 "zone_code": "PAR-02",
                 "name": "Wheeler-Paradip Continental Edge",
-                "lat": 20.3800,
-                "lon": 87.0100,
+                "lat": 20.38,
+                "lon": 87.01,
                 "bearing_deg": 70.0,
                 "distance_km": 38.1,
                 "depth_m": 65.0,
                 "target_species": "Tuna, Ribbonfish, Horse Mackerel",
-                "description": "Deep shelf thermal boundary in Northern Bay of Bengal."
+                "description": "Deep shelf thermal boundary in Northern Bay of Bengal.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 27.9,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-PAR-03",
+                "zone_code": "PAR-03",
+                "name": "Dhamra Estuary Outer Spit (Inactive)",
+                "lat": 20.45,
+                "lon": 87.12,
+                "bearing_deg": 65.0,
+                "distance_km": 34.0,
+                "depth_m": 28.0,
+                "target_species": "Hilsa, Pomfret",
+                "description": "Monsoon freshwater dilution temporarily lowered salinity below pelagic tolerance.",
+                "status": "INACTIVE",
+                "inactive_reason": "Freshwater dilution lowered salinity below pelagic tolerance",
+                "sst": 27.4,
+                "chlorophyll": 0.31,
+                "confidence": 39
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate to Rough",
+            "wave_height_m": 1.8,
+            "wind_speed_kmh": 23.0,
+            "wind_direction": "NE (045\u00b0) \u2022 brisk",
+            "sst_celsius": 27.9,
+            "confidence_pct": 90,
+            "departure_recommendation": "05:00\u201308:00 \u2022 Morning tidal window",
+            "best_fishing_summary": "Mahanadi estuarine discharge meeting coastal current creating massive bloom"
+        },
+        "advisories": [
+            {
+                "id": "adv-par-1",
+                "type": "Caution",
+                "severity": "Caution",
+                "risk_level": "CAUTION",
+                "title": "Brisk North-Easterly Sea",
+                "description": "1.8m waves across northern Bay of Bengal shelf. Exercise caution."
             }
         ]
     },
-
-    # --- WEST BENGAL (North-East) ---
     {
         "id": "haldia",
         "name": "Haldia / Diamond Harbour",
@@ -596,13 +1407,54 @@ INDIAN_COASTAL_PORTS: List[Dict[str, Any]] = [
                 "id": "PFZ-HAL-01",
                 "zone_code": "HAL-01",
                 "name": "Sandheads Oceanic Estuarine Front",
-                "lat": 21.6500,
-                "lon": 88.2500,
+                "lat": 21.65,
+                "lon": 88.25,
                 "bearing_deg": 157.0,
                 "distance_km": 50.1,
                 "depth_m": 32.0,
                 "target_species": "Tenualosa ilisha (Hilsa), Seabass (Bhetki), Prawns",
-                "description": "Famous Sandheads fishing corridor where Hooghly freshwater mixes with Bay of Bengal."
+                "description": "Famous Sandheads fishing corridor where Hooghly freshwater mixes with Bay of Bengal.",
+                "status": "ACTIVE",
+                "confidence": 92,
+                "sst": 28.0,
+                "chlorophyll": 1.4
+            },
+            {
+                "id": "PFZ-HAL-02",
+                "zone_code": "HAL-02",
+                "name": "Sagar Island South Channel (Inactive)",
+                "lat": 21.75,
+                "lon": 88.1,
+                "bearing_deg": 185.0,
+                "distance_km": 28.0,
+                "depth_m": 24.0,
+                "target_species": "Hilsa, Bhetki",
+                "description": "High silt turbidity obstructing plankton photosynthesis.",
+                "status": "INACTIVE",
+                "inactive_reason": "High silt turbidity obstructing photosynthesis",
+                "sst": 28.2,
+                "chlorophyll": 0.25,
+                "confidence": 37
+            }
+        ],
+        "marine_conditions": {
+            "sea_state": "Moderate",
+            "wave_height_m": 1.5,
+            "wind_speed_kmh": 20.0,
+            "wind_direction": "ENE (070\u00b0) \u2022 steady",
+            "sst_celsius": 28.0,
+            "confidence_pct": 89,
+            "departure_recommendation": "05:30\u201309:00 \u2022 High-water navigation window",
+            "best_fishing_summary": "Famous Sandheads fishing corridor where Hooghly mixes with Bay of Bengal"
+        },
+        "advisories": [
+            {
+                "id": "adv-hal-1",
+                "type": "Caution",
+                "severity": "Caution",
+                "risk_level": "CAUTION",
+                "title": "Sandheads Shallow Swell",
+                "description": "Shifting sandbars and 1.5m swells along navigation fairway."
             }
         ]
     }
@@ -616,11 +1468,31 @@ def get_port_by_id(port_id: str) -> Dict[str, Any]:
             return port
     return INDIAN_COASTAL_PORTS[3]  # default to Mumbai
 
+def get_port_dashboard_context(port_id: str) -> Dict[str, Any]:
+    """Retrieve comprehensive port-specific dashboard context, conditions, advisories, and PFZs."""
+    port = get_port_by_id(port_id)
+    cands = port.get("pfz_candidates", [])
+    active = [c for c in cands if c.get("status") == "ACTIVE"]
+    inactive = [c for c in cands if c.get("status") == "INACTIVE"]
+    return {
+        "port_id": port["id"],
+        "name": port["name"],
+        "state": port["state"],
+        "sector": port["sector"],
+        "lat": port["lat"],
+        "lon": port["lon"],
+        "marine_conditions": port.get("marine_conditions", {}),
+        "advisories": port.get("advisories", []),
+        "pfz_candidates": cands,
+        "active_pfzs": active,
+        "inactive_pfzs": inactive
+    }
+
 def get_all_pfz_candidates() -> List[Dict[str, Any]]:
     """Flatten all PFZ candidates across all ports with parent port metadata."""
     all_pfzs = []
     for port in INDIAN_COASTAL_PORTS:
-        for pfz in port["pfz_candidates"]:
+        for pfz in port.get("pfz_candidates", []):
             entry = dict(pfz)
             entry["port_id"] = port["id"]
             entry["port_name"] = port["name"]

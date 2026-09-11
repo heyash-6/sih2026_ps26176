@@ -18,6 +18,8 @@ class PFZCandidate(BaseModel):
     port_name: Optional[str] = None
     bearing_deg: Optional[float] = None
     depth_m: Optional[float] = None
+    status: Optional[str] = "ACTIVE"
+    inactive_reason: Optional[str] = None
 
 class TideSchedule(BaseModel):
     high: List[str] = []

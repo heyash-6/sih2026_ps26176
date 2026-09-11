@@ -56,7 +56,7 @@ export async function signUpWithEmail(email, password, fullName = '', role = 'us
     })
     if (error) {
       if (error.message?.toLowerCase().includes('rate limit')) {
-        throw new Error('Supabase email rate limit exceeded. Please wait or use the Quick Demo access below.')
+        throw new Error('Email verification rate limit reached. Please wait or use the Quick Access demo below.')
       }
       throw error
     }

@@ -60,7 +60,7 @@ class MarineAgent:
         # 2. Port-specific lookup from coastal registry
         if port_id and port_id.lower() not in ["all", "any"]:
             port = get_port_by_id(port_id)
-            for item in port["pfz_candidates"]:
+            for item in port.get("pfz_candidates", []):
                 candidates.append(PFZCandidate(
                     zone_id=item["id"],
                     name=item["name"],
@@ -73,11 +73,13 @@ class MarineAgent:
                     bearing_deg=item.get("bearing_deg", 250.0),
                     depth_m=item.get("depth_m", 45.0),
                     date=date,
-                    sst_celsius=28.2,
-                    chlorophyll_mg_m3=1.6,
-                    confidence_score=0.92,
+                    sst_celsius=item.get("sst", 28.2),
+                    chlorophyll_mg_m3=item.get("chlorophyll", 1.6),
+                    confidence_score=(item.get("confidence", 90) / 100.0) if item.get("confidence") else 0.90,
                     source="INCOIS Indian Coastline Registry",
-                    confidence="advisory"
+                    confidence="advisory",
+                    status=item.get("status", "ACTIVE"),
+                    inactive_reason=item.get("inactive_reason")
                 ))
             return candidates
 
@@ -96,11 +98,13 @@ class MarineAgent:
                     bearing_deg=item.get("bearing_deg", 250.0),
                     depth_m=item.get("depth_m", 45.0),
                     date=date,
-                    sst_celsius=28.2,
-                    chlorophyll_mg_m3=1.6,
-                    confidence_score=0.92,
+                    sst_celsius=item.get("sst", 28.2),
+                    chlorophyll_mg_m3=item.get("chlorophyll", 1.6),
+                    confidence_score=(item.get("confidence", 90) / 100.0) if item.get("confidence") else 0.90,
                     source="INCOIS Indian Coastline Registry",
-                    confidence="advisory"
+                    confidence="advisory",
+                    status=item.get("status", "ACTIVE"),
+                    inactive_reason=item.get("inactive_reason")
                 ))
             return candidates
 
