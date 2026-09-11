@@ -173,13 +173,31 @@ export async function getAnalytics(period = '7', port = 'mumbai') {
 /**
  * Active Marine Hazard Advisories from Supabase
  */
-export async function getAllAlerts() {
+export async function getAllAlerts(port = null) {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/alerts`);
+    const url = port ? `${API_BASE_URL}/api/alerts?port=${encodeURIComponent(port)}` : `${API_BASE_URL}/api/alerts`;
+    const res = await fetch(url);
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
     console.warn('[ORCA API] getAllAlerts failed:', err);
+    return null;
+  }
+}
+
+/**
+ * Multi-Day Deterministic Trip Simulation & Outlook
+ */
+export async function getFishingMultiDay(port = 'mumbai', pfz = null, days = 4, startDate = null, language = 'en') {
+  try {
+    const params = new URLSearchParams({ port, days: String(days), language });
+    if (pfz) params.append('pfz', pfz);
+    if (startDate) params.append('start_date', startDate);
+    const res = await fetch(`${API_BASE_URL}/api/fishing/multi-day?${params.toString()}`);
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.warn('[ORCA API] getFishingMultiDay failed:', err);
     return null;
   }
 }

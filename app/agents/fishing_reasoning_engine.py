@@ -35,7 +35,8 @@ class FishingReasoningEngine:
         tide_info: Optional[Dict[str, Any]] = None,
         hazards: Optional[List[Dict[str, Any]]] = None,
         departure_time: Optional[str] = None,
-        trip_duration_hours: float = 6.0
+        trip_duration_hours: float = 6.0,
+        language: str = "en"
     ) -> Dict[str, Any]:
         """
         Compute transparent, multi-factor fishing suitability for a single day.
@@ -240,42 +241,107 @@ class FishingReasoningEngine:
         # 10. Generate Concrete Reasoning Explanations (Why suitability differs from PFZ)
         reasons = []
 
-        # PFZ strength reason
-        if pfz_probability >= 80:
-            reasons.append(f"PFZ confidence is strong at {int(pfz_probability)}% with dense chlorophyll front ({chlorophyll} mg/m³).")
-        elif pfz_probability >= 60:
-            reasons.append(f"PFZ probability is moderate ({int(pfz_probability)}%), indicating fair pelagic fish aggregation.")
-        else:
-            reasons.append(f"PFZ probability is low ({int(pfz_probability)}%), as satellite thermal gradient has partially dissipated.")
-
-        # Wave & sea state reason
-        if wave_height <= 1.2:
-            reasons.append(f"Wave swell ({wave_height}m) is calm and favourable for safe navigation.")
-        elif wave_height <= 1.8:
-            reasons.append(f"Moderate sea chop ({wave_height}m swell) slightly trims overall operational suitability.")
-        else:
-            reasons.append(f"Elevated wave swell ({wave_height}m) significantly reduces safety and fishing suitability.")
-
-        # Weather & rain reason
-        if rain_available:
-            if precipitation_mm >= 4.0:
-                reasons.append(f"Persistent coastal rain ({precipitation_mm} mm, {int(rain_prob)}% chance) impairs deck safety and visibility.")
-            elif precipitation_mm > 0:
-                reasons.append(f"Light passing rain ({precipitation_mm} mm) is manageable with standard offshore gear.")
+        if language == "mr":
+            # Marathi Reasoning Bullets
+            if pfz_probability >= 80:
+                reasons.append(f"PFZ विश्वासार्हता {int(pfz_probability)}% असून दाट क्लोरोफिल फ्रंट ({chlorophyll} mg/m³) उपलब्ध आहे.")
+            elif pfz_probability >= 60:
+                reasons.append(f"PFZ संभाव्यता मध्यम ({int(pfz_probability)}%) असून सरासरी मासळी संचयन दर्शवते.")
             else:
-                reasons.append(f"No rainfall expected ({int(rain_prob)}% probability), ensuring clear atmospheric visibility.")
+                reasons.append(f"PFZ संभाव्यता कमी ({int(pfz_probability)}%) असून सागरी थर्मल फ्रंट क्षीण झाला आहे.")
+
+            if wave_height <= 1.2:
+                reasons.append(f"लाटांची उंची ({wave_height} मी) शांत असून सुरक्षित प्रवासासाठी अनुकूल आहे.")
+            elif wave_height <= 1.8:
+                reasons.append(f"मध्यम उसळणारा समुद्र ({wave_height} मी) सागरी अनुकूलता किंचित कमी करतो.")
+            else:
+                reasons.append(f"उंच लाटा ({wave_height} मी) सुरक्षिततेसाठी धोकादायक असून मासेमारी अनुकूलता कमी करतात.")
+
+            if rain_available:
+                if precipitation_mm >= 4.0:
+                    reasons.append(f"किनारपट्टीवर पाऊस ({precipitation_mm} मिमी, {int(rain_prob)}% शक्यता) दृश्यमानता व डेक सुरक्षितता कमी करतो.")
+                elif precipitation_mm > 0:
+                    reasons.append(f"हलक्या पावसाच्या सरी ({precipitation_mm} मिमी) सामान्य उपकरणांसह व्यवस्थापित करण्यायोग्य आहेत.")
+                else:
+                    reasons.append(f"पावसाची शक्यता नाही ({int(rain_prob)}%), हवामान स्वच्छ राहील.")
+            else:
+                reasons.append("पावसाचा अंदाज सध्या अनुपलब्ध आहे.")
+
+            if tide_available and high_tide:
+                reasons.append(f"भरतीची वेळ {high_tide.get('time')} ({high_tide.get('water_level_m')} मी) खाडीतून सुरक्षित प्रस्थानासाठी अनुकूल खोली देते.")
+
+            if safety_override:
+                reasons.insert(0, f"सुरक्षा मर्यादा सक्रिय: {safety_override_reason}")
+            elif hazard_titles:
+                reasons.append(f"सागरी सूचना: {hazard_titles[0]}.")
+
+        elif language == "hi":
+            # Hindi Reasoning Bullets
+            if pfz_probability >= 80:
+                reasons.append(f"PFZ संभावना {int(pfz_probability)}% अत्यधिक मजबूत है और क्लोरोफिल फ्रंट ({chlorophyll} mg/m³) उपस्थित है।")
+            elif pfz_probability >= 60:
+                reasons.append(f"PFZ संभावना मध्यम ({int(pfz_probability)}%) है, जो सामान्य मछली एकत्रीकरण का संकेत देती है।")
+            else:
+                reasons.append(f"PFZ संभावना कम ({int(pfz_probability)}%) है, क्योंकि थर्मल ग्रेडिएंट कमज़ोर पड़ गया है।")
+
+            if wave_height <= 1.2:
+                reasons.append(f"लहरों की ऊंचाई ({wave_height} मी) शांत और सुरक्षित नौकायन के लिए अनुकूल है।")
+            elif wave_height <= 1.8:
+                reasons.append(f"मध्यम लहरें ({wave_height} मी) समग्र परिचालन उपयुक्तता को थोड़ा प्रभावित करती हैं।")
+            else:
+                reasons.append(f"ऊंची समुद्री लहरें ({wave_height} मी) सुरक्षा और उपयुक्तता को काफी कम करती हैं।")
+
+            if rain_available:
+                if precipitation_mm >= 4.0:
+                    reasons.append(f"तटीय वर्षा ({precipitation_mm} मिमी, {int(rain_prob)}% संभावना) दृश्यता और डेक सुरक्षा को प्रभावित करती है।")
+                elif precipitation_mm > 0:
+                    reasons.append(f"हल्की बारिश ({precipitation_mm} मिमी) सामान्य सावधानियों के साथ नियंत्रित की जा सकती है।")
+                else:
+                    reasons.append(f"बारिश की कोई संभावना नहीं ({int(rain_prob)}%), मौसम साफ रहेगा।")
+            else:
+                reasons.append("बारिश का पूर्वानुमान वर्तमान में उपलब्ध नहीं है।")
+
+            if tide_available and high_tide:
+                reasons.append(f"ज्वार का समय {high_tide.get('time')} ({high_tide.get('water_level_m')} मी) सुरक्षित प्रस्थान के लिए पर्याप्त गहराई देता है।")
+
+            if safety_override:
+                reasons.insert(0, f"सुरक्षा अवरोध सक्रिय: {safety_override_reason}")
+            elif hazard_titles:
+                reasons.append(f"सक्रिय तटीय चेतावनी: {hazard_titles[0]}.")
+
         else:
-            reasons.append("Rain forecast is currently unavailable; rainfall could not be factored into safety.")
+            # English Reasoning Bullets
+            if pfz_probability >= 80:
+                reasons.append(f"PFZ confidence is strong at {int(pfz_probability)}% with dense chlorophyll front ({chlorophyll} mg/m³).")
+            elif pfz_probability >= 60:
+                reasons.append(f"PFZ probability is moderate ({int(pfz_probability)}%), indicating fair pelagic fish aggregation.")
+            else:
+                reasons.append(f"PFZ probability is low ({int(pfz_probability)}%), as satellite thermal gradient has partially dissipated.")
 
-        # Tide reason
-        if tide_available and high_tide:
-            reasons.append(f"High tide at {high_tide.get('time')} ({high_tide.get('water_level_m')}m) provides optimal deep channel departure depth.")
+            if wave_height <= 1.2:
+                reasons.append(f"Wave swell ({wave_height}m) is calm and favourable for safe navigation.")
+            elif wave_height <= 1.8:
+                reasons.append(f"Moderate sea chop ({wave_height}m swell) slightly trims overall operational suitability.")
+            else:
+                reasons.append(f"Elevated wave swell ({wave_height}m) significantly reduces safety and fishing suitability.")
 
-        # Safety warnings reason
-        if safety_override:
-            reasons.insert(0, f"SAFETY OVERRIDE ACTIVE: {safety_override_reason}")
-        elif hazard_titles:
-            reasons.append(f"Active advisory in sector: {hazard_titles[0]}.")
+            if rain_available:
+                if precipitation_mm >= 4.0:
+                    reasons.append(f"Persistent coastal rain ({precipitation_mm} mm, {int(rain_prob)}% chance) impairs deck safety and visibility.")
+                elif precipitation_mm > 0:
+                    reasons.append(f"Light passing rain ({precipitation_mm} mm) is manageable with standard offshore gear.")
+                else:
+                    reasons.append(f"No rainfall expected ({int(rain_prob)}% probability), ensuring clear atmospheric visibility.")
+            else:
+                reasons.append("Rain forecast is currently unavailable; rainfall could not be factored into safety.")
+
+            if tide_available and high_tide:
+                reasons.append(f"High tide at {high_tide.get('time')} ({high_tide.get('water_level_m')}m) provides optimal deep channel departure depth.")
+
+            if safety_override:
+                reasons.insert(0, f"SAFETY OVERRIDE ACTIVE: {safety_override_reason}")
+            elif hazard_titles:
+                reasons.append(f"Active advisory in sector: {hazard_titles[0]}.")
 
         return {
             "port_id": port["id"],
@@ -320,13 +386,16 @@ class FishingReasoningEngine:
         port_id: str,
         pfz_id: Optional[str] = None,
         start_date: Optional[str] = None,
-        num_days: int = 4
+        num_days: int = 4,
+        language: str = "en"
     ) -> Dict[str, Any]:
         """
-        Calculates structured 4-to-5 day forward simulation comparing
+        Calculates structured forward simulation comparing
         PFZ probability, marine weather, wave swell, tides, and overall suitability.
-        Identifies the BEST fishing window based on OVERALL suitability (not PFZ alone).
+        DETERMINISTIC: Evaluated per calendar date and location. The same date + location
+        resolves to the exact same source data regardless of trip duration.
         """
+        import hashlib
         port = get_port_by_id(port_id)
         cands = port.get("pfz_candidates", [])
         active_cands = [c for c in cands if c.get("status") == "ACTIVE"]
@@ -352,107 +421,160 @@ class FishingReasoningEngine:
 
         days_evaluated = []
         best_day = None
+        challenging_day = None
         highest_suitability = -1
+        lowest_suitability = 999
 
         for i in range(num_days):
             cur_dt = base_dt + timedelta(days=i)
             date_str = cur_dt.strftime("%Y-%m-%d")
-            day_name = "Today" if i == 0 else ("Tomorrow" if i == 1 else cur_dt.strftime("%A (%d %b)"))
+            day_name = cur_dt.strftime("%d %B") if i > 1 else ("Today" if i == 0 else "Tomorrow")
 
-            # Simulate realistic coastal oceanographic trends
+            # Deterministic, date-based evaluation strictly keyed to (port_id, target_pfz_id, date_str)
+            # This ensures that selecting 3 days vs 4 days or 7 days produces the EXACT SAME
+            # underlying data and risk for any given date, with ZERO random day-index rules.
+            seed_key = f"{port_id}_{target_pfz.get('id', 'pfz')}_{date_str}".encode('utf-8')
+            seed_val = int(hashlib.sha256(seed_key).hexdigest()[:8], 16)
+
+            # Realistic coastal variance keyed to date:
+            # Day 0 uses actual real-time port telemetry; future dates project deterministically
             if i == 0:
-                d_pfz = base_pfz_prob
                 d_wave = base_wave
                 d_wind = base_wind
+                d_pfz = base_pfz_prob
                 d_rain_mm = base_rain["precipitation_mm"]
                 d_rain_prob = base_rain["rain_probability_pct"]
                 d_rain_intensity = base_rain["rain_intensity"]
-            elif i == 1:
-                # Tomorrow: typically calmer morning window
-                d_pfz = min(94.0, base_pfz_prob + 6.0)
-                d_wave = max(0.7, round(base_wave - 0.2, 1))
-                d_wind = max(11.0, round(base_wind - 2.0, 1))
-                d_rain_mm = max(0.0, round(base_rain["precipitation_mm"] * 0.5, 1))
-                d_rain_prob = max(10, int(base_rain["rain_probability_pct"] * 0.6))
-                d_rain_intensity = "Light" if d_rain_mm > 0 else "None"
-            elif i == 2:
-                # Day 3: moderate oceanic front swell
-                d_pfz = max(45.0, base_pfz_prob - 18.0)
-                d_wave = round(base_wave + 0.6, 1)
-                d_wind = round(base_wind + 8.0, 1)
-                d_rain_mm = round(base_rain["precipitation_mm"] + 4.5, 1)
-                d_rain_prob = min(85, base_rain["rain_probability_pct"] + 35)
-                d_rain_intensity = "Moderate"
             else:
-                # Day 4: optimal post-upwelling pelagic surge
-                d_pfz = min(95.0, base_pfz_prob + 12.0)
-                d_wave = max(0.8, round(base_wave - 0.3, 1))
-                d_wind = max(10.0, round(base_wind - 3.0, 1))
-                d_rain_mm = 0.0
-                d_rain_prob = 10
-                d_rain_intensity = "None"
+                wave_delta = ((seed_val % 7) - 2) * 0.1
+                wind_delta = float(((seed_val >> 3) % 9) - 3)
+                pfz_delta = float(((seed_val >> 6) % 10) - 4)
+                rain_delta = max(0.0, float(((seed_val >> 9) % 5) * 0.6))
+
+                d_wave = max(0.6, round(base_wave + wave_delta, 1))
+                d_wind = max(8.0, round(base_wind + wind_delta, 1))
+                d_pfz = max(40.0, min(95.0, round(base_pfz_prob + pfz_delta, 1)))
+                d_rain_mm = round(max(0.0, base_rain["precipitation_mm"] + rain_delta), 1)
+                d_rain_prob = max(10, min(85, int(base_rain["rain_probability_pct"] + rain_delta * 8)))
+                d_rain_intensity = "Heavy" if d_rain_mm >= 5.0 else ("Moderate" if d_rain_mm >= 2.0 else ("Light" if d_rain_mm > 0 else "None"))
+
+            weather_label = "Clear / Favourable" if d_rain_mm == 0 else ("Passing Showers" if d_rain_mm < 3.0 else "Heavy Rain & Squall")
 
             # Compute day suitability using shared engine
             day_assessment = self.compute_day_suitability(
                 port_id=port_id,
                 pfz={**target_pfz, "confidence": d_pfz},
-                marine_conditions={"wave_height_m": d_wave, "wind_speed_kmh": d_wind, "sea_state": "Slight" if d_wave <= 1.0 else ("Moderate" if d_wave <= 1.8 else "Rough")},
+                marine_conditions={
+                    "wave_height_m": d_wave,
+                    "wind_speed_kmh": d_wind,
+                    "sea_state": "Slight" if d_wave <= 1.0 else ("Moderate" if d_wave <= 1.8 else "Rough")
+                },
                 weather={"wind_speed_kmh": d_wind},
-                rain_data={"precipitation_mm": d_rain_mm, "rain_probability_pct": d_rain_prob, "rain_intensity": d_rain_intensity, "weather_label": "Clear / Favourable" if d_rain_mm == 0 else "Passing Showers"},
+                rain_data={
+                    "precipitation_mm": d_rain_mm,
+                    "rain_probability_pct": d_rain_prob,
+                    "rain_intensity": d_rain_intensity,
+                    "weather_label": weather_label
+                },
                 tide_info=tide_info,
-                hazards=port.get("advisories", []) if i == 0 else []
+                hazards=port.get("advisories", []) if i == 0 else [],
+                language=language
             )
 
             suit = day_assessment["overall_suitability"]
-            risk_badge = "Low" if suit >= 75 else ("Moderate" if suit >= 50 else "High")
+            risk_badge = "LOW" if suit >= 75 else ("CAUTION" if suit >= 50 else "HIGH")
 
             day_obj = {
                 "day_index": i + 1,
                 "label": day_name,
                 "date": date_str,
                 "pfz_probability": int(d_pfz),
+                "pfz_probability_pct": int(d_pfz),
                 "overall_suitability": int(suit),
+                "suitability_score": int(suit),
                 "verdict": day_assessment["verdict_badge"],
+                "suitability_verdict": day_assessment["verdict_badge"],
                 "recommendation_level": day_assessment["recommendation_level"],
                 "safety_override": day_assessment["safety_override"],
+                "risk": risk_badge,
                 "risk_badge": risk_badge,
+                "risk_level": risk_badge,
                 "wave_m": d_wave,
+                "wave_height_m": d_wave,
                 "wind_kmh": d_wind,
+                "wind_speed_kmh": d_wind,
                 "rain_mm": d_rain_mm,
+                "rain_precipitation_mm": d_rain_mm,
                 "rain_prob": d_rain_prob,
-                "weather_summary": f"{d_wave}m waves • {d_wind} km/h wind • {d_rain_mm} mm rain"
+                "rain_probability_pct": d_rain_prob,
+                "weather": weather_label,
+                "weather_summary": f"{d_wave}m waves • {d_wind} km/h wind • {d_rain_mm} mm rain",
+                "reasoning": day_assessment.get("reasoning", []),
+                "short_report": {
+                    "date": date_str,
+                    "weather": weather_label,
+                    "fishing": day_assessment["verdict_badge"],
+                    "risk": risk_badge,
+                    "pfz": f"{int(d_pfz)}%"
+                }
             }
 
             days_evaluated.append(day_obj)
 
-            # Select best day based on overall conditions (NOT PFZ alone!)
+            # Track best day and most challenging day
             if not day_assessment["safety_override"] and suit > highest_suitability:
                 highest_suitability = suit
                 best_day = day_obj
 
+            if suit < lowest_suitability:
+                lowest_suitability = suit
+                challenging_day = day_obj
+
         if not best_day and days_evaluated:
             best_day = days_evaluated[0]
+        if not challenging_day and days_evaluated:
+            challenging_day = days_evaluated[-1]
 
-        # Comparative explanation
-        today = days_evaluated[0]
-        tomorrow = days_evaluated[1] if len(days_evaluated) > 1 else today
+        # Overall trip summary evaluation (Requirement 7)
+        has_high_risk = any(d["risk"] == "HIGH" for d in days_evaluated)
+        has_caution = any(d["risk"] == "CAUTION" for d in days_evaluated)
+        overall_trip_risk = "HIGH RISK" if has_high_risk else ("CAUTION" if has_caution else "RECOMMENDED")
 
-        comparison_verdict = ""
-        if today["overall_suitability"] >= 80:
-            comparison_verdict = f"Today is already highly favourable ({today['overall_suitability']}%), though {best_day['label']} also offers excellent conditions ({best_day['overall_suitability']}%)."
-        elif tomorrow["overall_suitability"] > today["overall_suitability"]:
-            comparison_verdict = f"Tomorrow ({tomorrow['overall_suitability']}%) and {best_day['label']} ({best_day['overall_suitability']}%) provide significantly better overall fishing suitability and calmer seas than Today ({today['overall_suitability']}%)."
+        if language == "mr":
+            trip_summary_text = (
+                f"आपली {num_days}-दिवसीय मासेमारी योजना सर्वसाधारणपणे {'अनुकूल' if overall_trip_risk != 'HIGH RISK' else 'सावधगिरीची'} आहे.\n\n"
+                f"• **सर्वोत्तम दिवस:** {best_day['label']} ({best_day['overall_suitability']}% अनुकूलता, {best_day['wave_m']} मी लाटा)\n"
+                f"• **सर्वात आव्हानात्मक दिवस:** {challenging_day['label']} ({challenging_day['risk']} धोका, {challenging_day['weather']})\n\n"
+                f"**शिफारस:** मुख्य मासेमारी मोहीम {best_day['label']} रोजी आयोजित करा आणि {challenging_day['label']} च्या प्रतिकूल हवामानात किनार्‍याजवळच राहा."
+            )
+        elif language == "hi":
+            trip_summary_text = (
+                f"आपकी {num_days}-दिवसीय यात्रा आमतौर पर मछली पकड़ने के लिए {'अनुकूल' if overall_trip_risk != 'HIGH RISK' else 'सावधानीपूर्ण'} है।\n\n"
+                f"• **सर्वश्रेष्ठ दिन:** {best_day['label']} ({best_day['overall_suitability']}% उपयुक्तता, {best_day['wave_m']} मी लहरें)\n"
+                f"• **सबसे कठिन दिन:** {challenging_day['label']} ({challenging_day['risk']} जोखिम, {challenging_day['weather']})\n\n"
+                f"**सिफारिश:** मुख्य मछली पकड़ने की गतिविधि {best_day['label']} के आसपास आयोजित करें और {challenging_day['label']} को उच्च जोखिम अवधि से बचें।"
+            )
         else:
-            comparison_verdict = f"Based on the 4-day marine outlook, {best_day['label']} is the best overall departure window with {best_day['overall_suitability']}% suitability."
+            trip_summary_text = (
+                f"Your {num_days}-day trip is generally {'favourable for fishing' if overall_trip_risk != 'HIGH RISK' else 'requires caution due to weather fronts'}.\n\n"
+                f"• **Best day:** {best_day['label']} ({best_day['overall_suitability']}% suitability, {best_day['wave_m']}m waves)\n"
+                f"• **Most difficult day:** {challenging_day['label']} ({challenging_day['risk']} Risk, {challenging_day['weather']})\n\n"
+                f"**Recommendation:** Plan the main fishing activity around {best_day['label']} and avoid offshore exposure during {challenging_day['label']}."
+            )
 
         return {
             "port_id": port_id,
             "port_name": port["name"],
             "zone_id": target_pfz.get("id", "PFZ-01"),
             "zone_name": target_pfz.get("name", "Offshore Pelagic Front"),
+            "departure_date": start_date or cur_dt.strftime("%Y-%m-%d"),
+            "duration_days": num_days,
+            "overall_trip_risk": overall_trip_risk,
             "days": days_evaluated,
             "best_day": best_day,
-            "comparison_verdict": comparison_verdict
+            "challenging_day": challenging_day,
+            "trip_summary": trip_summary_text,
+            "comparison_verdict": trip_summary_text
         }
 
 fishing_reasoning_engine = FishingReasoningEngine()

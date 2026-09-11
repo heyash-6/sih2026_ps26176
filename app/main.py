@@ -145,11 +145,15 @@ def get_pfz(
 def get_fishing_multi_day(
     port: str = Query("mumbai", description="Port ID"),
     pfz: Optional[str] = Query(None, description="PFZ ID"),
-    days: int = Query(4, description="Number of forecast days (4-5)")
+    days: int = Query(4, description="Number of forecast days (1-7)"),
+    start_date: Optional[str] = Query(None, description="Start Date YYYY-MM-DD"),
+    language: str = Query("en", description="Language code: en, hi, mr")
 ):
     """Multi-day intelligent forward simulation comparing PFZ, sea state, weather, tides & risk."""
     from app.agents.fishing_reasoning_engine import fishing_reasoning_engine
-    return fishing_reasoning_engine.compute_multi_day_comparison(port_id=port, pfz_id=pfz, num_days=days)
+    return fishing_reasoning_engine.compute_multi_day_comparison(
+        port_id=port, pfz_id=pfz, start_date=start_date, num_days=days, language=language
+    )
 
 @app.get("/api/fishing/suitability")
 def get_fishing_suitability(
@@ -257,11 +261,13 @@ def post_risk(request: RiskInput):
     return res.model_dump()
 
 @app.get("/api/alerts")
-def get_all_alerts():
-    """Retrieve all active marine hazard advisories from Supabase database."""
+def get_all_alerts(
+    port: Optional[str] = Query(None, description="Optional Port ID to filter localized alerts")
+):
+    """Retrieve active marine hazard advisories from Supabase database with port-level resolution."""
     from app.database.supabase_client import supabase_client
-    alerts = supabase_client.get_active_alerts(limit=20)
-    return {"alerts": alerts, "count": len(alerts)}
+    alerts = supabase_client.get_active_alerts(limit=50, port_id=port)
+    return {"alerts": alerts, "count": len(alerts), "port": port}
 
 @app.get("/api/analytics")
 def get_analytics(

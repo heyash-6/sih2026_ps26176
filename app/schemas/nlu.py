@@ -15,6 +15,7 @@ class IntentEnum(str, Enum):
     GEOFENCE_CHECK = "geofence_check"
     MULTI_DAY_COMPARISON = "multi_day_comparison"
     FOLLOWUP = "followup"
+    GIBBERISH = "gibberish"
     OTHER = "other"
 
 class EntityBundle(BaseModel):

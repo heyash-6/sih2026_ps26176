@@ -1,7 +1,7 @@
 import os
 import logging
-from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
+from typing import List, Dict, Any, Optional, Tuple
+from datetime import datetime, timedelta, timezone
 import httpx
 from app.config import settings
 
@@ -34,22 +34,101 @@ class SupabaseClient:
     # -------------------------------------------------------------------------
     # 1. Hazard Alerts
     # -------------------------------------------------------------------------
-    def get_active_alerts(self, limit: int = 10) -> List[Dict[str, Any]]:
-        """Retrieve active hazard alerts from Supabase alerts table."""
-        if not self._is_configured:
-            return []
-        try:
-            with httpx.Client(timeout=6.0) as client:
-                res = client.get(
-                    f"{self.rest_url}/alerts?is_active=eq.true&order=issued_at.desc&limit={limit}",
-                    headers=self.headers
-                )
-                if res.status_code == 200:
-                    return res.json()
-                logger.warning(f"Supabase get_active_alerts returned status {res.status_code}: {res.text}")
-        except Exception as e:
-            logger.warning(f"Supabase get_active_alerts error: {e}")
-        return []
+    def get_active_alerts(self, limit: int = 50, port_id: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Retrieve active, unexpired hazard alerts with optional port filtering."""
+        raw_alerts = []
+        if self._is_configured:
+            try:
+                with httpx.Client(timeout=6.0) as client:
+                    res = client.get(
+                        f"{self.rest_url}/alerts?is_active=eq.true&order=issued_at.desc&limit={limit}",
+                        headers=self.headers
+                    )
+                    if res.status_code == 200:
+                        raw_alerts = res.json()
+            except Exception as e:
+                logger.warning(f"Supabase get_active_alerts error: {e}")
+
+        # Filter out expired alerts (resolved_at earlier than now)
+        now_utc = datetime.now(timezone.utc)
+        active_alerts = []
+        for a in raw_alerts:
+            # Check resolved_at / expiry
+            res_at = a.get("resolved_at")
+            if res_at:
+                try:
+                    dt = datetime.fromisoformat(res_at.replace("Z", "+00:00"))
+                    if dt < now_utc:
+                        continue
+                except Exception:
+                    pass
+            active_alerts.append(a)
+
+        # Merge port-specific advisories from coastal registry
+        from app.database.indian_coastal_registry import INDIAN_COASTAL_PORTS, get_port_by_id
+        
+        # If port_id is provided, strictly filter alerts relevant to that port
+        if port_id and port_id != "all":
+            clean_id = port_id.lower().strip()
+            port = get_port_by_id(clean_id)
+            port_name_lower = port["name"].lower()
+            port_state_lower = port.get("state", "").lower()
+            p_lat, p_lon = port["lat"], port["lon"]
+
+            filtered = []
+            for a in active_alerts:
+                # Spatial proximity within ~1.2 degrees (~130 km)
+                a_lat = a.get("latitude")
+                a_lon = a.get("longitude")
+                is_near = False
+                if a_lat is not None and a_lon is not None:
+                    dist_deg = ((a_lat - p_lat)**2 + (a_lon - p_lon)**2)**0.5
+                    if dist_deg <= 1.3:
+                        is_near = True
+
+                title_lower = (a.get("title") or "").lower()
+                desc_lower = (a.get("description") or "").lower()
+                matches_text = clean_id in title_lower or port_name_lower in title_lower or port_state_lower in desc_lower
+
+                if is_near or matches_text:
+                    a_copy = dict(a)
+                    a_copy["port_id"] = clean_id
+                    filtered.append(a_copy)
+
+            # Also add any port advisories from registry for this specific port
+            for adv in port.get("advisories", []):
+                if not any(f.get("id") == adv["id"] or f.get("title") == adv["title"] for f in filtered):
+                    filtered.append({
+                        "id": adv["id"],
+                        "title": adv["title"],
+                        "description": adv["description"],
+                        "risk_level": adv.get("risk_level", adv.get("severity", "CAUTION")).upper(),
+                        "is_active": True,
+                        "latitude": p_lat,
+                        "longitude": p_lon,
+                        "port_id": clean_id,
+                        "issued_at": datetime.now(timezone.utc).isoformat()
+                    })
+
+            return filtered
+
+        # If no port_id (or 'all'), return all active alerts with coastal registry advisories
+        for p in INDIAN_COASTAL_PORTS:
+            for adv in p.get("advisories", []):
+                if not any(a.get("title") == adv["title"] for a in active_alerts):
+                    active_alerts.append({
+                        "id": adv["id"],
+                        "title": adv["title"],
+                        "description": adv["description"],
+                        "risk_level": adv.get("risk_level", adv.get("severity", "CAUTION")).upper(),
+                        "is_active": True,
+                        "latitude": p["lat"],
+                        "longitude": p["lon"],
+                        "port_id": p["id"],
+                        "issued_at": datetime.now(timezone.utc).isoformat()
+                    })
+
+        return active_alerts[:limit]
 
     def insert_alert(self, alert: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Insert or update a hazard alert in Supabase."""

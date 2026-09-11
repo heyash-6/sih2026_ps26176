@@ -223,6 +223,44 @@ class NLULanguageAgent:
                 return loc_val
         return None
 
+    def _is_gibberish(self, text: str) -> bool:
+        """
+        Carefully detect obvious meaningless / garbled text or typos (e.g. 'abcd', 'asdfgh', 'qwerty123').
+        Preserves valid short conversational messages: 'hi', 'hello', 'ok', 'yes', 'no', 'thanks', 'namaste', etc.
+        """
+        clean = text.strip().lower()
+        if not clean:
+            return False
+
+        # Valid conversational greetings, affirmatives and short ocean terms
+        valid_short_words = {
+            "hi", "hello", "hey", "namaste", "नमस्ते", "नमस्कार", "ok", "okay", "yes", "no",
+            "thanks", "thank you", "thx", "dhanyawad", "धन्यवाद", "bye", "help", "who are you",
+            "what can you do", "good", "bad", "safe", "pfz", "sst", "imd", "incois", "gps", "tide",
+            "port", "sea", "wave", "wind", "rain"
+        }
+        if clean in valid_short_words or any(clean == w for w in valid_short_words):
+            return False
+
+        words = clean.split()
+        if len(words) > 3:
+            return False
+
+        for w in words:
+            # Common keyboard walk sequences
+            if w in ["abcd", "abcde", "abcdef", "asdf", "asdfg", "asdfgh", "qwerty", "qwerty123", "zxcv", "zxcvb", "1234", "12345", "qwer", "lkjh", "poiuy", "aaaa", "bbbb", "cccc", "zzzz"]:
+                return True
+            # Latin string with no vowels and length >= 4 (e.g. "zxcvb", "asdfgh", "bcdfgh")
+            if re.fullmatch(r'[a-z0-9]+', w):
+                vowels = sum(1 for ch in w if ch in 'aeiou')
+                if len(w) >= 4 and vowels == 0 and w not in ["pfz", "sst", "gps", "incois", "imd"]:
+                    return True
+                # Repeated characters >= 3 like "aaaa", "bbbb"
+                if re.search(r'(.)\1{2,}', w):
+                    return True
+
+        return False
+
     def _rule_based_nlu(self, text: str, ref_time_str: str, prior_context: Optional[Dict[str, Any]]) -> NLUOutput:
         text_lower = text.lower()
         
@@ -251,40 +289,44 @@ class NLULanguageAgent:
             else:
                 language = "hi"
 
-        # 2. Intent Detection
-        # Check conceptual / ocean science queries first (Requirement 10 & 16)
-        is_conceptual = any(kw in text_lower for kw in [
-            "what is chlorophyll", "define chlorophyll", "chlorophyll", "क्लोरोफिल",
-            "what is sst", "sst", "surface temp", "productivity", "उत्पादकता",
-            "upwelling", "thermal front", "plankton", "temperature gradient", "fish productivity"
-        ]) and not any(kw in text_lower for kw in ["where to fish", "safe to go", "trip", "can i go", "route"])
-
-        if is_conceptual:
-            if any(kw in text_lower for kw in ["productivity", "decrease", "declined", "उत्पादकता"]):
-                intent = IntentEnum.PRODUCTIVITY_EXPLANATION
-            else:
-                intent = IntentEnum.CHLOROPHYLL_SST_LOOKUP
-        elif any(kw in text_lower for kw in [
-            "check best fishing day", "which day is best", "best day", "best fishing day",
-            "when will it be best", "when is it best", "compare next days", "next few days",
-            "compare days", "कधी जावे", "कोणता दिवस चांगला", "कोणत्या दिवशी", "कब जाना अच्छा",
-            "कौन सा दिन अच्छा", "कौन से दिन"
-        ]):
-            intent = IntentEnum.MULTI_DAY_COMPARISON
-        elif any(kw in text_lower for kw in ["fish", "fishing", "trip", "मासे", "मासेमारी", "मछली", "पकड़ने", "पकडणे"]):
-            intent = IntentEnum.FISHING_TRIP_PLANNING
-        elif any(kw in text_lower for kw in ["hazard", "storm", "cyclone", "warning", "lightning", "alert", "धोका", "खतरा", "तूफान"]):
-            intent = IntentEnum.HAZARD_ALERT_CHECK
-        elif any(kw in text_lower for kw in ["safe", "safety", "सुरक्षित", "सुरक्षा", "leave", "can i go", "जाणे सुरक्षित"]):
-            intent = IntentEnum.SAFETY_CHECK
-        elif any(kw in text_lower for kw in ["pfz", "nearest zone", "fishing zone"]):
-            intent = IntentEnum.PFZ_LOOKUP
-        elif any(kw in text_lower for kw in ["what if", "instead"]):
-            intent = IntentEnum.FOLLOWUP
-        elif re.search(r'\b(hello|hi|hey|namaste|नमस्ते|नमस्कार|who are you|what can you do|talk to me|help me)\b', text_lower):
-            intent = IntentEnum.OTHER
+        # 2. Gibberish / Typo Detection (Requirement for obvious meaningless text like 'abcd')
+        is_conceptual = False
+        if self._is_gibberish(text):
+            intent = IntentEnum.GIBBERISH
         else:
-            intent = IntentEnum.OTHER
+            # Check conceptual / ocean science queries first (Requirement 10 & 16)
+            is_conceptual = any(kw in text_lower for kw in [
+                "what is chlorophyll", "define chlorophyll", "chlorophyll", "क्लोरोफिल",
+                "what is sst", "sst", "surface temp", "productivity", "उत्पादकता",
+                "upwelling", "thermal front", "plankton", "temperature gradient", "fish productivity"
+            ]) and not any(kw in text_lower for kw in ["where to fish", "safe to go", "trip", "can i go", "route"])
+
+            if is_conceptual:
+                if any(kw in text_lower for kw in ["productivity", "decrease", "declined", "उत्पादकता"]):
+                    intent = IntentEnum.PRODUCTIVITY_EXPLANATION
+                else:
+                    intent = IntentEnum.CHLOROPHYLL_SST_LOOKUP
+            elif any(kw in text_lower for kw in [
+                "check best fishing day", "which day is best", "best day", "best fishing day",
+                "when will it be best", "when is it best", "compare next days", "next few days",
+                "compare days", "कधी जावे", "कोणता दिवस चांगला", "कोणत्या दिवशी", "कब जाना अच्छा",
+                "कौन सा दिन अच्छा", "कौन से दिन"
+            ]):
+                intent = IntentEnum.MULTI_DAY_COMPARISON
+            elif any(kw in text_lower for kw in ["fish", "fishing", "trip", "मासे", "मासेमारी", "मछली", "पकड़ने", "पकडणे"]):
+                intent = IntentEnum.FISHING_TRIP_PLANNING
+            elif any(kw in text_lower for kw in ["hazard", "storm", "cyclone", "warning", "lightning", "alert", "धोका", "खतरा", "तूफान"]):
+                intent = IntentEnum.HAZARD_ALERT_CHECK
+            elif any(kw in text_lower for kw in ["safe", "safety", "सुरक्षित", "सुरक्षा", "leave", "can i go", "जाणे सुरक्षित"]):
+                intent = IntentEnum.SAFETY_CHECK
+            elif any(kw in text_lower for kw in ["pfz", "nearest zone", "fishing zone"]):
+                intent = IntentEnum.PFZ_LOOKUP
+            elif any(kw in text_lower for kw in ["what if", "instead"]):
+                intent = IntentEnum.FOLLOWUP
+            elif re.search(r'\b(hello|hi|hey|namaste|नमस्ते|नमस्कार|who are you|what can you do|talk to me|help me)\b', text_lower):
+                intent = IntentEnum.OTHER
+            else:
+                intent = IntentEnum.OTHER
 
         # 3. Location Hierarchy Logic (Requirements 13, 14, 15, 16)
         location_text = None
@@ -295,8 +337,8 @@ class NLULanguageAgent:
                 location_text = loc_val
                 break
 
-        # If question is conceptual/science (e.g. "What is chlorophyll?"), DO NOT force location!
-        if not is_conceptual and intent != IntentEnum.OTHER:
+        # If question is conceptual/science (e.g. "What is chlorophyll?"), or gibberish, DO NOT force location!
+        if not is_conceptual and intent not in (IntentEnum.OTHER, IntentEnum.GIBBERISH):
             # PRIORITY 2: Selected Port from ORCA session (Req 14)
             if not location_text and prior_context:
                 sel_port = prior_context.get("selected_port") or prior_context.get("port_id")

@@ -70,10 +70,61 @@ class DecisionExplanationAgent:
         query_lower = user_query.lower()
         import re
 
+        # Case 0: Typo / Obvious Gibberish (Requirement 10: polite typo notice + ORCA intro, no marine hallucination)
+        if intent == "gibberish":
+            if language == "mr":
+                typo_msg = (
+                    "कदाचित ही टायपिंग चूक (typo) असावी.\n\n"
+                    "नमस्कार! मी ORCA आहे, आपला सागरी इंटेलिजन्स सहाय्यक. मी आपणास मासेमारी परिस्थिती, संभाव्य मासेमारी क्षेत्रे (PFZ), सागरी हवामान, लाटांची स्थिती, भरती-ओहोटी, महासागर विश्लेषण आणि सुरक्षित सागरी मार्गांची माहिती देऊ शकतो.\n\n"
+                    "तुम्ही पुढीलप्रमाणे प्रश्न विचारू शकता:\n"
+                    "• *\"आज मासेमारीला जाणे सुरक्षित आहे का?\"*\n"
+                    "• *\"मासेमारीसाठी सर्वात चांगला दिवस कोणता?\"*\n"
+                    "• *\"मुंबई जवळील सागरी हवामान कसे आहे?\"*"
+                )
+                typo_actions = ["आज मासेमारीला जाणे सुरक्षित आहे का?", "सर्वोत्तम मासेमारी दिवस", "सुरक्षित सागरी मार्ग"]
+            elif language == "hi":
+                typo_msg = (
+                    "शायद यह कोई टाइपिंग त्रुटि (typo) है।\n\n"
+                    "नमस्ते! मैं ORCA हूँ, आपका समुद्री इंटेलिजेंस सहायक। मैं आपको मछली पकड़ने की स्थिति, संभावित मत्स्य क्षेत्र (PFZ), समुद्री मौसम, लहरों की स्थिति, ज्वार-भाटा, महासागर विश्लेषण और सुरक्षित समुद्री मार्गों की जानकारी प्रदान कर सकता हूँ।\n\n"
+                    "आप इस तरह के प्रश्न पूछ सकते हैं:\n"
+                    "• *\"क्या मैं आज मछली पकड़ने जा सकता हूँ?\"*\n"
+                    "• *\"मछली पकड़ने का सबसे अच्छा दिन कौन सा है?\"*\n"
+                    "• *\"मुंबई के पास सक्रिय चेतावनियां दिखाएं\"*"
+                )
+                typo_actions = ["क्या मैं आज मछली पकड़ने जा सकता हूँ?", "मछली पकड़ने का सबसे अच्छा दिन", "सुरक्षित समुद्री मार्ग"]
+            else:
+                typo_msg = (
+                    "It looks like that may have been a typo.\n\n"
+                    "Hello! I’m ORCA, your marine intelligence assistant. I can help you with fishing conditions, Potential Fishing Zones (PFZs), marine weather, wave swell, tides, ocean analytics, and safe coastal routes.\n\n"
+                    "Try asking:\n"
+                    "• *\"Can I go fishing today?\"*\n"
+                    "• *\"Check best fishing day\"*\n"
+                    "• *\"Show hazards near Mumbai\"*"
+                )
+                typo_actions = ["Can I go fishing today?", "Check best fishing day", "View safe route on map"]
+
+            return FinalDecisionOutput(
+                session_id=session_id,
+                language=language,
+                execution_trace=execution_trace,
+                recommendation=None,
+                alternatives_considered=[],
+                evidence=[],
+                explanation_text=typo_msg,
+                map_payload=MapPayload(),
+                suggested_actions=typo_actions,
+                disclaimer=settings.disclaimer_text,
+                generated_at=datetime.now().isoformat()
+            )
+
         # Case 1: Conversational / General Greeting / Capabilities
         is_greeting = bool(re.search(r'\b(hello|hi|hey|namaste|नमस्ते|नमस्कार|who are you|what can you do|talk to me|help me)\b', query_lower))
         if (intent == "other" and not any(kw in query_lower for kw in ["fish", "trip", "wave", "hazard", "storm", "chlorophyll", "sst", "productivity", "safe"])) or (is_greeting and not any(kw in query_lower for kw in ["fish", "fishing", "trip", "zone", "hazard", "cyclone", "wave", "chlorophyll"])):
             explanation = self._generate_conversational_response(user_query, language)
+            actions = ["आज मासेमारीला जाणे सुरक्षित आहे का?", "सर्वोत्तम मासेमारी दिवस", "सागरी इशारे"] if language == "mr" else (
+                ["क्या आज मछली पकड़ने जा सकते हैं?", "मछली पकड़ने का सबसे अच्छा दिन", "सक्रिय मौसम चेतावनी"] if language == "hi" else
+                ["Can I go fishing today?", "Check best fishing day", "Active weather alerts"]
+            )
             return FinalDecisionOutput(
                 session_id=session_id,
                 language=language,
@@ -83,7 +134,7 @@ class DecisionExplanationAgent:
                 evidence=[],
                 explanation_text=explanation,
                 map_payload=MapPayload(),
-                suggested_actions=["Can I go fishing today?", "Check best fishing day", "Active weather alerts"],
+                suggested_actions=actions,
                 disclaimer=settings.disclaimer_text,
                 generated_at=datetime.now().isoformat()
             )
@@ -174,9 +225,13 @@ class DecisionExplanationAgent:
         )
         if is_multi_day:
             port_id = resolve_port_id(location_text, user_query)
-            multi_res = fishing_reasoning_engine.compute_multi_day_comparison(port_id=port_id)
+            multi_res = fishing_reasoning_engine.compute_multi_day_comparison(port_id=port_id, language=language)
             explanation = self._generate_multi_day_explanation(multi_res, language)
             
+            multi_actions = ["आज मासेमारीला जावे का?", "भरती-ओहोटीची वेळ", "नकाशावर सुरक्षित मार्ग पहा"] if language == "mr" else (
+                ["क्या आज मछली पकड़ने जाएं?", "ज्वार-भाटा का समय", "मैप पर सुरक्षित मार्ग देखें"] if language == "hi" else
+                ["Can I go fishing today?", "Check high tide timings", "View safe route on map"]
+            )
             return FinalDecisionOutput(
                 session_id=session_id,
                 language=language,
@@ -186,7 +241,7 @@ class DecisionExplanationAgent:
                 evidence=[],
                 explanation_text=explanation,
                 map_payload=MapPayload(),
-                suggested_actions=["Can I go fishing today?", "Check high tide timings", "View safe route on map"],
+                suggested_actions=multi_actions,
                 multi_day_outlook=multi_res,
                 disclaimer=settings.disclaimer_text,
                 generated_at=datetime.now().isoformat()
@@ -445,7 +500,8 @@ class DecisionExplanationAgent:
             weather=weather_dict,
             rain_data=weather_dict or origin_weather,
             tide_info=None,
-            hazards=hazards
+            hazards=hazards,
+            language=language
         )
 
         pfz_prob = assessment["pfz_probability"]
@@ -471,9 +527,19 @@ class DecisionExplanationAgent:
 
         # Interactive actions
         if overall_suit < 65 or safety_override:
-            suggested_actions = ["Check best fishing day", "Check high tide timings", "View active weather alerts"]
+            if language == "mr":
+                suggested_actions = ["मासेमारीसाठी सर्वोत्तम दिवस", "भरती-ओहोटीची वेळ", "सक्रिय सागरी इशारे"]
+            elif language == "hi":
+                suggested_actions = ["मछली पकड़ने का सबसे अच्छा दिन", "ज्वार-भाटा का समय", "सक्रिय मौसम चेतावनियां"]
+            else:
+                suggested_actions = ["Check best fishing day", "Check high tide timings", "View active weather alerts"]
         else:
-            suggested_actions = ["Check best fishing day", "View safe route on map", "Check high tide timings"]
+            if language == "mr":
+                suggested_actions = ["मासेमारीसाठी सर्वोत्तम दिवस", "नकाशावर सुरक्षित मार्ग पहा", "भरती-ओहोटीची वेळ"]
+            elif language == "hi":
+                suggested_actions = ["मछली पकड़ने का सबसे अच्छा दिन", "मैप पर सुरक्षित मार्ग देखें", "ज्वार-भाटा का समय"]
+            else:
+                suggested_actions = ["Check best fishing day", "View safe route on map", "Check high tide timings"]
 
         # Build multilingual outputs
         if language == "mr":
