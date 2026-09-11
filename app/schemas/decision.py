@@ -49,5 +49,9 @@ class FinalDecisionOutput(BaseModel):
     evidence: List[EvidenceItem] = []
     explanation_text: str = ""
     map_payload: MapPayload = Field(default_factory=MapPayload)
+    suggested_actions: List[str] = Field(default_factory=list)
+    suitability_breakdown: Optional[Dict[str, Any]] = None
+    multi_day_outlook: Optional[Dict[str, Any]] = None
     disclaimer: str = ""
     generated_at: Optional[str] = None
+

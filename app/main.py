@@ -41,13 +41,14 @@ class QueryRequest(BaseModel):
     session_id: Optional[str] = "default_session"
     text: Optional[str] = None
     query: Optional[str] = None
+    query_text: Optional[str] = None
     language: Optional[str] = "en"
     request_timestamp: Optional[str] = None
     prior_context: Optional[Dict[str, Any]] = None
 
-    @property
-    def query_text(self) -> str:
-        return self.text or self.query or ""
+    def get_query_text(self) -> str:
+        return self.text or self.query or self.query_text or ""
+
 
 class RouteRequest(BaseModel):
     origin: LatLon
@@ -82,9 +83,10 @@ def post_query(request: QueryRequest):
     Runs NLU -> Planner -> Specialist Execution -> Risk Scoring -> Decision Reasoning.
     """
     try:
-        query_str = request.query_text
+        query_str = request.get_query_text()
         if not query_str:
             raise HTTPException(status_code=400, detail="Query text is required")
+
 
         result = orchestrator.process_query(
             session_id=request.session_id or "default_session",
@@ -139,7 +141,27 @@ def get_pfz(
         "count": len(candidates)
     }
 
+@app.get("/api/fishing/multi-day")
+def get_fishing_multi_day(
+    port: str = Query("mumbai", description="Port ID"),
+    pfz: Optional[str] = Query(None, description="PFZ ID"),
+    days: int = Query(4, description="Number of forecast days (4-5)")
+):
+    """Multi-day intelligent forward simulation comparing PFZ, sea state, weather, tides & risk."""
+    from app.agents.fishing_reasoning_engine import fishing_reasoning_engine
+    return fishing_reasoning_engine.compute_multi_day_comparison(port_id=port, pfz_id=pfz, num_days=days)
+
+@app.get("/api/fishing/suitability")
+def get_fishing_suitability(
+    port: str = Query("mumbai", description="Port ID"),
+    pfz: Optional[str] = Query(None, description="PFZ ID")
+):
+    """Explainable data-driven overall fishing suitability with full multi-factor breakdown."""
+    from app.agents.fishing_reasoning_engine import fishing_reasoning_engine
+    return fishing_reasoning_engine.compute_day_suitability(port_id=port)
+
 @app.get("/api/sync")
+
 @app.post("/api/sync")
 def trigger_coastal_sync():
     """Trigger synchronization of real-time marine data across the Indian coastline to Supabase."""

@@ -981,12 +981,13 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
   const selectedZone = displayedPfzs.find(z => z.id === targetPfzId) || activePfzs[0] || staticPfz[0]
   const rainInfo = portContext?.rain_data || { precipitation_mm: 1.2, rain_probability_pct: 25, intensity: 'Light' }
 
-  // Multi-day trip forecast calculation
+  // Multi-day trip forecast calculation aligned with FishingReasoningEngine (Requirement 24)
   const tripDays = useMemo(() => {
     const list = []
     const start = new Date(departureDate || Date.now())
     const baseWave = selectedZone?.waves || 1.2
     const baseWind = selectedZone?.wind || 16
+    const pfzProb = Number(selectedZone?.confidence || 85)
 
     for (let i = 0; i < stayDuration; i++) {
       const d = new Date(start)
@@ -999,19 +1000,28 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
       const rainMm = Number((rainInfo.precipitation_mm + (isPeakWave ? 14.2 : (i * 1.8))).toFixed(1))
       const rainProb = Math.min(95, Math.round(rainInfo.rain_probability_pct + (isPeakWave ? 50 : (i * 8))))
 
+      let waveScore = wave <= 0.9 ? 95 : (wave <= 1.3 ? 84 : (wave <= 1.7 ? 65 : (wave <= 2.1 ? 45 : (wave <= 2.4 ? 28 : 10))))
+      let windScore = wind <= 18 ? 90 : (wind <= 26 ? 72 : (wind <= 35 ? 48 : (wind <= 42 ? 25 : 10)))
+      let rainScore = rainMm >= 15 ? 15 : (rainMm >= 4 ? 50 : (rainMm > 0 ? 85 : 98))
+      let weatherCombined = 0.6 * windScore + 0.4 * rainScore
+      let suitScore = Math.round(0.35 * pfzProb + 0.20 * waveScore + 0.20 * weatherCombined + 0.10 * 90 + 0.10 * 85 + 0.05 * 85)
+      
       let risk = 'LOW'
       let potential = 'High Opportunity'
       let weather = 'Calm / Clear'
 
-      if (wave >= 2.4 || wind >= 40 || rainMm >= 15) {
+      if (wave >= 2.4 || wind >= 42 || rainMm >= 15) {
+        suitScore = Math.min(38, suitScore)
         risk = 'HIGH'
         potential = 'Poor / High Risk'
         weather = 'Squall Warning • High Swell'
-      } else if (wave >= 1.6 || wind >= 26 || rainProb >= 50) {
+      } else if (wave >= 1.6 || wind >= 26 || rainProb >= 50 || suitScore < 65) {
         risk = 'CAUTION'
         potential = 'Moderate Opportunity'
         weather = 'Chop / Passing Showers'
       }
+
+      const verdict = suitScore >= 80 ? 'Highly Favourable' : (suitScore >= 65 ? 'Favourable' : (suitScore >= 45 ? 'Moderate' : 'Unfavourable'))
 
       list.push({
         dayNum: i + 1,
@@ -1022,11 +1032,15 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
         rainProb,
         risk,
         potential,
-        weather
+        weather,
+        suitScore,
+        verdict,
+        pfzProb
       })
     }
     return list
   }, [departureDate, stayDuration, selectedZone, rainInfo])
+
 
   const highRiskPeriod = tripDays.find(d => d.risk === 'HIGH')
   const cautionPeriod = tripDays.find(d => d.risk === 'CAUTION')
@@ -1132,11 +1146,16 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
                     <span>{d.rainMm} mm ({d.rainProb}%) • {d.weather}</span>
                   </div>
                   <div className="tripDayField">
-                    <strong>Fishing Potential</strong>
-                    <span style={{ color: d.risk === 'HIGH' ? 'var(--danger)' : 'var(--navy)', fontWeight: 600 }}>
-                      {d.potential}
+                    <strong>Fishing Suitability</strong>
+                    <span style={{ color: d.suitScore < 45 ? 'var(--danger)' : (d.suitScore < 65 ? '#f59e0b' : 'var(--navy)'), fontWeight: 700 }}>
+                      {d.suitScore}% · {d.verdict}
                     </span>
                   </div>
+                  <div className="tripDayField">
+                    <strong>PFZ Confidence</strong>
+                    <span>{d.pfzProb}% Confidence</span>
+                  </div>
+
                 </div>
               </div>
             ))}
@@ -1674,6 +1693,33 @@ function Assistant({
                         </button>
                       </div>
                     )}
+                    {m.suggestedActions && m.suggestedActions.length > 0 && (
+                      <div className="bubbleSuggestedActions" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
+                        {m.suggestedActions.map((act, actIdx) => (
+                          <button
+                            key={actIdx}
+                            className="suggestedActionBtn"
+                            style={{
+                              background: 'rgba(56, 189, 248, 0.15)',
+                              border: '1px solid rgba(56, 189, 248, 0.4)',
+                              color: 'var(--text-main, #38bdf8)',
+                              padding: '6px 14px',
+                              borderRadius: '20px',
+                              fontSize: '13px',
+                              fontWeight: '600',
+                              cursor: 'pointer',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}
+                            onClick={() => onSendMessage(act)}
+                          >
+                            <span>⚡</span>
+                            <span>{act}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )
@@ -1689,10 +1735,20 @@ function Assistant({
           </div>
 
           <div className="suggestions">
-            {['nearest', 'safeTomorrow', 'showHazards', 'findRoute'].map(k => (
-              <button key={k} onClick={() => onSendMessage(t(k))}>{t(k)}</button>
-            ))}
+            <button onClick={() => onSendMessage(lang === 'mr' ? 'आज मासेमारीला जावे का?' : (lang === 'hi' ? 'क्या आज मछली पकड़ने जा सकते हैं?' : 'Can I go fishing today?'))}>
+              🎣 {lang === 'mr' ? 'आज मासेमारी करावी का?' : (lang === 'hi' ? 'आज मछली पकड़ें?' : 'Can I go fishing today?')}
+            </button>
+            <button onClick={() => onSendMessage(lang === 'mr' ? 'मासेमारीसाठी सर्वात चांगला दिवस तपासा' : (lang === 'hi' ? 'मछली पकड़ने का सबसे अच्छा दिन जांचें' : 'Check best fishing day'))}>
+              📅 {lang === 'mr' ? 'सर्वोत्तम दिवस' : (lang === 'hi' ? 'सर्वश्रेष्ठ दिन' : 'Check best fishing day')}
+            </button>
+            <button onClick={() => onSendMessage(t('showHazards'))}>
+              ⚠️ {t('showHazards')}
+            </button>
+            <button onClick={() => onSendMessage(t('findRoute'))}>
+              🧭 {t('findRoute')}
+            </button>
           </div>
+
 
           <div className="composer">
             <input
@@ -2050,7 +2106,8 @@ function App() {
               text: m.message_text,
               time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
               data: m.structured_data || null,
-              hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route)
+              hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route),
+              suggestedActions: m.structured_data?.suggested_actions || []
             })))
           } else {
             setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: getInitialAnswer(lang, userLocation), time: '10:00 AM' }])
@@ -2090,7 +2147,8 @@ function App() {
           text: m.message_text,
           time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           data: m.structured_data || null,
-          hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route)
+          hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route),
+          suggestedActions: m.structured_data?.suggested_actions || []
         })))
       } else {
         setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: getInitialAnswer(lang, userLocation), time: '10:00 AM' }])
@@ -2131,15 +2189,18 @@ function App() {
     }
 
     try {
-      // Build location payload
-      const userLocPayload = userLocation ? {
-        latitude: userLocation.lat,
-        longitude: userLocation.lon,
-        port_id: userLocation.port_id,
-        port_name: userLocation.port_name,
-        state: userLocation.state,
-        is_coastal: userLocation.is_coastal
-      } : null
+      // Build location payload with selected_port priority
+      const userLocPayload = {
+        selected_port: selectedPort || 'mumbai',
+        ...(userLocation ? {
+          latitude: userLocation.lat,
+          longitude: userLocation.lon,
+          port_id: userLocation.port_id,
+          port_name: userLocation.port_name,
+          state: userLocation.state,
+          is_coastal: userLocation.is_coastal
+        } : {})
+      }
 
       const res = await askOrca(queryText, lang, userLocPayload)
       let botAnswer = ''
@@ -2165,8 +2226,10 @@ function App() {
         text: botAnswer,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         data: botData,
-        hasRoute: hasRoute
+        hasRoute: hasRoute,
+        suggestedActions: res?.suggested_actions || botData?.suggested_actions || []
       }
+
 
       setMessages(prev => [...prev, botMsg])
 

@@ -86,6 +86,20 @@ class Orchestrator:
                 location_text=nlu_out.entities.location_text
             )
 
+        # Fast Short-Circuit for Multi-Day Intelligence Comparison (Requirements 6, 7, 10, 11)
+        if nlu_out.intent == IntentEnum.MULTI_DAY_COMPARISON:
+            loc_text = nlu_out.entities.location_text or (context.get("selected_port") if context else None) or _ORCA_SESSION_MEMORY.get(session_id, {}).get("location")
+            return decision_agent.decide_and_explain(
+                session_id=session_id,
+                language=nlu_out.language,
+                candidates=[],
+                execution_trace=[],
+                user_query=text,
+                intent=nlu_out.intent.value,
+                location_text=loc_text
+            )
+
+
         # Step 3: Run Planner Agent (Decomposes, calls specialist tools, evaluates risk)
         plan_out = planner_agent.plan_and_execute(nlu_out)
         res = plan_out.results

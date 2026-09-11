@@ -13,6 +13,7 @@ class IntentEnum(str, Enum):
     ROUTE_PLANNING = "route_planning"
     PRODUCTIVITY_EXPLANATION = "productivity_explanation"
     GEOFENCE_CHECK = "geofence_check"
+    MULTI_DAY_COMPARISON = "multi_day_comparison"
     FOLLOWUP = "followup"
     OTHER = "other"
 

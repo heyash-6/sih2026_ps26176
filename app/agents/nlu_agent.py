@@ -264,6 +264,13 @@ class NLULanguageAgent:
                 intent = IntentEnum.PRODUCTIVITY_EXPLANATION
             else:
                 intent = IntentEnum.CHLOROPHYLL_SST_LOOKUP
+        elif any(kw in text_lower for kw in [
+            "check best fishing day", "which day is best", "best day", "best fishing day",
+            "when will it be best", "when is it best", "compare next days", "next few days",
+            "compare days", "कधी जावे", "कोणता दिवस चांगला", "कोणत्या दिवशी", "कब जाना अच्छा",
+            "कौन सा दिन अच्छा", "कौन से दिन"
+        ]):
+            intent = IntentEnum.MULTI_DAY_COMPARISON
         elif any(kw in text_lower for kw in ["fish", "fishing", "trip", "मासे", "मासेमारी", "मछली", "पकड़ने", "पकडणे"]):
             intent = IntentEnum.FISHING_TRIP_PLANNING
         elif any(kw in text_lower for kw in ["hazard", "storm", "cyclone", "warning", "lightning", "alert", "धोका", "खतरा", "तूफान"]):
@@ -290,7 +297,15 @@ class NLULanguageAgent:
 
         # If question is conceptual/science (e.g. "What is chlorophyll?"), DO NOT force location!
         if not is_conceptual and intent != IntentEnum.OTHER:
-            # PRIORITY 2: Device/User GPS Location from prior_context
+            # PRIORITY 2: Selected Port from ORCA session (Req 14)
+            if not location_text and prior_context:
+                sel_port = prior_context.get("selected_port") or prior_context.get("port_id")
+                if sel_port:
+                    from app.database.indian_coastal_registry import get_port_by_id
+                    p_obj = get_port_by_id(sel_port)
+                    location_text = p_obj.get("name", sel_port)
+
+            # PRIORITY 3: Device/User GPS Location from prior_context
             if not location_text and prior_context:
                 u_loc = prior_context.get("user_location")
                 if u_loc and isinstance(u_loc, dict):
@@ -298,7 +313,7 @@ class NLULanguageAgent:
                 elif u_loc and isinstance(u_loc, str):
                     location_text = u_loc
 
-            # PRIORITY 3: Previously established conversation context / memory
+            # PRIORITY 4: Previously established conversation context / memory
             if not location_text and prior_context:
                 if prior_context.get("location"):
                     location_text = prior_context["location"]
