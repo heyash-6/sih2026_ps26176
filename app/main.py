@@ -120,12 +120,23 @@ def get_pfz(
         "count": len(candidates)
     }
 
+@app.get("/api/sync")
 @app.post("/api/sync")
 def trigger_coastal_sync():
     """Trigger synchronization of real-time marine data across the Indian coastline to Supabase."""
     from app.database.data_pipeline import data_pipeline
     result = data_pipeline.sync_all_indian_coastal_hubs()
     return result
+
+@app.get("/api/incois/live")
+def get_incois_live(
+    lat: float = Query(18.94, description="Latitude"),
+    lon: float = Query(72.83, description="Longitude")
+):
+    """Query live oceanographic parameters directly from official INCOIS THREDDS OpenDAP operational models."""
+    from app.datasources.incois_client import incois_client
+    obs = incois_client.get_live_marine_observation(lat, lon)
+    return obs
 
 @app.get("/api/weather")
 def get_weather(

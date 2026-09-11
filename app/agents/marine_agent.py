@@ -4,18 +4,19 @@ from app.config import settings
 from app.schemas.marine import PFZCandidate, OceanConditions, ProductivityTrend
 from app.datasources.base import BasePFZDataSource
 from app.datasources.demo_datasources import DemoPFZDataSource, haversine_distance
+from app.datasources.live_datasources import LivePFZDataSource
 from app.database.supabase_client import supabase_client
 from app.database.indian_coastal_registry import INDIAN_COASTAL_PORTS, get_port_by_id, get_all_pfz_candidates
 
 class MarineAgent:
     """
     Stage 3: Marine & PFZ Specialist Agent.
-    Retrieves PFZ advisories across the entire Indian Coastline from Supabase PostgreSQL
-    or live coastal registry, with seamless port-aware filtering.
+    Retrieves PFZ advisories across the entire Indian Coastline from Supabase PostgreSQL,
+    INCOIS Live Ocean State / SST Models, or coastal registry, with seamless port-aware filtering.
     """
 
     def __init__(self):
-        self.datasource: BasePFZDataSource = DemoPFZDataSource()
+        self.datasource: BasePFZDataSource = LivePFZDataSource()
 
     def get_pfz_candidates(
         self,

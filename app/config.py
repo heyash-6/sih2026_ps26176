@@ -12,7 +12,7 @@ class RiskWeights(BaseModel):
     geofence: float = 0.10
 
 class Settings(BaseModel):
-    orca_mode: str = os.getenv("ORCA_MODE", "demo")
+    orca_mode: str = os.getenv("ORCA_MODE", "live")
     llm_provider: str = os.getenv("LLM_PROVIDER", "gemini")  # gemini, openai, or mock
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
     openai_api_key: str = os.getenv("OPENAI_API_KEY", "")
