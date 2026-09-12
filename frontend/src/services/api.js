@@ -385,8 +385,16 @@ export async function getConversationMessages(convId) {
     if (res.ok) {
       const data = await res.json();
       if (data && Array.isArray(data.messages)) {
-        localStorage.setItem(storageKey, JSON.stringify(data.messages));
-        return data.messages;
+        const normalized = data.messages.map(m => ({
+          ...m,
+          message_text: m.message_text || m.message || m.text || '',
+          text: m.message_text || m.message || m.text || '',
+          message: m.message || m.message_text || m.text || '',
+          structured_data: m.structured_data || m.metadata || null,
+          metadata: m.metadata || m.structured_data || {}
+        }));
+        localStorage.setItem(storageKey, JSON.stringify(normalized));
+        return normalized;
       }
     }
   } catch (err) {
@@ -395,7 +403,16 @@ export async function getConversationMessages(convId) {
   // Local cache fallback
   try {
     const cached = localStorage.getItem(storageKey);
-    return cached ? JSON.parse(cached) : [];
+    if (!cached) return [];
+    const parsed = JSON.parse(cached);
+    return Array.isArray(parsed) ? parsed.map(m => ({
+      ...m,
+      message_text: m.message_text || m.message || m.text || '',
+      text: m.message_text || m.message || m.text || '',
+      message: m.message || m.message_text || m.text || '',
+      structured_data: m.structured_data || m.metadata || null,
+      metadata: m.metadata || m.structured_data || {}
+    })) : [];
   } catch {
     return [];
   }
@@ -428,9 +445,12 @@ export async function saveChatMessage(convId, userIdOrSender, senderOrText, text
     user_id: actualUserId,
     sender: actualSender,
     message: actualText,
+    message_text: actualText,
+    text: actualText,
     language,
     has_route: hasRoute,
     metadata: actualMeta,
+    structured_data: actualMeta,
     created_at: new Date().toISOString()
   };
 

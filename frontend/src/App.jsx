@@ -100,10 +100,14 @@ const T = {
     peakScore: 'Peak score',
     meanIndex: 'Mean index',
     methodologyTitle: 'Ocean Indices & Methodology Guide',
+    methodologyGuide: 'Ocean Indices & Methodology Guide',
     whyChlorophyll: 'Why Chlorophyll-a?',
     whyChlorophyllDesc: 'Chlorophyll-a is an optical ocean-colour indicator widely used to estimate phytoplankton biomass and base-trophic marine productivity. ORCA correlates Chlorophyll-a gradients with SST thermal breaks to reliably identify forage grounds.',
+    chlorophyllExplain: 'Chlorophyll-a is an optical ocean-colour indicator widely used to estimate phytoplankton biomass and base-trophic marine productivity. ORCA correlates Chlorophyll-a gradients with SST thermal breaks to reliably identify forage grounds.',
     whatIsProductivity: 'What is the Productivity Index?',
+    whatIsProdIndex: 'What is the Productivity Index?',
     whatIsProductivityDesc: 'The Productivity Index is an ORCA composite indicator (20–100) combining Chlorophyll-a, SST Thermal Balance, and Wave Stability for pelagic fishing suitability.',
+    prodIndexExplain: 'The Productivity Index is an ORCA composite indicator (20–100) combining Chlorophyll-a, SST Thermal Balance, and Wave Stability for pelagic fishing suitability.',
     tideTitle: 'Tide Information',
     tideSubtitle: 'Official tidal predictions and harmonic schedules sourced from coastal prediction records.',
     highTide: 'HIGH TIDE',
@@ -265,10 +269,14 @@ const T = {
     peakScore: 'उच्चतम स्कोर',
     meanIndex: 'माध्य सूचकांक',
     methodologyTitle: 'समुद्री सूचकांक और कार्यप्रणाली गाइड',
+    methodologyGuide: 'समुद्री सूचकांक और कार्यप्रणाली गाइड',
     whyChlorophyll: 'क्लोरोफिल-ए क्यों?',
     whyChlorophyllDesc: 'क्लोरोफिल-ए एक समुद्री रंग संकेतक है जो फाइटोप्लांकटन बायोमास का अनुमान लगाता है। ORCA मछली पकड़ने के अनुकूल क्षेत्रों की पहचान के लिए इसे SST के साथ जोड़ता है।',
+    chlorophyllExplain: 'क्लोरोफिल-ए एक समुद्री रंग संकेतक है जो फाइटोप्लांकटन बायोमास का अनुमान लगाता है। ORCA मछली पकड़ने के अनुकूल क्षेत्रों की पहचान के लिए इसे SST के साथ जोड़ता है।',
     whatIsProductivity: 'उत्पादकता सूचकांक क्या है?',
+    whatIsProdIndex: 'उत्पादकता सूचकांक क्या है?',
     whatIsProductivityDesc: 'उत्पादकता सूचकांक एक समग्र स्कोर (20–100) है जो क्लोरोफिल, SST तापमान संतुलन और लहर स्थिरता को जोड़ता है।',
+    prodIndexExplain: 'उत्पादकता सूचकांक एक समग्र स्कोर (20–100) है जो क्लोरोफिल, SST तापमान संतुलन और लहर स्थिरता को जोड़ता है।',
     tideTitle: 'ज्वार-भाटा की जानकारी',
     tideSubtitle: 'तटीय रिकॉर्ड से प्राप्त आधिकारिक ज्वार-भाटा पूर्वानुमान और समय सारिणी।',
     highTide: 'ज्वार (HIGH TIDE)',
@@ -430,10 +438,14 @@ const T = {
     peakScore: 'कमाल स्कोअर',
     meanIndex: 'मध्यम निर्देशांक',
     methodologyTitle: 'सागरी निर्देशांक आणि कार्यपद्धती मार्गदर्शक',
+    methodologyGuide: 'सागरी निर्देशांक आणि कार्यपद्धती मार्गदर्शक',
     whyChlorophyll: 'क्लोरोफिल-ए का?',
     whyChlorophyllDesc: 'क्लोरोफिल-ए हा सागरी रंग दर्शक आहे जो फायटोप्लँक्टन बायोमासचा अंदाज लावतो. ORCA मासेमारीसाठी योग्य क्षेत्रे ओळखण्यासाठी याला SST शी जोडतो.',
+    chlorophyllExplain: 'क्लोरोफिल-ए हा सागरी रंग दर्शक आहे जो फायटोप्लँक्टन बायोमासचा अंदाज लावतो. ORCA मासेमारीसाठी योग्य क्षेत्रे ओळखण्यासाठी याला SST शी जोडतो.',
     whatIsProductivity: 'उत्पादकता निर्देशांक काय आहे?',
+    whatIsProdIndex: 'उत्पादकता निर्देशांक काय आहे?',
     whatIsProductivityDesc: 'उत्पादकता निर्देशांक हा एक समग्र स्कोअर (20–100) आहे जो क्लोरोफिल, SST तापमान संतुलन आणि लाटांच्या स्थिरतेला एकत्र करतो.',
+    prodIndexExplain: 'उत्पादकता निर्देशांक हा एक समग्र स्कोअर (20–100) आहे जो क्लोरोफिल, SST तापमान संतुलन आणि लाटांच्या स्थिरतेला एकत्र करतो.',
     tideTitle: 'भरती-ओहोटीची माहिती',
     tideSubtitle: 'किनारपट्टीच्या नोंदींमधून घेतलेले अधिकृत भरती-ओहोटीचे अंदाज आणि वेळापत्रक.',
     highTide: 'भरती (HIGH TIDE)',
@@ -1429,22 +1441,22 @@ function Analytics({
 
       {/* Ocean Intelligence Index Methodology Guide */}
       <div style={{ marginTop: '20px', marginBottom: '20px' }}>
-        <Card title={`ℹ️ ${t('methodologyGuide')}`}>
+        <Card title={`ℹ️ ${t('methodologyGuide') || t('methodologyTitle')}`}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginTop: '10px' }}>
-            <div style={{ background: 'var(--surface-elevated, #162032)', padding: '14px 18px', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
-              <h4 style={{ margin: '0 0 6px 0', color: '#20c997', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ background: 'var(--surface-elevated, #162032)', padding: '16px 20px', borderRadius: '10px', border: '1px solid rgba(32, 201, 151, 0.3)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+              <h4 style={{ margin: '0 0 8px 0', color: '#20c997', fontSize: '15px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span>🌱</span> {t('whyChlorophyll')}
               </h4>
-              <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-muted, #94a3b8)' }}>
-                {t('chlorophyllExplain')}
+              <p style={{ margin: 0, fontSize: '13.5px', lineHeight: '1.6', color: 'var(--text-secondary, #cbd5e1)' }}>
+                {t('chlorophyllExplain') || t('whyChlorophyllDesc')}
               </p>
             </div>
-            <div style={{ background: 'var(--surface-elevated, #162032)', padding: '14px 18px', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
-              <h4 style={{ margin: '0 0 6px 0', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span>📊</span> {t('whatIsProdIndex')}
+            <div style={{ background: 'var(--surface-elevated, #162032)', padding: '16px 20px', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.3)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
+              <h4 style={{ margin: '0 0 8px 0', color: '#38bdf8', fontSize: '15px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>📊</span> {t('whatIsProdIndex') || t('whatIsProductivity')}
               </h4>
-              <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-muted, #94a3b8)' }}>
-                {t('prodIndexExplain')}
+              <p style={{ margin: 0, fontSize: '13.5px', lineHeight: '1.6', color: 'var(--text-secondary, #cbd5e1)' }}>
+                {t('prodIndexExplain') || t('whatIsProductivityDesc')}
               </p>
             </div>
           </div>
@@ -3113,9 +3125,37 @@ function App() {
   const [query, setQuery] = useState('')
   const [backendOnline, setBackendOnline] = useState(false)
 
-  // Supabase Auth State
-  const [currentUser, setCurrentUser] = useState(null)
+  // Supabase Auth State (compulsory authentication gate)
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const cached = localStorage.getItem('orca_user')
+      return cached ? JSON.parse(cached) : null
+    } catch (e) {
+      return null
+    }
+  })
   const [authModalOpen, setAuthModalOpen] = useState(false)
+
+  useEffect(() => {
+    getSession().then(session => {
+      if (session?.user) {
+        setCurrentUser(session.user)
+        try { localStorage.setItem('orca_user', JSON.stringify(session.user)) } catch (e) {}
+      }
+    }).catch(() => {})
+    const { data: authListener } = onAuthStateChange((event, user) => {
+      if (user) {
+        setCurrentUser(user)
+        try { localStorage.setItem('orca_user', JSON.stringify(user)) } catch (e) {}
+      } else if (event === 'SIGNED_OUT') {
+        setCurrentUser(null)
+        try { localStorage.removeItem('orca_user') } catch (e) {}
+      }
+    })
+    return () => {
+      authListener?.subscription?.unsubscribe?.()
+    }
+  }, [])
 
   // Dynamic Data & Route State
   const [selectedPort, setSelectedPort] = useState('mumbai')
@@ -3194,14 +3234,14 @@ function App() {
           if (!isMounted) return
           if (msgs && msgs.length > 0) {
             setMessages(msgs.map(m => ({
-              id: m.id,
-              role: m.sender,
-              sender: m.sender,
-              text: m.message_text,
-              time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              data: m.structured_data || null,
-              hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route),
-              suggestedActions: m.structured_data?.suggested_actions || []
+              id: m.id || ('m_' + Math.random()),
+              role: m.sender || (m.role === 'user' ? 'user' : 'orca'),
+              sender: m.sender || m.role || 'orca',
+              text: m.message_text || m.message || m.text || '',
+              time: m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '10:00 AM',
+              data: m.structured_data || m.metadata || null,
+              hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route || m.metadata?.navigation || m.metadata?.route),
+              suggestedActions: m.structured_data?.suggested_actions || m.metadata?.suggested_actions || []
             })))
           } else {
             setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: getInitialAnswer(lang, userLocation), time: '10:00 AM' }])
@@ -3235,14 +3275,14 @@ function App() {
       const msgs = await getConversationMessages(convId)
       if (msgs && msgs.length > 0) {
         setMessages(msgs.map(m => ({
-          id: m.id,
-          role: m.sender,
-          sender: m.sender,
-          text: m.message_text,
-          time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          data: m.structured_data || null,
-          hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route),
-          suggestedActions: m.structured_data?.suggested_actions || []
+          id: m.id || ('m_' + Math.random()),
+          role: m.sender || (m.role === 'user' ? 'user' : 'orca'),
+          sender: m.sender || m.role || 'orca',
+          text: m.message_text || m.message || m.text || '',
+          time: m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '10:00 AM',
+          data: m.structured_data || m.metadata || null,
+          hasRoute: Boolean(m.structured_data?.navigation || m.structured_data?.route || m.metadata?.navigation || m.metadata?.route),
+          suggestedActions: m.structured_data?.suggested_actions || m.metadata?.suggested_actions || []
         })))
       } else {
         setMessages([{ id: 'init', role: 'orca', sender: 'orca', text: getInitialAnswer(lang, userLocation), time: '10:00 AM' }])
@@ -3637,9 +3677,20 @@ function App() {
     loadPfzs(selectedPort)
   }, [selectedPort, oceanPeriod])
 
+  const handleAuthSuccess = (user) => {
+    setCurrentUser(user)
+    try {
+      localStorage.setItem('orca_user', JSON.stringify(user))
+    } catch (e) {}
+    setAuthModalOpen(false)
+  }
+
   const handleSignOut = async () => {
     await signOutUser()
     setCurrentUser(null)
+    try {
+      localStorage.removeItem('orca_user')
+    } catch (e) {}
     setConversations([])
     setActiveConvId(null)
     setMessages([])
@@ -3812,6 +3863,22 @@ function App() {
     )
   }
 
+  // Compulsory Auth Gate: Users must sign in or register to access the portal
+  if (!currentUser) {
+    return (
+      <div className="shell lockedShell" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'radial-gradient(circle at top, #0f2744 0%, #060d19 100%)' }}>
+        <AuthModal
+          isOpen={true}
+          isMandatory={true}
+          onClose={() => {}}
+          onAuthSuccess={handleAuthSuccess}
+          lang={lang}
+          setLang={setLang}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="shell">
       <aside className="sidebar">
@@ -3946,8 +4013,9 @@ function App() {
       <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
-        onAuthSuccess={user => setCurrentUser(user)}
+        onAuthSuccess={handleAuthSuccess}
         lang={lang}
+        setLang={setLang}
       />
     </div>
   )
