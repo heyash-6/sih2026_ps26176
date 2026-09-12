@@ -53,7 +53,149 @@ const T = {
     inactivePfzTitle: 'Inactive / Caution Zones',
     noActivePfz: 'No active PFZs available for this port.',
     noInactivePfz: 'No inactive PFZ records available.',
-    allPfzTitle: 'All Potential Fishing Zones'
+    allPfzTitle: 'All Potential Fishing Zones',
+    liveCoastalActive: 'Live Coastal Position Active',
+    liveInlandActive: 'Live Inland Coordinates Active',
+    redetectGps: 'Re-detect GPS',
+    dashboardSubtitle: 'Real-time marine intelligence tailored to your port coordinates, synced with INCOIS models.',
+    rainWeather: 'Rain & Weather',
+    clearFair: 'Clear / Fair',
+    rainSuffix: 'rain',
+    activePfzBadge: 'ACTIVE PFZs',
+    inactivePfzBadge: 'INACTIVE PFZs',
+    statusActive: 'ACTIVE',
+    statusInactive: 'INACTIVE',
+    subOptimalGradient: 'Sub-optimal gradient',
+    radarEyebrow: 'GEOSPATIAL & SATELLITE RADAR',
+    mapSubtitle: 'Real-time marine intelligence radar across the Indian Coastline (Arabian Sea & Bay of Bengal).',
+    focusPort: '⚓ Focus Port',
+    wholeCoast: '🇮🇳 Whole Coast',
+    routeLayer: 'Route',
+    chlorophyllLabel: 'Chlorophyll',
+    planSafeRoute: '🚀 Plan Safe Route',
+    analyticsSubtitle: 'Real-time satellite SST, Chlorophyll-a front tracking, Wave height observation, and Survey of India tidal predictions.',
+    liveSatelliteTelemetry: 'Live Satellite Telemetry',
+    lastUpdated: 'Last Updated',
+    loadingAnalytics: 'Loading ocean analytics data for',
+    analyticsError: 'Unable to load ocean analytics data. Please check backend connection.',
+    retry: 'Retry',
+    sstKpi: 'SEA SURFACE TEMP',
+    observedBaseline: 'Observed baseline',
+    chlorophyllKpi: 'CHLOROPHYLL-a',
+    oceanColourBiomass: 'Ocean-colour biomass',
+    waveHeightKpi: 'WAVE HEIGHT',
+    productivityKpi: 'PRODUCTIVITY INDEX',
+    orcaDerivedIndex: 'ORCA-derived index',
+    sstChartTitle: 'Sea Surface Temperature (SST)',
+    chlChartTitle: 'Chlorophyll-a Concentration',
+    swhChartTitle: 'Significant Wave Height (SWH)',
+    mpiChartTitle: 'Marine Productivity Index',
+    average: 'Average',
+    minimum: 'Minimum',
+    maximum: 'Maximum',
+    currentConcentration: 'Current concentration',
+    statusLabel: 'Status',
+    currentHeight: 'Current height',
+    currentScore: 'Current score',
+    peakScore: 'Peak score',
+    meanIndex: 'Mean index',
+    methodologyTitle: 'Ocean Indices & Methodology Guide',
+    whyChlorophyll: 'Why Chlorophyll-a?',
+    whyChlorophyllDesc: 'Chlorophyll-a is an optical ocean-colour indicator widely used to estimate phytoplankton biomass and base-trophic marine productivity. ORCA correlates Chlorophyll-a gradients with SST thermal breaks to reliably identify forage grounds.',
+    whatIsProductivity: 'What is the Productivity Index?',
+    whatIsProductivityDesc: 'The Productivity Index is an ORCA composite indicator (20–100) combining Chlorophyll-a, SST Thermal Balance, and Wave Stability for pelagic fishing suitability.',
+    tideTitle: 'Tide Information',
+    tideSubtitle: 'Official tidal predictions and harmonic schedules sourced from coastal prediction records.',
+    highTide: 'HIGH TIDE',
+    lowTide: 'LOW TIDE',
+    deepDraftClearance: 'Deep draft channel clearance & optimal harbor departure window',
+    shallowWaterCaution: 'Shallow water navigation caution along nearshore sandbars',
+    tideSequence: 'Chronological Tidal Sequence (Today & Tomorrow)',
+    waterLevel: 'Water Level',
+    meters: 'meters',
+    portSector: 'Port Sector:',
+    allIndianCoast: 'All Indian Coast',
+    multiDayPlannerTitle: 'Multi-Day Marine Trip Planner',
+    highRiskAdvisory: 'HIGH RISK ADVISORY',
+    cautionAdvised: 'CAUTION ADVISED',
+    safeTripWindow: 'SAFE TRIP WINDOW',
+    multiDayPlannerDesc: 'Plan multi-day offshore voyages with day-by-day weather forecasts, wave swell analysis, and pelagic fishing potential.',
+    destPfzLabel: 'Destination PFZ',
+    depDateLabel: 'Departure Date',
+    depTimeLabel: 'Departure Time',
+    stayDurationLabel: 'Stay Duration',
+    singleVoyage: '1 Day (Single Voyage)',
+    overnightStay: '2 Days (Overnight Stay)',
+    extendedTrip: '3 Days (Extended Trip)',
+    daysCount: 'Days',
+    dayExpedition: 'Days (Week Expedition)',
+    dayLabel: 'Day',
+    seaWaves: 'Sea & Waves',
+    fishingSuitability: 'Fishing Suitability',
+    pfzConfidenceLabel: 'PFZ Confidence',
+    dailyAssessment: 'Daily Assessment',
+    activePfzDesc: 'High pelagic productivity & verified thermal boundaries',
+    inactivePfzDesc: 'Divergent thermal gradients, elevated wave risks, or depleted chlorophyll',
+    statusAdvisory: 'Status Advisory:',
+    safetySubtitle: 'Evaluate real-time coastal routes, geofences, and INCOIS weather hazards before departure.',
+    plannerTitle: 'Interactive Voyage Route Planner',
+    computingPath: 'Computing Safe A* Path...',
+    routeAssessmentCardTitle: 'Route Assessment & Safe Corridor',
+    highRiskRouteAdvisory: 'HIGH RISK ROUTE — ADVISORY ACTIVE',
+    cautionRoute: 'CAUTION ROUTE',
+    optimalPath: 'A* OPTIMAL PATH',
+    riskScoreLabel: 'Risk Score',
+    waypointsLabel: 'Waypoints',
+    geofenceStatusLabel: 'Geofence Status',
+    safeClearanceLabel: '✓ Safe Clearance',
+    routeAssessmentPointsTitle: 'Route Assessment Points',
+    routeAssessmentPointsSub: 'Geometry-derived assessment of sea conditions along the selected passage.',
+    geometryDerivedBadge: 'Geometry-Derived',
+    realtimeSeaStateLabel: 'Real-time sea state along passage',
+    routeAssessmentPointsDesc: 'Assessment covers the departure corridor, mid-channel passage, and target shelf approach.',
+    waveSwellLabel: 'Wave Swell',
+    matchesTableLeg: 'Matches Table',
+    verifiedClear: '✓ Verified',
+    departureCorridor: 'Departure Corridor',
+    midChannelPassage: 'Mid-Channel Passage',
+    shelfApproach: 'Target Shelf Approach',
+    waypointLogTitle: 'Full Route Waypoint Navigation Log & Clearance',
+    waypointLogSubtitle: 'Highlighted rows correspond to Route Assessment Points 01, 02, 03',
+    point: 'Point',
+    leg: 'Leg',
+    checkpoint: 'Checkpoint',
+    coordinates: 'Coordinates',
+    heading: 'Heading',
+    seaStateCol: 'Sea State',
+    clearanceCol: 'Clearance',
+    corridorLeg: 'Corridor Leg',
+    passStatus: 'Pass',
+    viewRouteOnMapBtn: 'View Full Route on Marine Map',
+    weatherVerified: 'Weather Verified',
+    seaStateWithinLimits: 'Sea State Within Limits',
+    boundariesCleared: 'Boundaries Cleared',
+    routeRiskEvaluated: 'Route Risk Evaluated',
+    liveTelemetryActive: 'Live Telemetry Active',
+    geofencePathVerified: 'A* Geofence Path Verified',
+    allCoastAdvisories: 'All Coastline Advisories',
+    highPriorityWarnings: 'HIGH PRIORITY WARNINGS',
+    cautionAdvisories: 'CAUTION ADVISORIES',
+    coastalBulletins: 'COASTAL BULLETINS & INFORMATIONAL',
+    noHighAlerts: 'No critical or high-risk maritime hazard warnings active for this coastal sector.',
+    noMediumAlerts: 'No moderate chop or caution advisories active for this coastal sector.',
+    noLowAlerts: 'No coastal bulletins logged for this sector.',
+    currentChatTitle: 'Current Marine Intelligence Chat',
+    clearMessages: 'Clear Messages',
+    deleteChat: 'Delete Chat',
+    startFreshConv: 'Start fresh conversation',
+    deleteThisConv: 'Delete this conversation',
+    clearAllInChat: 'Clear all messages in current chat',
+    deleteEntireConv: 'Delete this entire conversation',
+    activeOperationalAccount: 'Active Operational Account',
+    encryptedSession: 'End-to-End Encrypted Session',
+    accountSecurity: 'Account Security',
+    darkThemeDesc: 'Deep ocean blue dark interface',
+    lightThemeDesc: 'Clean coastal light interface'
   },
   hi: {
     dashboard: 'डैशबोर्ड', map: 'समुद्री इंटेलिजेंस मैप', analytics: 'महासागर विश्लेषण', fishing: 'मछली पकड़ने की इंटेलिजेंस', safety: 'सुरक्षा और मार्ग', assistant: 'ORCA AI सहायक', alerts: 'सूचनाएं', settings: 'सेटिंग्स', profile: 'प्रोफ़ाइल', workspace: 'वर्कस्पेस', operational: 'सिस्टम चालू हैं', connected: 'समुद्री डेटा सेवाएं जुड़ी हैं', marine: 'समुद्री इंटेलिजेंस', glance: 'समुद्री स्थिति एक नज़र में।', location: 'मुंबई तट • लाइव समुद्री सेंसर डेटा कनेक्टेड', ask: 'ORCA से पूछें', seaState: 'समुद्र की स्थिति', wind: 'हवा', sst: 'समुद्र सतह तापमान', activePFZ: 'सक्रिय PFZ', moderate: 'मध्यम', waves: '1.2 मी. लहरें', steady: 'NE • स्थिर', favourable: 'अनुकूल', openMap: 'मैप खोलें', activeAdvisories: 'सक्रिय सलाह', viewAll: 'सभी देखें', insights: 'आज की समुद्री जानकारी', bestFishing: 'बेहतरीन मछली पकड़ने का अवसर', departure: 'अनुशंसित प्रस्थान', confidence: 'डेटा विश्वसनीयता', verified: 'सत्यापित इंटेलिजेंस', sources: 'स्रोत: ISRO • INCOIS • IMD • ओशन डेटा', oceanInputs: 'समुद्र और भौगोलिक इनपुट की जांच की गई।', allLayers: 'सभी लेयर', weather: 'मौसम', hazards: 'जोखिम', boundaries: 'सीमाएं', today: 'आज', selectedZone: 'चयनित क्षेत्र', high: 'उच्च विश्वसनीयता', why: 'यह क्षेत्र क्यों?', signal: 'संकेत', how: 'ORCA कैसे निर्णय लेता है', discover: 'खोजें', correlate: 'संबंध जोड़ें', assess: 'आकलन करें', explain: 'समझाएं', findZones: 'संभावित मछली पकड़ने वाले क्षेत्र खोजें।', explore: 'PFZ खोजें', viewZone: 'क्षेत्र देखें', recommendation: 'ORCA की सिफारिश', start: 'शुरुआत करें', safeRoute: 'सुरक्षित मार्ग आकलन', recommended: 'अनुशंसित', low: 'कम', risk: 'जोखिम', whyRoute: 'ORCA इस मार्ग की सिफारिश क्यों करता है', safetyChecklist: 'सुरक्षा चेकलिस्ट', askSea: 'समुद्र के बारे में ORCA से पूछें।', conversational: 'कन्वर्सेशनल मरीन इंटेलिजेंस', placeholder: 'समुद्र से जुड़ा सवाल पूछें...', send: 'भेजें', nearest: 'आज का निकटतम PFZ', safeTomorrow: 'क्या कल सुबह जाना सुरक्षित है?', showHazards: 'मुंबई के पास जोखिम दिखाएं', findRoute: 'सुरक्षित मार्ग खोजें', close: 'बंद करें', reset: 'दृश्य रीसेट', satellite: 'सैटेलाइट', street: 'सड़क', locate: 'मेरा स्थान', language: 'भाषा', search: 'खोजें', notifications: 'सूचनाएं', noResults: 'कोई परिणाम नहीं मिला।', routeA: 'तटीय मार्ग A', routeB: 'तटीय मार्ग B', routeC: 'संतुलित मार्ग', routeRisk: 'मार्ग जोखिम', checked: 'जांच पूरी', refresh: 'रीफ्रेश', save: 'बदलाव सहेजें', saved: 'बदलाव सहेजे गए', theme: 'थीम', darkMode: 'डार्क मोड', email: 'ईमेल सूचनाएं', profileTitle: 'ऑपरेशनल प्रोफ़ाइल', role: 'समुद्री शोधकर्ता / कप्तान', details: 'प्रोफ़ाइल विवरण', name: 'Capt. Devesh Madhavi', status: 'सक्रिय सत्र', mobile: 'मोबाइल नंबर', emailLabel: 'ईमेल', profession: 'पेशा', edit: 'संपादित करें', done: 'पूर्ण', trend: 'PFZ विश्वसनीयता ट्रेंड', pfzConfidence: 'PFZ विश्वसनीयता', freshness: 'डेटा ताजगी', latest: 'नवीनतम नमूना', marineInputs: 'सैटेलाइट समुद्री रंग, SST और मौसम इनपुट।', spatialSignals: 'आसपास के स्थानिक संकेत और PFZ उम्मीदवार जोड़ता है।', opportunitySafety: 'मछली पकड़ने के अवसर को सुरक्षा सीमाओं के साथ संतुलित करता है।', evidenceRecommendation: 'हर सिफारिश के पीछे के प्रमाण समझाता है।', hazardAvoided: 'पहचाने गए सावधानी क्षेत्र से बचता है।', boundariesChecked: 'मार्ग से पहले परिचालन सीमाएं जांचता है।', riskCorridor: 'कम जोखिम वाले तटीय गलियारे को प्राथमिकता देता है।', recalculate: 'नए डेटा के बाद मार्ग फिर निकाला जा सकता है।', demo: 'रीयल-टाइम मोड • लाइव टेलीमेट्री कनेक्टेड।', demoAnswer: 'नमस्ते कप्तान! मैं ORCA हूँ, आपका समुद्री AI निर्णय सहायक। मैं आपकी क्या मदद कर सकता हूँ?', mapFail: 'मैप टाइल लोड नहीं हो पाईं।', routeSummary: '39.2 किमी • लगभग 2 घंटे 35 मिनट', routeBText: '48.5 किमी • लगभग 3 घंटे 10 मिनट', routeCText: '42.0 किमी • लगभग 2 घंटे 45 मिनट', selectPeriod: 'अवधि', hours24: '24 घंटे', days7: '7 दिन', system: 'सिस्टम', resetData: 'रीसेट', layers: 'मैप लेयर', pfzLayer: 'मछली पकड़ने के क्षेत्र', alertLayer: 'समुद्री अलर्ट', vessels: 'नौकाएं', mapLabels: 'मैप के नाम वेबसाइट की भाषा के अनुसार हैं।', signIn: 'साइन इन / रजिस्टर', signOut: 'साइन आउट', viewOnMap: '🗺️ मैप पर मार्ग देखें', viewSafety: '🛡️ सुरक्षा आकलन', navHudTitle: 'सक्रिय नेविगेशन मार्ग', originPort: 'प्रस्थान बंदरगाह', destZone: 'गंतव्य क्षेत्र', eta: 'अनुमानित यात्रा समय', distance: 'दूरी', geofenceClear: 'सीमा अनुमति', calculateRoute: 'सुरक्षित समुद्री मार्ग निकालें',
@@ -76,7 +218,149 @@ const T = {
     inactivePfzTitle: 'निष्क्रिय / सावधानी क्षेत्र (Inactive PFZ)',
     noActivePfz: 'इस बंदरगाह के लिए कोई सक्रिय PFZ उपलब्ध नहीं है।',
     noInactivePfz: 'कोई निष्क्रिय PFZ रिकॉर्ड नहीं है।',
-    allPfzTitle: 'सभी संभावित मछली पकड़ने के क्षेत्र'
+    allPfzTitle: 'सभी संभावित मछली पकड़ने के क्षेत्र',
+    liveCoastalActive: 'लाइव तटीय स्थिति सक्रिय',
+    liveInlandActive: 'लाइव अंतर्देशीय निर्देशांक सक्रिय',
+    redetectGps: 'GPS पुनः खोजें',
+    dashboardSubtitle: 'आपके बंदरगाह निर्देशांक के अनुसार सटीक समुद्री डेटा, INCOIS मॉडल से सिंक।',
+    rainWeather: 'बारिश और मौसम',
+    clearFair: 'साफ / शांत',
+    rainSuffix: 'बारिश',
+    activePfzBadge: 'सक्रिय PFZ',
+    inactivePfzBadge: 'निष्क्रिय PFZ',
+    statusActive: 'सक्रिय',
+    statusInactive: 'निष्क्रिय',
+    subOptimalGradient: 'उप-इष्टतम ढाल',
+    radarEyebrow: 'भू-स्थानिक और सैटेलाइट रडार',
+    mapSubtitle: 'भारतीय तट (अरब सागर और बंगाल की खाड़ी) का लाइव समुद्री रडार।',
+    focusPort: '⚓ बंदरगाह केंद्रित करें',
+    wholeCoast: '🇮🇳 संपूर्ण तट',
+    routeLayer: 'मार्ग',
+    chlorophyllLabel: 'क्लोरोफिल',
+    planSafeRoute: '🚀 सुरक्षित मार्ग बनाएं',
+    analyticsSubtitle: 'उपग्रह SST, क्लोरोफिल-ए फ्रंट ट्रैकिंग, लहरों की ऊंचाई और आधिकारिक ज्वार-भाटा पूर्वानुमान।',
+    liveSatelliteTelemetry: 'लाइव सैटेलाइट टेलीमेट्री',
+    lastUpdated: 'अंतिम अपडेट',
+    loadingAnalytics: 'डेटा लोड हो रहा है',
+    analyticsError: 'डेटा लोड करने में असमर्थ। कृपया बैकएंड कनेक्शन जांचें।',
+    retry: 'पुनः प्रयास करें',
+    sstKpi: 'समुद्र सतह तापमान',
+    observedBaseline: 'निरीक्षित आधार',
+    chlorophyllKpi: 'क्लोरोफिल-ए',
+    oceanColourBiomass: 'समुद्री बायोमास',
+    waveHeightKpi: 'लहरों की ऊंचाई',
+    productivityKpi: 'उत्पादकता सूचकांक',
+    orcaDerivedIndex: 'ORCA-व्युत्पन्न सूचकांक',
+    sstChartTitle: 'समुद्र सतह तापमान (SST)',
+    chlChartTitle: 'क्लोरोफिल-ए सांद्रता',
+    swhChartTitle: 'सार्थक लहर ऊंचाई (SWH)',
+    mpiChartTitle: 'समुद्री उत्पादकता सूचकांक',
+    average: 'औसत',
+    minimum: 'न्यूनतम',
+    maximum: 'अधिकतम',
+    currentConcentration: 'वर्तमान सांद्रता',
+    statusLabel: 'स्थिति',
+    currentHeight: 'वर्तमान ऊंचाई',
+    currentScore: 'वर्तमान स्कोर',
+    peakScore: 'उच्चतम स्कोर',
+    meanIndex: 'माध्य सूचकांक',
+    methodologyTitle: 'समुद्री सूचकांक और कार्यप्रणाली गाइड',
+    whyChlorophyll: 'क्लोरोफिल-ए क्यों?',
+    whyChlorophyllDesc: 'क्लोरोफिल-ए एक समुद्री रंग संकेतक है जो फाइटोप्लांकटन बायोमास का अनुमान लगाता है। ORCA मछली पकड़ने के अनुकूल क्षेत्रों की पहचान के लिए इसे SST के साथ जोड़ता है।',
+    whatIsProductivity: 'उत्पादकता सूचकांक क्या है?',
+    whatIsProductivityDesc: 'उत्पादकता सूचकांक एक समग्र स्कोर (20–100) है जो क्लोरोफिल, SST तापमान संतुलन और लहर स्थिरता को जोड़ता है।',
+    tideTitle: 'ज्वार-भाटा की जानकारी',
+    tideSubtitle: 'तटीय रिकॉर्ड से प्राप्त आधिकारिक ज्वार-भाटा पूर्वानुमान और समय सारिणी।',
+    highTide: 'ज्वार (HIGH TIDE)',
+    lowTide: 'भाटा (LOW TIDE)',
+    deepDraftClearance: 'गहरे चैनल के लिए उपयुक्त व प्रस्थान की सही अवधि',
+    shallowWaterCaution: 'तट के निकट उथले पानी और रेतीले टीलों से सावधानी',
+    tideSequence: 'कालक्रमानुसार ज्वार-भाटा क्रम (आज और कल)',
+    waterLevel: 'जल स्तर',
+    meters: 'मीटर',
+    portSector: 'बंदरगाह क्षेत्र:',
+    allIndianCoast: 'संपूर्ण भारतीय तट',
+    multiDayPlannerTitle: 'मल्टी-डे समुद्री यात्रा योजनाकार',
+    highRiskAdvisory: 'उच्च जोखिम चेतावनी',
+    cautionAdvised: 'सावधानी बरतें',
+    safeTripWindow: 'सुरक्षित यात्रा अवधि',
+    multiDayPlannerDesc: 'दिन-प्रतिदिन मौसम पूर्वानुमान, लहरों के विश्लेषण और मछली पकड़ने की संभावना के साथ बहु-दिवसीय यात्राओं की योजना बनाएं।',
+    destPfzLabel: 'गंतव्य PFZ',
+    depDateLabel: 'प्रस्थान तिथि',
+    depTimeLabel: 'प्रस्थान समय',
+    stayDurationLabel: 'यात्रा अवधि',
+    singleVoyage: '1 दिन (एकल यात्रा)',
+    overnightStay: '2 दिन (रात्रि प्रवास)',
+    extendedTrip: '3 दिन (विस्तारित यात्रा)',
+    daysCount: 'दिन',
+    dayExpedition: 'दिन (साप्ताहिक अभियान)',
+    dayLabel: 'दिन',
+    seaWaves: 'समुद्र और लहरें',
+    fishingSuitability: 'मछली पकड़ने की अनुकूलता',
+    pfzConfidenceLabel: 'PFZ विश्वसनीयता',
+    dailyAssessment: 'दैनिक मूल्यांकन',
+    activePfzDesc: 'उच्च समुद्री उत्पादकता और सत्यापित थर्मल सीमाएं',
+    inactivePfzDesc: 'प्रतिकूल तापमान, ऊंची लहरें या कम क्लोरोफिल',
+    statusAdvisory: 'स्थिति सलाह:',
+    safetySubtitle: 'प्रस्थान से पहले वास्तविक समय के तटीय मार्गों, भू-बाड़ और मौसम जोखिमों का आकलन करें।',
+    plannerTitle: 'इंटरएक्टिव नौकायन मार्ग योजनाकार',
+    computingPath: 'सुरक्षित A* मार्ग की गणना हो रही है...',
+    routeAssessmentCardTitle: 'मार्ग आकलन और सुरक्षित गलियारा',
+    highRiskRouteAdvisory: 'उच्च जोखिम मार्ग — चेतावनी सक्रिय',
+    cautionRoute: 'सावधानी मार्ग',
+    optimalPath: 'A* इष्टतम मार्ग',
+    riskScoreLabel: 'जोखिम स्कोर',
+    waypointsLabel: 'वेपॉइंट्स',
+    geofenceStatusLabel: 'सीमा स्थिति',
+    safeClearanceLabel: '✓ सुरक्षित अनुमति',
+    routeAssessmentPointsTitle: 'मार्ग आकलन बिंदु',
+    routeAssessmentPointsSub: 'चयनित मार्ग पर समुद्र की स्थिति का ज्यामितीय आकलन।',
+    geometryDerivedBadge: 'ज्यामितीय-व्युत्पन्न',
+    realtimeSeaStateLabel: 'मार्ग में रीयल-टाइम समुद्र स्थिति',
+    routeAssessmentPointsDesc: 'मूल्यांकन में प्रस्थान गलियारा, मध्य-चैनल मार्ग और गंतव्य तट दृष्टिकोण शामिल है।',
+    waveSwellLabel: 'लहरों का उभार',
+    matchesTableLeg: 'तालिका से मेल खाता है',
+    verifiedClear: '✓ सत्यापित',
+    departureCorridor: 'प्रस्थान गलियारा',
+    midChannelPassage: 'मध्य-चैनल मार्ग',
+    shelfApproach: 'गंतव्य शेल्फ दृष्टिकोण',
+    waypointLogTitle: 'संपूर्ण मार्ग वेपॉइंट नेविगेशन लॉग और अनुमति',
+    waypointLogSubtitle: 'हाइलाइट की गई पंक्तियां मार्ग आकलन बिंदु 01, 02, 03 से संबंधित हैं',
+    point: 'बिंदु',
+    leg: 'चरण',
+    checkpoint: 'चेकपॉइंट',
+    coordinates: 'निर्देशांक',
+    heading: 'दिशा',
+    seaStateCol: 'समुद्री स्थिति',
+    clearanceCol: 'अनुमति',
+    corridorLeg: 'गलियारा चरण',
+    passStatus: 'सफल',
+    viewRouteOnMapBtn: 'मैप पर संपूर्ण मार्ग देखें',
+    weatherVerified: 'मौसम सत्यापित',
+    seaStateWithinLimits: 'समुद्र की स्थिति सीमा में',
+    boundariesCleared: 'सीमाएं स्पष्ट',
+    routeRiskEvaluated: 'मार्ग जोखिम मूल्यांकित',
+    liveTelemetryActive: 'लाइव टेलीमेट्री सक्रिय',
+    geofencePathVerified: 'A* सीमा मार्ग सत्यापित',
+    allCoastAdvisories: 'सभी तटीय सूचनाएं',
+    highPriorityWarnings: 'उच्च प्राथमिकता चेतावनियां',
+    cautionAdvisories: 'सावधानी सलाह',
+    coastalBulletins: 'तटीय बुलेटिन और सूचनाएं',
+    noHighAlerts: 'इस तटीय क्षेत्र के लिए कोई गंभीर या उच्च जोखिम वाली समुद्री चेतावनी नहीं है।',
+    noMediumAlerts: 'इस क्षेत्र के लिए कोई मध्यम या सावधानी सलाह सक्रिय नहीं है।',
+    noLowAlerts: 'इस क्षेत्र के लिए कोई तटीय बुलेटिन दर्ज नहीं है।',
+    currentChatTitle: 'सक्रिय समुद्री चर्चा',
+    clearMessages: 'संदेश साफ करें',
+    deleteChat: 'चैट हटाएं',
+    startFreshConv: 'नई बातचीत शुरू करें',
+    deleteThisConv: 'यह बातचीत हटाएं',
+    clearAllInChat: 'वर्तमान चैट के सभी संदेश साफ करें',
+    deleteEntireConv: 'यह पूरा चैट सत्र हटाएं',
+    activeOperationalAccount: 'सक्रिय ऑपरेशनल खाता',
+    encryptedSession: 'एंड-टू-एंड एन्क्रिप्टेड सत्र',
+    accountSecurity: 'खाता सुरक्षा',
+    darkThemeDesc: 'गहरा समुद्री नीला डार्क इंटरफेस',
+    lightThemeDesc: 'स्वच्छ तटीय लाइट इंटरफेस'
   },
   mr: {
     dashboard: 'डॅशबोर्ड', map: 'सागरी इंटेलिजन्स नकाशा', analytics: 'महासागर विश्लेषण', fishing: 'मासेमारी इंटेलिजन्स', safety: 'सुरक्षा आणि मार्ग', assistant: 'ORCA AI सहाय्यक', alerts: 'सूचना', settings: 'सेटिंग्ज', profile: 'प्रोफाइल', workspace: 'वर्कस्पेस', operational: 'सिस्टम कार्यरत', connected: 'सागरी डेटा सेवा जोडलेल्या', marine: 'सागरी इंटेलिजन्स', glance: 'सागरी स्थिती एका नजरेत.', location: 'मुंबई किनारा • थेट सागरी सेन्सर जोडणी', ask: 'ORCA ला विचारा', seaState: 'समुद्राची स्थिती', wind: 'वारा', sst: 'समुद्र पृष्ठभाग तापमान', activePFZ: 'सक्रिय PFZ', moderate: 'मध्यम', waves: '1.2 मी. लाटा', steady: 'NE • स्थिर', favourable: 'अनुकूल', openMap: 'नकाशा उघडा', activeAdvisories: 'सक्रिय सूचना', viewAll: 'सर्व पहा', insights: 'आजची सागरी माहिती', bestFishing: 'मासेमारीची सर्वोत्तम संधी', departure: 'शिफारस केलेली प्रस्थान वेळ', confidence: 'डेटा विश्वासार्हता', verified: 'सत्यापित इंटेलिजन्स', sources: 'स्रोत: ISRO • INCOIS • IMD • ओशन डेटा', oceanInputs: 'समुद्र आणि डेटाबेस इनपुट तपासले.', allLayers: 'सर्व लेयर्स', weather: 'हवामान', hazards: 'धोके', boundaries: 'सीमा', today: 'आज', selectedZone: 'निवडलेले क्षेत्र', high: 'उच्च विश्वासार्हता', why: 'हे क्षेत्र का?', signal: 'संकेत', how: 'ORCA कसे निर्णय घेतो', discover: 'शोध', correlate: 'संबंध जोडा', assess: 'आकलन', explain: 'समजावून सांगा', findZones: 'आशादायक मासेमारी क्षेत्र शोधा.', explore: 'PFZ शोधा', viewZone: 'क्षेत्र पहा', recommendation: 'ORCA ची शिफारस', start: 'सुरुवात', safeRoute: 'सुरक्षित मार्गाचे आकलन', recommended: 'शिफारस केलेला', low: 'कमी', risk: 'धोका', whyRoute: 'ORCA या मार्गाची शिफारस का करतो', safetyChecklist: 'सुरक्षा तपासणी', askSea: 'समुद्राबद्दल ORCA ला विचारा.', conversational: 'कन्वर्सेशनल मरीन इंटेलिजन्स', placeholder: 'सागरी प्रश्न विचारा किंवा मार्ग योजना करा...', send: 'पाठवा', nearest: 'आजचा जवळचा PFZ', safeTomorrow: 'उद्या सकाळी जाणे सुरक्षित आहे का?', showHazards: 'मुंबईजवळचे धोके दाखवा', findRoute: 'सुरक्षित मार्ग शोधा', close: 'बंद', reset: 'दृश्य रीसेट', satellite: 'सॅटेलाइट', street: 'रस्ता', locate: 'माझे स्थान', language: 'भाषा', search: 'शोधा', notifications: 'सूचना', noResults: 'जुळणारे परिणाम नाहीत.', routeA: 'किनारी मार्ग A', routeB: 'किनारी मार्ग B', routeC: 'संतुलित मार्ग', routeRisk: 'मार्ग धोका', checked: 'तपासले', refresh: 'रीफ्रेश', save: 'बदल जतन करा', saved: 'बदल जतन झाले', theme: 'थीम', darkMode: 'डार्क मोड', email: 'ईमेल सूचना', profileTitle: 'ऑपरेशनल प्रोफाइल', role: 'सागरी संशोधक / कॅप्टन', details: 'प्रोफाइल तपशील', name: 'Capt. Devesh Madhavi', status: 'सक्रिय खाते', mobile: 'मोबाइल क्रमांक', emailLabel: 'ईमेल', profession: 'व्यवसाय', edit: 'संपादित करा', done: 'पूर्ण', trend: 'PFZ विश्वासार्हता ट्रेंड', pfzConfidence: 'PFZ विश्वासार्हता', freshness: 'डेटा ताजेपणा', latest: 'नवीन नमुना', marineInputs: 'सॅटेलाइट समुद्री रंग, SST आणि हवामान इनपुट.', spatialSignals: 'जवळचे स्थानिक संकेत आणि PFZ उमेदवार जोडतो.', opportunitySafety: 'मासेमारीची संधी आणि सुरक्षा मर्यादा संतुलित करतो.', evidenceRecommendation: 'प्रत्येक शिफारसीमागील पुरावे समजावतो.', hazardAvoided: 'ओळखलेल्या सावधगिरीच्या क्षेत्रापासून दूर राहतो.', boundariesChecked: 'मार्गापूर्वी ऑपरेशनल सीमा तपासतो.', riskCorridor: 'कमी-धोका किनारी मार्ग पसंत करतो.', recalculate: 'नवीन डेटा आल्यावर मार्ग पुन्हा काढता येईल.', demo: 'थेट मोड • रिअल-टाइम टेलीमेट्री जोडली आहे.', demoAnswer: 'नमस्कार कॅप्टन! मी ORCA आहे, आपला सागरी AI निर्णय सहाय्यक. मी आज आपल्या प्रवासासाठी कशी मदत करू?', mapFail: 'नकाशा टाइल लोड झाल्या नाहीत.', routeSummary: '39.2 किमी • सुमारे 2 तास 35 मिनिटे', routeBText: '48.5 किमी • सुमारे 3 तास 10 मिनिटे', routeCText: '42.0 किमी • सुमारे 2 तास 45 मिनिटे', selectPeriod: 'कालावधी', hours24: '24 तास', days7: '7 दिवस', system: 'सिस्टम', resetData: 'रीसेट', layers: 'नकाशा लेयर्स', pfzLayer: 'मासेमारी क्षेत्रे', alertLayer: 'सागरी सूचना', vessels: 'नौका', mapLabels: 'नकाशावरील नावे वेबसाइटच्या भाषेनुसार आहेत.', signIn: 'साइन इन / नोंदणी', signOut: 'साइन आउट', viewOnMap: '🗺️ नकाशावर मार्ग पहा', viewSafety: '🛡️ सुरक्षा विश्लेषण', navHudTitle: 'सक्रिय नेव्हिगेशन मार्ग', originPort: 'प्रस्थान बंदर', destZone: 'गंतव्य क्षेत्र', eta: 'अंदाजित वेळ', distance: 'अंतर', geofenceClear: 'सीमा तपासणी', calculateRoute: 'सुरक्षित सागरी मार्ग काढा',
@@ -99,7 +383,149 @@ const T = {
     inactivePfzTitle: 'निष्क्रिय / सावधगिरी क्षेत्र (Inactive PFZ)',
     noActivePfz: 'या बंदरासाठी कोणतेही सक्रिय PFZ उपलब्ध नाहीत.',
     noInactivePfz: 'कोणतेही निष्क्रिय PFZ नोंदी उपलब्ध नाहीत.',
-    allPfzTitle: 'सर्व संभाव्य मासेमारी क्षेत्र'
+    allPfzTitle: 'सर्व संभाव्य मासेमारी क्षेत्र',
+    liveCoastalActive: 'थेट किनारी स्थान सक्रिय',
+    liveInlandActive: 'थेट अंतर्देशीय निर्देशांक सक्रिय',
+    redetectGps: 'GPS पुन्हा शोधा',
+    dashboardSubtitle: 'आपल्या बंदराच्या समन्वयकांनुसार अचूक सागरी डेटा, INCOIS मॉडेलसह सिंक.',
+    rainWeather: 'पाऊस आणि हवामान',
+    clearFair: 'स्वच्छ / शांत',
+    rainSuffix: 'पाऊस',
+    activePfzBadge: 'सक्रिय PFZ',
+    inactivePfzBadge: 'निष्क्रिय PFZ',
+    statusActive: 'सक्रिय',
+    statusInactive: 'निष्क्रिय',
+    subOptimalGradient: 'उप-इष्टतम उतार',
+    radarEyebrow: 'भू-स्थानिक आणि सॅटेलाइट रडार',
+    mapSubtitle: 'भारतीय किनारपट्टीचा (अरबी समुद्र आणि बंगालचा उपसागर) थेट सागरी रडार.',
+    focusPort: '⚓ बंदरावर केंद्रित करा',
+    wholeCoast: '🇮🇳 संपूर्ण किनारा',
+    routeLayer: 'मार्ग',
+    chlorophyllLabel: 'क्लोरोफिल',
+    planSafeRoute: '🚀 सुरक्षित मार्ग आखा',
+    analyticsSubtitle: 'उपग्रह SST, क्लोरोफिल-ए फ्रंट ट्रॅकिंग, लाटांची उंची आणि अधिकृत भरती-ओहोटी अंदाज.',
+    liveSatelliteTelemetry: 'थेट सॅटेलाइट टेलीमेट्री',
+    lastUpdated: 'शेवटचे अपडेट',
+    loadingAnalytics: 'डेटा लोड होत आहे',
+    analyticsError: 'डेटा लोड करण्यात अयशस्वी. कृपया बॅकएंड कनेक्शन तपासा.',
+    retry: 'पुन्हा प्रयत्न करा',
+    sstKpi: 'समुद्र पृष्ठभाग तापमान',
+    observedBaseline: 'निरीक्षित बेसलाइन',
+    chlorophyllKpi: 'क्लोरोफिल-ए',
+    oceanColourBiomass: 'सागरी बायोमास',
+    waveHeightKpi: 'लाटांची उंची',
+    productivityKpi: 'उत्पादकता निर्देशांक',
+    orcaDerivedIndex: 'ORCA-आधारित निर्देशांक',
+    sstChartTitle: 'समुद्र पृष्ठभाग तापमान (SST)',
+    chlChartTitle: 'क्लोरोफिल-ए प्रमाण',
+    swhChartTitle: 'महत्त्वाची लाटांची उंची (SWH)',
+    mpiChartTitle: 'सागरी उत्पादकता निर्देशांक',
+    average: 'सरासरी',
+    minimum: 'किमान',
+    maximum: 'कमाल',
+    currentConcentration: 'सध्याचे प्रमाण',
+    statusLabel: 'स्थिती',
+    currentHeight: 'सध्याची उंची',
+    currentScore: 'सध्याचा स्कोअर',
+    peakScore: 'कमाल स्कोअर',
+    meanIndex: 'मध्यम निर्देशांक',
+    methodologyTitle: 'सागरी निर्देशांक आणि कार्यपद्धती मार्गदर्शक',
+    whyChlorophyll: 'क्लोरोफिल-ए का?',
+    whyChlorophyllDesc: 'क्लोरोफिल-ए हा सागरी रंग दर्शक आहे जो फायटोप्लँक्टन बायोमासचा अंदाज लावतो. ORCA मासेमारीसाठी योग्य क्षेत्रे ओळखण्यासाठी याला SST शी जोडतो.',
+    whatIsProductivity: 'उत्पादकता निर्देशांक काय आहे?',
+    whatIsProductivityDesc: 'उत्पादकता निर्देशांक हा एक समग्र स्कोअर (20–100) आहे जो क्लोरोफिल, SST तापमान संतुलन आणि लाटांच्या स्थिरतेला एकत्र करतो.',
+    tideTitle: 'भरती-ओहोटीची माहिती',
+    tideSubtitle: 'किनारपट्टीच्या नोंदींमधून घेतलेले अधिकृत भरती-ओहोटीचे अंदाज आणि वेळापत्रक.',
+    highTide: 'भरती (HIGH TIDE)',
+    lowTide: 'ओहोटी (LOW TIDE)',
+    deepDraftClearance: 'खोल पाण्यासाठी योग्य व बंदरातून प्रस्थानाची उत्तम वेळ',
+    shallowWaterCaution: 'किनाऱ्याजवळील उथळ पाणी आणि वाळूच्या पट्ट्यांपासून सावधगिरी',
+    tideSequence: 'कालक्रमानुसार भरती-ओहोटी क्रम (आज आणि उद्या)',
+    waterLevel: 'पाण्याची पातळी',
+    meters: 'मीटर',
+    portSector: 'बंदर विभाग:',
+    allIndianCoast: 'संपूर्ण भारतीय किनारा',
+    multiDayPlannerTitle: 'बहु-दिवसीय सागरी सहल योजनाकार',
+    highRiskAdvisory: 'उच्च धोका इशारा',
+    cautionAdvised: 'सावधगिरी बाळगा',
+    safeTripWindow: 'सुरक्षित प्रवास कालावधी',
+    multiDayPlannerDesc: 'दिवसेंदिवस हवामान अंदाज, लाटांचे विश्लेषण आणि संभाव्य मासेमारीसह अनेक दिवसांच्या सागरी प्रवासाचे नियोजन करा.',
+    destPfzLabel: 'गंतव्य PFZ',
+    depDateLabel: 'प्रस्थान दिनांक',
+    depTimeLabel: 'प्रस्थान वेळ',
+    stayDurationLabel: 'प्रवासाचा कालावधी',
+    singleVoyage: '1 दिवस (एकल प्रवास)',
+    overnightStay: '2 दिवस (रात्र मुक्काम)',
+    extendedTrip: '3 दिवस (विस्तारित प्रवास)',
+    daysCount: 'दिवस',
+    dayExpedition: 'दिवस (आठवड्याची मोहीम)',
+    dayLabel: 'दिवस',
+    seaWaves: 'समुद्र आणि लाटा',
+    fishingSuitability: 'मासेमारी अनुकूलता',
+    pfzConfidenceLabel: 'PFZ विश्वासार्हता',
+    dailyAssessment: 'दैनिक मूल्यमापन',
+    activePfzDesc: 'उच्च सागरी उत्पादकता आणि सत्यापित थर्मल सीमा',
+    inactivePfzDesc: 'प्रतिकूल तापमान, मोठ्या लाटा किंवा कमी क्लोरोफिल',
+    statusAdvisory: 'स्थिती सल्लागार:',
+    safetySubtitle: 'प्रस्थानापूर्वी थेट किनारी मार्ग, सागरी सीमा आणि हवामानाच्या धोक्यांचे मूल्यांकन करा.',
+    plannerTitle: 'परस्परसंवादी सागरी मार्ग योजनाकार',
+    computingPath: 'सुरक्षित A* मार्गाची गणना होत आहे...',
+    routeAssessmentCardTitle: 'मार्ग मूल्यांकन आणि सुरक्षित पट्टा',
+    highRiskRouteAdvisory: 'उच्च धोका मार्ग — इशारा सक्रिय',
+    cautionRoute: 'सावधगिरीचा मार्ग',
+    optimalPath: 'A* सर्वोत्तम मार्ग',
+    riskScoreLabel: 'धोका स्कोअर',
+    waypointsLabel: 'वेपॉइंट्स',
+    geofenceStatusLabel: 'सीमा स्थिती',
+    safeClearanceLabel: '✓ सुरक्षित परवानगी',
+    routeAssessmentPointsTitle: 'मार्ग मूल्यमापन बिंदू',
+    routeAssessmentPointsSub: 'निवडलेल्या मार्गावरील समुद्र स्थितीचे भौमितिक मूल्यांकन.',
+    geometryDerivedBadge: 'भौमितिक-आधारित',
+    realtimeSeaStateLabel: 'मार्गावरील थेट समुद्र स्थिती',
+    routeAssessmentPointsDesc: 'मूल्यांकनामध्ये प्रस्थान पट्टा, मध्य-वाहिनी मार्ग आणि गंतव्य किनारा समाविष्ट आहे.',
+    waveSwellLabel: 'लाटांचा फुगवटा',
+    matchesTableLeg: 'तक्त्याशी जुळतो',
+    verifiedClear: '✓ सत्यापित',
+    departureCorridor: 'प्रस्थान पट्टा',
+    midChannelPassage: 'मध्य-वाहिनी मार्ग',
+    shelfApproach: 'गंतव्य शेल्फ दृष्टिकोन',
+    waypointLogTitle: 'संपूर्ण मार्ग वेपॉइंट नेव्हिगेशन तपशील व परवानगी',
+    waypointLogSubtitle: 'ठळक केलेल्या ओळी मार्ग मूल्यमापन बिंदू 01, 02, 03 शी संबंधित आहेत',
+    point: 'बिंदू',
+    leg: 'टप्पा',
+    checkpoint: 'चेकपॉइंट',
+    coordinates: 'निर्देशांक',
+    heading: 'दिशा',
+    seaStateCol: 'सागरी स्थिती',
+    clearanceCol: 'परवानगी',
+    corridorLeg: 'पट्टा टप्पा',
+    passStatus: 'उत्तीर्ण',
+    viewRouteOnMapBtn: 'नकाशावर संपूर्ण मार्ग पहा',
+    weatherVerified: 'हवामान सत्यापित',
+    seaStateWithinLimits: 'समुद्र स्थिती मर्यादित',
+    boundariesCleared: 'सीमा मंजूर',
+    routeRiskEvaluated: 'मार्ग धोका मूल्यांकित',
+    liveTelemetryActive: 'थेट टेलीमेट्री सक्रिय',
+    geofencePathVerified: 'A* सीमा मार्ग सत्यापित',
+    allCoastAdvisories: 'सर्व किनारपट्टी सूचना',
+    highPriorityWarnings: 'उच्च प्राधान्य इशारे',
+    cautionAdvisories: 'सावधगिरीच्या सूचना',
+    coastalBulletins: 'किनारी बुलेटिन आणि माहिती',
+    noHighAlerts: 'या किनारी भागासाठी कोणतेही गंभीर किंवा उच्च धोक्याचे इशारे सक्रिय नाहीत.',
+    noMediumAlerts: 'या क्षेत्रासाठी कोणतीही मध्यम किंवा सावधगिरीची सूचना सक्रिय नाही.',
+    noLowAlerts: 'या क्षेत्रासाठी कोणतेही किनारी बुलेटिन नोंदवलेले नाही.',
+    currentChatTitle: 'सक्रिय सागरी चर्चा',
+    clearMessages: 'मेसेज साफ करा',
+    deleteChat: 'चॅट हटवा',
+    startFreshConv: 'नवीन संभाषण सुरू करा',
+    deleteThisConv: 'हे संभाषण हटवा',
+    clearAllInChat: 'या चॅटमधील सर्व संदेश साफ करा',
+    deleteEntireConv: 'हा संपूर्ण चॅट हटवा',
+    activeOperationalAccount: 'सक्रिय ऑपरेशनल खाते',
+    encryptedSession: 'एंड-टू-एंड कूटबद्ध सत्र',
+    accountSecurity: 'खाते सुरक्षा',
+    darkThemeDesc: 'खोल निळा डार्क इंटरफेस',
+    lightThemeDesc: 'स्वच्छ किनारी लाइट इंटरफेस'
   }
 }
 
@@ -246,15 +672,15 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
           <div className="locationBannerContent">
             <span className="pulseGps" style={{ width: '12px', height: '12px' }} />
             <div className="locationBannerText">
-              <strong>📍 {userLocation.is_coastal ? 'Live Coastal Position Active' : 'Live Inland Coordinates Active'}</strong>
+              <strong>📍 {userLocation.is_coastal ? t('liveCoastalActive') : t('liveInlandActive')}</strong>
               <p>
-                {userLocation.lat.toFixed(4)}°N, {userLocation.lon.toFixed(4)}°E • {t('nearestPortLabel')}: <b>{userLocation.port_name}</b> ({userLocation.distance_to_port_km?.toFixed(1)} km away) • Live INCOIS Connected
+                {userLocation.lat.toFixed(4)}°N, {userLocation.lon.toFixed(4)}°E • {t('nearestPortLabel')}: <b>{userLocation.port_name}</b> ({userLocation.distance_to_port_km?.toFixed(1)} km away) • {t('liveIncoisStatus')}
               </p>
             </div>
           </div>
           <div className="locationBannerActions">
             <button className="locationBtnSec" onClick={() => requestLocationPermission && requestLocationPermission(true)} disabled={detectingLocation}>
-              {detectingLocation ? t('detectingLoc') : '🔄 Re-detect GPS'}
+              {detectingLocation ? t('detectingLoc') : `🔄 ${t('redetectGps')}`}
             </button>
             <button className="locationBtn" onClick={() => navigate('/map')}>
               🗺️ {t('openMap')}
@@ -267,7 +693,7 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
         <div>
           <span className="eyebrow">{t('marine')} • {userLocation?.port_name ? `${userLocation.port_name} Sector` : currentPort.sector}</span>
           <h2>{userLocation?.port_name || currentPort.name}</h2>
-          <p>Real-time marine intelligence tailored to your port coordinates, synced with INCOIS models.</p>
+          <p>{t('dashboardHeroDesc')}</p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
           <select 
@@ -295,9 +721,9 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
           <small>{windDirection}</small>
         </div>
         <div className="stat">
-          <span>Rain & Weather</span>
+          <span>{t('rainWeather')}</span>
           <strong>{rainData.condition || 'Clear / Fair'}</strong>
-          <small>{rainData.precipitation_mm} mm • {rainData.rain_probability_pct}% rain • {rainData.intensity}</small>
+          <small>{rainData.precipitation_mm} mm • {rainData.rain_probability_pct}% {t('rainWeather').toLowerCase()} • {rainData.intensity}</small>
         </div>
         <div className="stat">
           <span>{t('sst')}</span>
@@ -307,7 +733,7 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
         <div className="stat">
           <span>{t('activePFZ')}</span>
           <strong>{activePfzs.length}</strong>
-          <small>{inactivePfzs.length} Inactive • {currentPort.name.split(' ')[0]}</small>
+          <small>{inactivePfzs.length} {t('statusInactive')} • {currentPort.name.split(' ')[0]}</small>
         </div>
       </div>
 
@@ -315,7 +741,7 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
         <Card title={t('allPfzTitle')} action={<button className="textBtn" onClick={() => navigate('/fishing')}>{t('viewAll')} →</button>}>
           {/* ACTIVE PFZs */}
           <div className="pfzSectionHead active">
-            <span className="sectionBadge active">● ACTIVE PFZs ({activePfzs.length})</span>
+            <span className="sectionBadge active">● {t('activePfzBadge')} ({activePfzs.length})</span>
           </div>
           {activePfzs.length > 0 ? (
             <div className="rank">
@@ -323,7 +749,7 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
                 <button key={z.id} onClick={() => { setSelected(z.id); navigate('/map') }}>
                   <span><b>{z.id}</b>{z.name}</span>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                    <span className="statusPill active">ACTIVE</span>
+                    <span className="statusPill active">{t('statusActive')}</span>
                     <strong>{z.confidence}%</strong>
                   </div>
                 </button>
@@ -335,7 +761,7 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
 
           {/* INACTIVE PFZs */}
           <div className="pfzSectionHead inactive" style={{ marginTop: '14px' }}>
-            <span className="sectionBadge inactive">○ INACTIVE PFZs ({inactivePfzs.length})</span>
+            <span className="sectionBadge inactive">○ {t('inactivePfzBadge')} ({inactivePfzs.length})</span>
           </div>
           {inactivePfzs.length > 0 ? (
             <div className="rank">
@@ -343,7 +769,7 @@ function Dashboard({ lang, navigate, setSelected, setModal, pfzList, alertList, 
                 <button key={z.id} className="pfzInactiveRow" onClick={() => { setSelected(z.id); navigate('/map') }}>
                   <span><b>{z.id}</b>{z.name}</span>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                    <span className="statusPill inactive">INACTIVE</span>
+                    <span className="statusPill inactive">{t('statusInactive')}</span>
                     <small style={{ color: 'var(--text-muted)' }}>{z.inactive_reason || 'Sub-optimal gradient'}</small>
                   </div>
                 </button>
@@ -635,9 +1061,9 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
     <>
       <div className="pageIntro">
         <div>
-          <span className="eyebrow">GEOSPATIAL & SATELLITE RADAR</span>
+          <span className="eyebrow">{t('radarEyebrow')}</span>
           <h2>{t('map')}</h2>
-          <p>Real-time marine intelligence radar across the Indian Coastline (Arabian Sea & Bay of Bengal).</p>
+          <p>{t('mapSubtitle')}</p>
         </div>
         <div className="toolbar" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
           <select 
@@ -661,8 +1087,8 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
               📍 {t('locate')} ({userLocation.port_name?.split(' ')[0] || 'GPS'})
             </button>
           )}
-          <button onClick={focusPort}>⚓ Focus Port</button>
-          <button onClick={viewAllIndia}>🇮🇳 Whole Coast</button>
+          <button onClick={focusPort}>⚓ {t('focusPort')}</button>
+          <button onClick={viewAllIndia}>🇮🇳 {t('wholeCoast')}</button>
           <button onClick={recenterMap} style={{ fontWeight: 700 }}>🎯 {t('recenter')}</button>
           <button className={base === 'street' ? 'active' : ''} onClick={() => setBase('street')}>{t('street')}</button>
           <button className={base === 'satellite' ? 'active' : ''} onClick={() => setBase('satellite')}>{t('satellite')}</button>
@@ -676,7 +1102,7 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
             {mapError && <div className="mapError">{t('mapFail')}</div>}
             
             <div className="mapControls">
-              <label><input type="checkbox" checked={showRoute} onChange={e => setShowRoute(e.target.checked)} /> Route</label>
+              <label><input type="checkbox" checked={showRoute} onChange={e => setShowRoute(e.target.checked)} /> {t('routeLayer')}</label>
               <label><input type="checkbox" checked={showPFZ} onChange={e => setShowPFZ(e.target.checked)} /> {t('pfzLayer')}</label>
               <label><input type="checkbox" checked={showAlerts} onChange={e => setShowAlerts(e.target.checked)} /> {t('alertLayer')}</label>
               <button onClick={focus}>{t('selectedZone')}</button>
@@ -702,7 +1128,7 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
                   </div>
                   <div className="hudItem">
                     <span>{t('eta')}</span>
-                    <b>~{Math.round(activeRoute.estimated_travel_time_min || (activeRoute.distance_km / 15 * 60))} mins</b>
+                    <b>~{Math.round(activeRoute.estimated_travel_time_min || (activeRoute.distance_km / 15 * 60))} {t('minutes')}</b>
                   </div>
                 </div>
               </div>
@@ -722,7 +1148,7 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
 
           <div className="miniMetrics">
             <div><span>{t('sst')}</span><b>{zone.sst || 27.8}°C</b></div>
-            <div><span>Chlorophyll</span><b>{zone.chlorophyll || 0.62} mg/m³</b></div>
+            <div><span>{t('chlorophyllLabel')}</span><b>{zone.chlorophyll || 0.62} mg/m³</b></div>
             <div><span>{t('waves')}</span><b>{zone.waves || 1.2} m</b></div>
             <div><span>{t('wind')}</span><b>{zone.wind || 16} km/h</b></div>
           </div>
@@ -740,7 +1166,7 @@ function MapPage({ lang, selected, setSelected, activeRoute, setActiveRoute, pfz
                   style={{ flex: 1.2, fontWeight: 600 }} 
                   onClick={() => onPlotRouteFromLocation(zone)}
                 >
-                  🚀 Plan Safe Route
+                  🚀 {t('planSafeRoute')}
                 </button>
               )}
             </div>
@@ -847,7 +1273,7 @@ function Analytics({
     }
   }, [oceanStats?.last_updated])
 
-  const rangeLabel = (oceanPeriod === '24' || oceanPeriod === '24h') ? '24 Hours' : '7 Days'
+  const rangeLabel = (oceanPeriod === '24' || oceanPeriod === '24h') ? t('hours24') : t('days7')
 
   return (
     <>
@@ -855,7 +1281,7 @@ function Analytics({
         <div>
           <span className="eyebrow">ORCA / {t('analytics')} • {currentPort.name}</span>
           <h2>{t('analytics')}</h2>
-          <p>Real-time satellite SST, Chlorophyll-a front tracking, Wave height observation, and Survey of India tidal predictions.</p>
+          <p>{t('analyticsSubtitle')}</p>
         </div>
         <div className="analyticsActions">
           <select 
@@ -869,7 +1295,7 @@ function Analytics({
             ))}
           </select>
           <span className="liveDot">
-            {lastUpdatedText ? `🛰️ Last Updated: ${lastUpdatedText}` : 'Live Satellite Telemetry'}
+            {lastUpdatedText ? `🛰️ ${t('lastUpdated')}: ${lastUpdatedText}` : t('liveSatelliteTelemetry')}
           </span>
           <select value={oceanPeriod} onChange={e => handlePeriodChange(e.target.value)}>
             <option value="24">{t('hours24')}</option>
@@ -891,7 +1317,7 @@ function Analytics({
           color: 'var(--text)'
         }}>
           <span className="liveDot" style={{ animation: 'pulse 1.2s infinite' }} />
-          <span>Loading ocean analytics data for <b>{currentPort.name}</b> ({rangeLabel})...</span>
+          <span>{t('loadingAnalytics')} <b>{currentPort.name}</b> ({rangeLabel})...</span>
         </div>
       )}
 
@@ -907,120 +1333,118 @@ function Analytics({
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <span><b>Unable to load ocean analytics data.</b> Please check backend connection.</span>
-          <button className="pillBtn" onClick={() => handlePeriodChange(oceanPeriod)} style={{ fontSize: '11px', padding: '4px 10px' }}>Retry</button>
+          <span><b>{t('unableLoadAnalytics')}</b> {t('checkBackendConn')}</span>
+          <button className="pillBtn" onClick={() => handlePeriodChange(oceanPeriod)} style={{ fontSize: '11px', padding: '4px 10px' }}>{t('retry')}</button>
         </div>
       )}
 
       <div className="analyticsKpis">
         <div className="kpiCard kpi-temp">
-          <span>SEA SURFACE TEMP</span>
+          <span>{t('sstKpi')}</span>
           <strong>{oceanStats?.sea_surface_temp?.current != null ? `${oceanStats.sea_surface_temp.current}°C` : '—'}</strong>
-          <small>Observed baseline <b>{oceanStats?.sea_surface_temp?.trend_delta || '—'}</b></small>
+          <small>{t('observedBaseline')} <b>{oceanStats?.sea_surface_temp?.trend_delta || '—'}</b></small>
         </div>
         <div className="kpiCard kpi-green" title="Chlorophyll-a is an ocean-colour indicator used as one input for marine productivity analysis.">
-          <span>CHLOROPHYLL-a</span>
+          <span>{t('chlorophyllKpi')}</span>
           <strong>{oceanStats?.chlorophyll?.current != null ? `${oceanStats.chlorophyll.current}` : '—'} <em>mg/m³</em></strong>
-          <small>Ocean-colour biomass <b>{oceanStats?.chlorophyll?.status || 'Favourable Front'}</b></small>
+          <small>{t('oceanColorBiomass')} <b>{oceanStats?.chlorophyll?.status || t('favourableFront')}</b></small>
         </div>
         <div className="kpiCard kpi-blue">
-          <span>WAVE HEIGHT</span>
+          <span>{t('waveHeightKpi')}</span>
           <strong>{oceanStats?.wave_height?.current != null ? `${oceanStats.wave_height.current}` : '—'} <em>m</em></strong>
-          <small>Sea state <b>{oceanStats?.wave_height?.status || 'Low'}</b></small>
+          <small>{t('seaStateLabel')} <b>{oceanStats?.wave_height?.status || t('low')}</b></small>
         </div>
         <div className="kpiCard kpi-cyan" title="Productivity Index is an ORCA-derived indicator summarizing marine pelagic conditions (combining Chlorophyll-a, SST thermal balance, and wave stability on a 20-100 scale).">
-          <span>PRODUCTIVITY INDEX</span>
+          <span>{t('productivityKpi')}</span>
           <strong>{oceanStats?.productivity_index?.current != null ? `${oceanStats.productivity_index.current}` : '—'} <em>/100</em></strong>
-          <small>ORCA-derived index <b>{oceanStats?.productivity_index?.status || 'Favourable Biomass'}</b></small>
+          <small>{t('orcaDerivedIndex')} <b>{oceanStats?.productivity_index?.status || t('favourableBiomass')}</b></small>
         </div>
       </div>
 
       <div className="analyticsGrid">
-        <Card title="Sea Surface Temperature (SST)" action={<span className="chartBadge red">{oceanStats?.sea_surface_temp?.trend_delta || '+0.0°C'}</span>}>
-          <p className="chartSub">Satellite GHRSST observation along {currentPort.name} ({rangeLabel})</p>
+        <Card title={t('sstChartTitle')} action={<span className="chartBadge red">{oceanStats?.sea_surface_temp?.trend_delta || '+0.0°C'}</span>}>
+          <p className="chartSub">{t('sstChartDesc')} {currentPort.name} ({rangeLabel})</p>
           <AreaChart
             values={temp}
             color="temp"
             fill="#ff6b6b"
             labels={labels}
-            emptyMessage={`SST data is currently unavailable for ${currentPort.name} for the selected period.`}
+            emptyMessage={t('sstUnavailable')}
           />
           <div className="chartStats">
-            <div><span>Average</span><b>{oceanStats?.sea_surface_temp?.average != null ? `${oceanStats.sea_surface_temp.average}°C` : '—'}</b></div>
-            <div><span>Minimum</span><b>{oceanStats?.sea_surface_temp?.min != null ? `${oceanStats.sea_surface_temp.min}°C` : '—'}</b></div>
-            <div><span>Maximum</span><b>{oceanStats?.sea_surface_temp?.max != null ? `${oceanStats.sea_surface_temp.max}°C` : '—'}</b></div>
+            <div><span>{t('average')}</span><b>{oceanStats?.sea_surface_temp?.average != null ? `${oceanStats.sea_surface_temp.average}°C` : '—'}</b></div>
+            <div><span>{t('minimum')}</span><b>{oceanStats?.sea_surface_temp?.min != null ? `${oceanStats.sea_surface_temp.min}°C` : '—'}</b></div>
+            <div><span>{t('maximum')}</span><b>{oceanStats?.sea_surface_temp?.max != null ? `${oceanStats.sea_surface_temp.max}°C` : '—'}</b></div>
           </div>
         </Card>
 
-        <Card title="Chlorophyll-a Concentration" action={<span className="chartBadge green">{oceanStats?.chlorophyll?.trend_delta || '+0.0%'}</span>}>
-          <p className="chartSub">Satellite ocean colour aggregation along continental shelf break ({rangeLabel})</p>
+        <Card title={t('chlChartTitle')} action={<span className="chartBadge green">{oceanStats?.chlorophyll?.trend_delta || '+0.0%'}</span>}>
+          <p className="chartSub">{t('chlChartDesc')} ({rangeLabel})</p>
           <AreaChart
             values={chl}
             color="chl"
             fill="#20c997"
             labels={labels}
-            emptyMessage={`Chlorophyll data is currently unavailable for ${currentPort.name} for the selected period.`}
+            emptyMessage={t('chlUnavailable')}
           />
           <div className="chartStats">
-            <div><span>Current concentration</span><b>{oceanStats?.chlorophyll?.current != null ? `${oceanStats.chlorophyll.current} mg/m³` : '—'}</b></div>
-            <div><span>Status</span><b>{oceanStats?.chlorophyll?.status || 'Favourable Front'}</b></div>
-            <div><span>Average</span><b>{oceanStats?.chlorophyll?.average != null ? `${oceanStats.chlorophyll.average} mg/m³` : '—'}</b></div>
+            <div><span>{t('currentConcentration')}</span><b>{oceanStats?.chlorophyll?.current != null ? `${oceanStats.chlorophyll.current} mg/m³` : '—'}</b></div>
+            <div><span>{t('statusLabel')}</span><b>{oceanStats?.chlorophyll?.status || t('favourableFront')}</b></div>
+            <div><span>{t('average')}</span><b>{oceanStats?.chlorophyll?.average != null ? `${oceanStats.chlorophyll.average} mg/m³` : '—'}</b></div>
           </div>
         </Card>
 
-        <Card title="Significant Wave Height (SWH)" action={<span className="chartBadge blue">{oceanStats?.wave_height?.trend_delta || '+0.0m'}</span>}>
-          <p className="chartSub">Operational INCOIS WaveWatch III & wave buoy observations along {currentPort.name} ({rangeLabel})</p>
+        <Card title={t('wavesChartTitle')} action={<span className="chartBadge blue">{oceanStats?.wave_height?.trend_delta || '+0.0m'}</span>}>
+          <p className="chartSub">{t('wavesChartDesc')} {currentPort.name} ({rangeLabel})</p>
           <AreaChart
             values={waves}
             color="waves"
             fill="#339af0"
             labels={labels}
-            emptyMessage={`Wave height data is currently unavailable for ${currentPort.name} for the selected period.`}
+            emptyMessage={t('wavesUnavailable')}
           />
           <div className="chartStats">
-            <div><span>Current height</span><b>{oceanStats?.wave_height?.current != null ? `${oceanStats.wave_height.current} m` : '—'}</b></div>
-            <div><span>Sea state</span><b>{oceanStats?.wave_height?.status || 'Low'}</b></div>
-            <div><span>Average</span><b>{oceanStats?.wave_height?.average != null ? `${oceanStats.wave_height.average} m` : '—'}</b></div>
+            <div><span>{t('currentHeight')}</span><b>{oceanStats?.wave_height?.current != null ? `${oceanStats.wave_height.current} m` : '—'}</b></div>
+            <div><span>{t('seaStateLabel')}</span><b>{oceanStats?.wave_height?.status || t('low')}</b></div>
+            <div><span>{t('average')}</span><b>{oceanStats?.wave_height?.average != null ? `${oceanStats.wave_height.average} m` : '—'}</b></div>
           </div>
         </Card>
 
-        <Card title="Marine Productivity Index" action={<span className="chartBadge cyan">{oceanStats?.productivity_index?.status || 'Favourable Biomass'}</span>}>
-          <p className="chartSub">Dynamic pelagic suitability derived from port SST thermal stability, chlorophyll, and upwelling ({rangeLabel})</p>
+        <Card title={t('prodChartTitle')} action={<span className="chartBadge cyan">{oceanStats?.productivity_index?.status || t('favourableBiomass')}</span>}>
+          <p className="chartSub">{t('prodChartDesc')} ({rangeLabel})</p>
           <AreaChart
             values={prodVals}
             color="prod"
             fill="#15aabf"
             labels={labels}
-            emptyMessage={`Productivity index data is currently unavailable for ${currentPort.name} for the selected period.`}
+            emptyMessage={t('prodUnavailable')}
           />
           <div className="chartStats">
-            <div><span>Current score</span><b>{oceanStats?.productivity_index?.current != null ? `${oceanStats.productivity_index.current} /100` : '—'}</b></div>
-            <div><span>Peak score</span><b>{oceanStats?.productivity_index?.max != null ? `${oceanStats.productivity_index.max} /100` : '—'}</b></div>
-            <div><span>Mean index</span><b>{oceanStats?.productivity_index?.average != null ? `${oceanStats.productivity_index.average} /100` : '—'}</b></div>
+            <div><span>{t('currentScore')}</span><b>{oceanStats?.productivity_index?.current != null ? `${oceanStats.productivity_index.current} /100` : '—'}</b></div>
+            <div><span>{t('peakScore')}</span><b>{oceanStats?.productivity_index?.max != null ? `${oceanStats.productivity_index.max} /100` : '—'}</b></div>
+            <div><span>{t('meanIndex')}</span><b>{oceanStats?.productivity_index?.average != null ? `${oceanStats.productivity_index.average} /100` : '—'}</b></div>
           </div>
         </Card>
       </div>
 
       {/* Ocean Intelligence Index Methodology Guide */}
       <div style={{ marginTop: '20px', marginBottom: '20px' }}>
-        <Card title="ℹ️ Ocean Indices & Methodology Guide">
+        <Card title={`ℹ️ ${t('methodologyGuide')}`}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px', marginTop: '10px' }}>
             <div style={{ background: 'var(--surface-elevated, #162032)', padding: '14px 18px', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
               <h4 style={{ margin: '0 0 6px 0', color: '#20c997', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span>🌱</span> Why Chlorophyll-a?
+                <span>🌱</span> {t('whyChlorophyll')}
               </h4>
               <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-muted, #94a3b8)' }}>
-                <b>Chlorophyll-a</b> is an optical ocean-colour indicator widely used to estimate phytoplankton biomass and base-trophic marine productivity. 
-                <i> Note: Chlorophyll-a alone does not equal fish abundance.</i> ORCA correlates Chlorophyll-a gradients with Sea Surface Temperature (SST) thermal breaks and verified INCOIS Potential Fishing Zones (PFZs) to reliably identify forage grounds.
+                {t('chlorophyllExplain')}
               </p>
             </div>
             <div style={{ background: 'var(--surface-elevated, #162032)', padding: '14px 18px', borderRadius: '10px', border: '1px solid rgba(56, 189, 248, 0.2)' }}>
               <h4 style={{ margin: '0 0 6px 0', color: '#38bdf8', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span>📊</span> What is the Productivity Index?
+                <span>📊</span> {t('whatIsProdIndex')}
               </h4>
               <p style={{ margin: 0, fontSize: '13px', lineHeight: '1.5', color: 'var(--text-muted, #94a3b8)' }}>
-                The <b>Productivity Index</b> is an ORCA application-derived composite indicator (scale 20–100) summarizing how favourable marine conditions are for pelagic fishing. 
-                It evaluates: <b>Chlorophyll-a</b> (up to 55 pts), <b>SST Thermal Balance</b> around 28°C baseline (up to 35 pts), and <b>Wave Stability Bonus</b> (&le;1.6m gives +10 pts). Scores &ge;75 indicate High Pelagic Activity; 55–74 represent Favourable Biomass.
+                {t('prodIndexExplain')}
               </p>
             </div>
           </div>
@@ -1030,41 +1454,41 @@ function Analytics({
       {/* 5. TIDE INFORMATION (Location-Aware from Database Prediction) */}
       <div className="tideSection">
         <Card 
-          title="Tide Information" 
+          title={t('tideTitle')} 
           action={
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <span className="chartBadge blue">Port: {currentPort.name.split(' ')[0]}</span>
+              <span className="chartBadge blue">{t('nearestPortLabel')}: {currentPort.name.split(' ')[0]}</span>
             </div>
           }
         >
           <p className="chartSub">
-            Official tidal predictions and harmonic schedules for <b>{currentPort.name}</b> ({currentPort.lat.toFixed(2)}°N, {currentPort.lon.toFixed(2)}°E) sourced from coastal prediction records.
+            {t('tideDesc')} <b>{currentPort.name}</b> ({currentPort.lat.toFixed(2)}°N, {currentPort.lon.toFixed(2)}°E).
           </p>
           <div className="tideGrid">
             <div className="tideCol high">
-              <span className="tideBadge">HIGH TIDE</span>
+              <span className="tideBadge">{t('highTide')}</span>
               <span className="tideTime">{tideInfo.high_tide?.time || '04:12'}</span>
-              <span className="tideLevel">{tideInfo.high_tide?.water_level_m || 3.8} <em>meters</em></span>
-              <small style={{ color: 'var(--muted)', fontSize: '11px' }}>Deep draft channel clearance & optimal harbor departure window</small>
+              <span className="tideLevel">{tideInfo.high_tide?.water_level_m || 3.8} <em>{t('meters')}</em></span>
+              <small style={{ color: 'var(--muted)', fontSize: '11px' }}>{t('highTideNotice')}</small>
             </div>
             <div className="tideCol low">
-              <span className="tideBadge">LOW TIDE</span>
+              <span className="tideBadge">{t('lowTide')}</span>
               <span className="tideTime">{tideInfo.low_tide?.time || '10:05'}</span>
-              <span className="tideLevel">{tideInfo.low_tide?.water_level_m || 0.9} <em>meters</em></span>
-              <small style={{ color: 'var(--muted)', fontSize: '11px' }}>Shallow water navigation caution along nearshore sandbars</small>
+              <span className="tideLevel">{tideInfo.low_tide?.water_level_m || 0.9} <em>{t('meters')}</em></span>
+              <small style={{ color: 'var(--muted)', fontSize: '11px' }}>{t('lowTideNotice')}</small>
             </div>
           </div>
 
           {tideInfo.events && tideInfo.events.length > 0 && (
             <div className="tideEventsList">
               <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                Chronological Tidal Sequence (Today & Tomorrow)
+                {t('tidalSequenceTitle')}
               </span>
               {tideInfo.events.map((ev, idx) => (
                 <div key={idx} className="tideEventItem">
-                  <span className={`tag ${ev.type === 'HIGH TIDE' ? 'high' : 'low'}`}>{ev.type}</span>
-                  <span><b>{ev.time}</b> ({ev.date || 'Today'})</span>
-                  <span>Water Level: <b>{ev.water_level_m} m</b></span>
+                  <span className={`tag ${ev.type === 'HIGH TIDE' ? 'high' : 'low'}`}>{ev.type === 'HIGH TIDE' ? t('highTide') : t('lowTide')}</span>
+                  <span><b>{ev.time}</b> ({ev.date || t('today')})</span>
+                  <span>{t('waterLevel')}: <b>{ev.water_level_m} {t('meters')}</b></span>
                 </div>
               ))}
             </div>
@@ -1233,16 +1657,16 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
         <div>
           <span className="eyebrow">ORCA / {t('fishing')}</span>
           <h2>{t('allPfzTitle')}</h2>
-          <p>Real-time Potential Fishing Zones (PFZs) categorized by verified oceanographic productivity and safety criteria.</p>
+          <p>{t('fishingIntroDesc')}</p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Port Sector:</label>
+          <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>{t('portSector')}:</label>
           <select 
             value={filterPort} 
             onChange={e => handleFilterChange(e.target.value)}
             className="selectControl"
           >
-            <option value="all">🇮🇳 All Indian Coast (32 PFZs)</option>
+            <option value="all">🇮🇳 {t('allIndianCoast')} (32 PFZs)</option>
             {PORTS.map(p => (
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
@@ -1253,32 +1677,32 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
       {/* 0. INTERACTIVE MULTI-DAY TRIP PLANNER */}
       <div className="tripPlannerWrap">
         <Card 
-          title="🎣 Multi-Day Marine Trip Planner" 
+          title={`🎣 ${t('multiDayPlannerTitle')}`} 
           action={
             <span className={`tripRiskBadge ${overallTripRisk.toLowerCase().replace(' ', '')}`}>
-              {overallTripRisk === 'HIGH RISK' ? '⚠️ HIGH RISK ADVISORY' : (overallTripRisk === 'CAUTION' ? '⚡ CAUTION ADVISED' : '✓ SAFE TRIP WINDOW')}
+              {overallTripRisk === 'HIGH RISK' ? `⚠️ ${t('highRiskAdvisory')}` : (overallTripRisk === 'CAUTION' ? `⚡ ${t('cautionAdvised')}` : `✓ ${t('safeTripWindow')}`)}
             </span>
           }
         >
           <p className="chartSub" style={{ marginBottom: '16px' }}>
-            Plan multi-day offshore voyages with day-by-day weather forecasts, wave swell analysis, and pelagic fishing potential.
+            {t('multiDayPlannerDesc')}
           </p>
 
           <div className="tripFormGrid">
             <div className="tripFormCol">
-              <label>Destination PFZ</label>
+              <label>{t('destPfzLabel')}</label>
               <select value={targetPfzId} onChange={e => setTargetPfzId(e.target.value)}>
                 {activePfzs.map(z => (
                   <option key={z.id} value={z.id}>{z.id} · {z.name} ({z.confidence}%)</option>
                 ))}
                 {inactivePfzs.map(z => (
-                  <option key={z.id} value={z.id}>{z.id} · {z.name} (INACTIVE)</option>
+                  <option key={z.id} value={z.id}>{z.id} · {z.name} ({t('statusInactive')})</option>
                 ))}
               </select>
             </div>
 
             <div className="tripFormCol">
-              <label>Departure Date</label>
+              <label>{t('depDateLabel')}</label>
               <input 
                 type="date" 
                 value={departureDate} 
@@ -1287,7 +1711,7 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
             </div>
 
             <div className="tripFormCol">
-              <label>Departure Time</label>
+              <label>{t('depTimeLabel')}</label>
               <input 
                 type="time" 
                 value={departureTime} 
@@ -1296,15 +1720,15 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
             </div>
 
             <div className="tripFormCol">
-              <label>Stay Duration</label>
+              <label>{t('stayDurationLabel')}</label>
               <select value={stayDuration} onChange={e => setStayDuration(Number(e.target.value))}>
-                <option value={1}>1 Day (Single Voyage)</option>
-                <option value={2}>2 Days (Overnight Stay)</option>
-                <option value={3}>3 Days (Extended Trip)</option>
-                <option value={4}>4 Days</option>
-                <option value={5}>5 Days</option>
-                <option value={6}>6 Days</option>
-                <option value={7}>7 Days (Week Expedition)</option>
+                <option value={1}>{t('singleVoyage')}</option>
+                <option value={2}>{t('overnightStay')}</option>
+                <option value={3}>{t('extendedTrip')}</option>
+                <option value={4}>4 {t('days')}</option>
+                <option value={5}>5 {t('days')}</option>
+                <option value={6}>6 {t('days')}</option>
+                <option value={7}>{t('weekExpedition')}</option>
               </select>
             </div>
           </div>
@@ -1314,31 +1738,33 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
             {tripDays.map(d => (
               <div key={d.dayNum} className="tripDayCard">
                 <div className="tripDayHead">
-                  <b>Day {d.dayNum} · {d.dateStr}</b>
-                  <span className={`tripRiskBadge ${d.risk.toLowerCase()}`}>{d.risk} RISK</span>
+                  <b>{t('day')} {d.dayNum} · {d.dateStr}</b>
+                  <span className={`tripRiskBadge ${d.risk.toLowerCase()}`}>
+                    {d.risk === 'HIGH' ? t('highRisk') : (d.risk === 'CAUTION' ? t('cautionRisk') : t('lowRisk'))}
+                  </span>
                 </div>
                 <div className="tripDayBody">
                   <div className="tripDayField">
-                    <strong>Sea & Waves</strong>
-                    <span>{d.wave} m swell • {d.wind} km/h wind</span>
+                    <strong>{t('seaWaves')}</strong>
+                    <span>{d.wave} m {t('waves')} • {d.wind} km/h {t('wind')}</span>
                   </div>
                   <div className="tripDayField">
-                    <strong>Rain & Weather</strong>
+                    <strong>{t('rainWeather')}</strong>
                     <span>{d.rainMm} mm ({d.rainProb}%) • {d.weather}</span>
                   </div>
                   <div className="tripDayField">
-                    <strong>Fishing Suitability</strong>
+                    <strong>{t('fishingSuitability')}</strong>
                     <span style={{ color: d.suitScore < 45 ? 'var(--danger)' : (d.suitScore < 65 ? '#f59e0b' : 'var(--navy)'), fontWeight: 700 }}>
                       {d.suitScore}% · {d.verdict}
                     </span>
                   </div>
                   <div className="tripDayField">
-                    <strong>PFZ Confidence</strong>
-                    <span>{d.pfzProb}% Confidence</span>
+                    <strong>{t('pfzConfidenceLabel')}</strong>
+                    <span>{d.pfzProb}% {t('confidence')}</span>
                   </div>
                   {d.reasoning && d.reasoning.length > 0 && (
                     <div className="tripDayField" style={{ marginTop: '6px', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '6px' }}>
-                      <strong style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Daily Assessment</strong>
+                      <strong style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{t('dailyAssessment')}</strong>
                       <span style={{ fontSize: '12px', lineHeight: '1.4' }}>{d.reasoning[0]}</span>
                     </div>
                   )}
@@ -1356,7 +1782,7 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
             ● {t('activePfzTitle').toUpperCase()} ({activePfzs.length})
           </span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            High pelagic productivity & verified thermal boundaries
+            {t('activePfzSubtitle')}
           </span>
         </div>
 
@@ -1366,7 +1792,7 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
               const isHighRisk = z.status === 'HIGH_RISK' || z.status === 'NOT_RECOMMENDED' || (z.risk_score >= 60)
               const isCaution = z.status === 'CAUTION' || (z.risk_score >= 35 && z.risk_score < 60)
               const pillCls = isHighRisk ? 'statusPill danger' : (isCaution ? 'statusPill caution' : 'statusPill active')
-              const pillTxt = isHighRisk ? 'HIGH RISK' : (isCaution ? 'CAUTION' : `${z.confidence}% ACTIVE`)
+              const pillTxt = isHighRisk ? t('highRisk') : (isCaution ? t('cautionRisk') : `${z.confidence}% ${t('statusActive')}`)
 
               return (
                 <Card 
@@ -1381,7 +1807,7 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
                   <div className="zoneStats">
                     <span>SST <b>{z.sst || 28.0}°C</b></span>
                     <span>Chl <b>{z.chlorophyll || 1.2} mg/m³</b></span>
-                    <span>Distance <b>{z.distance || '28 km'}</b></span>
+                    <span>{t('distance')} <b>{z.distance || '28 km'}</b></span>
                   </div>
                   <button className="primary full" onClick={() => { setSelected(z.id); navigate('/map') }}>
                     {t('viewZone')} →
@@ -1402,7 +1828,7 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
             ○ {t('inactivePfzTitle').toUpperCase()} ({inactivePfzs.length})
           </span>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            Divergent thermal gradients, elevated wave risks, or depleted chlorophyll
+            {t('inactivePfzSubtitle')}
           </span>
         </div>
 
@@ -1412,16 +1838,16 @@ function Fishing({ lang, navigate, setSelected, pfzList, allIndiaPfzList = [], s
               <Card 
                 key={z.id} 
                 title={`${z.id} · ${z.name}`} 
-                action={<span className="statusPill inactive">INACTIVE</span>}
+                action={<span className="statusPill inactive">{t('statusInactive')}</span>}
               >
                 <div className="signal" style={{ borderLeftColor: '#f59e0b' }}>
-                  <b style={{ color: '#d97706' }}>Status Advisory:</b>
+                  <b style={{ color: '#d97706' }}>{t('statusAdvisory')}:</b>
                   <span>{z.inactive_reason || 'Sub-optimal gradient or seasonal divergence'}</span>
                 </div>
                 <div className="zoneStats">
                   <span>SST <b>{z.sst || 29.1}°C</b></span>
                   <span>Chl <b>{z.chlorophyll || 0.42} mg/m³</b></span>
-                  <span>Distance <b>{z.distance || '35 km'}</b></span>
+                  <span>{t('distance')} <b>{z.distance || '35 km'}</b></span>
                 </div>
                 <button className="locationBtnSec" style={{ width: '100%' }} onClick={() => { setSelected(z.id); navigate('/map') }}>
                   {t('viewZone')} →
@@ -1551,19 +1977,19 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
         <div>
           <span className="eyebrow">ORCA / {t('safety')} • A* RISK-AWARE NAVIGATION</span>
           <h2>{t('safeRoute')}</h2>
-          <p>Evaluate real-time coastal routes, geofences, and INCOIS weather hazards before departure.</p>
+          <p>{t('safetySubtitle')}</p>
         </div>
       </div>
 
       <div className="safetyPlanner">
-        <Card title="Interactive Voyage Route Planner">
+        <Card title={t('plannerTitle')}>
           <div className="plannerForm">
             <div className="plannerRow">
               <label>{t('originPort')}</label>
               <select value={originId} onChange={e => handlePortChange(e.target.value)}>
                 {userLocation && (
                   <option value="current_gps">
-                    📍 My Current GPS ({userLocation.lat.toFixed(2)}°N, {userLocation.lon.toFixed(2)}°E — {userLocation.port_name})
+                    📍 {t('myCurrentGps')} ({userLocation.lat.toFixed(2)}°N, {userLocation.lon.toFixed(2)}°E — {userLocation.port_name})
                   </option>
                 )}
                 {PORTS.map(p => (
@@ -1582,17 +2008,17 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
             </div>
 
             <button className="primary" onClick={handleCalculateRoute} disabled={calculating}>
-              {calculating ? 'Computing Safe A* Path...' : `🚀 ${t('calculateRoute')}`}
+              {calculating ? t('computingSafePath') : `🚀 ${t('calculateRoute')}`}
             </button>
           </div>
         </Card>
 
-        <Card title="Route Assessment & Safe Corridor">
+        <Card title={t('routeAssessmentSafeCorridor')}>
           {activeRoute ? (() => {
             const isHigh = activeRoute.risk_band === 'HIGH' || (activeRoute.average_risk_score || 0) >= 60
             const isCaution = activeRoute.risk_band === 'CAUTION' || (activeRoute.average_risk_score || 0) >= 35
             const routeStatusPill = isHigh ? 'statusPill danger' : (isCaution ? 'statusPill caution' : 'statusPill active')
-            const routeStatusText = isHigh ? 'HIGH RISK ROUTE — ADVISORY ACTIVE' : (isCaution ? 'CAUTION ROUTE' : `${t('recommended')} · A* OPTIMAL PATH`)
+            const routeStatusText = isHigh ? t('highRiskRouteAdvisory') : (isCaution ? t('cautionRoute') : `${t('recommended')} · A* OPTIMAL PATH`)
             const riskColor = isHigh ? 'var(--danger)' : (isCaution ? 'var(--warning)' : 'var(--teal)')
 
             const etaFormatted = activeRoute.estimated_travel_time_min != null && activeRoute.estimated_travel_time_min > 0
@@ -1606,7 +2032,7 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                     <span className={routeStatusPill}>{routeStatusText}</span>
                     <h2>{activeRoute.destination_name || 'Designated Marine Route'}</h2>
                     <p>
-                      From: <b>{activeRoute.departure_name}</b><br/>
+                      {t('fromLabel')}: <b>{activeRoute.departure_name}</b><br/>
                       {activeRoute.distance_km} km ({activeRoute.distance_nm || (activeRoute.distance_km * 0.54).toFixed(1)} NM) • {etaFormatted} @ 18 km/h
                     </p>
                   </div>
@@ -1616,23 +2042,23 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                 {/* Navigation Telemetry KPIs */}
                 <div className="navStatsBar">
                   <div className="navStatItem">
-                    <span>Compass Heading</span>
+                    <span>{t('compassHeading')}</span>
                     <strong>{activeRoute.overall_bearing_deg || 248.8}° {activeRoute.compass_direction || 'WSW'}</strong>
                   </div>
                   <div className="navStatItem">
-                    <span>Risk Score</span>
+                    <span>{t('riskScoreLabel')}</span>
                     <strong style={{ color: riskColor }}>
                       {(activeRoute.average_risk_score != null ? activeRoute.average_risk_score : 14.8).toFixed(1)} / 100
                     </strong>
                   </div>
                   <div className="navStatItem">
-                    <span>Waypoints</span>
-                    <strong>{activeRoute.waypoint_list?.length || activeRoute.waypoints?.length || 4} Points</strong>
+                    <span>{t('waypointsLabel')}</span>
+                    <strong>{activeRoute.waypoint_list?.length || activeRoute.waypoints?.length || 4} {t('points')}</strong>
                   </div>
                   <div className="navStatItem">
-                    <span>Geofence Status</span>
+                    <span>{t('geofenceStatus')}</span>
                     <strong className={'navSafeTag ' + ((activeRoute.restricted_geofences_avoided?.length > 0) ? 'clear' : 'clear')}>
-                      ✓ Safe Clearance
+                      ✓ {t('safeClearance')}
                     </strong>
                   </div>
                 </div>
@@ -1649,17 +2075,17 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                         </svg>
                       </div>
                       <div>
-                        <h4 className="routeAssessmentTitle">Route Assessment Points</h4>
-                        <p className="routeAssessmentSubtitle">Geometry-derived assessment of sea conditions along the selected passage.</p>
+                        <h4 className="routeAssessmentTitle">{t('routeAssessmentPointsTitle')}</h4>
+                        <p className="routeAssessmentSubtitle">{t('routeAssessmentSubtitle')}</p>
                       </div>
                     </div>
                     <div className="routeAssessmentHeaderRight">
-                      <span className="routeAssessmentBadge">Geometry-Derived</span>
-                      <span className="routeAssessmentRealtimeLabel">Real-time sea state along passage</span>
+                      <span className="routeAssessmentBadge">{t('geometryDerived')}</span>
+                      <span className="routeAssessmentRealtimeLabel">{t('realtimeSeaState')}</span>
                     </div>
                   </div>
                   <p className="routeAssessmentBottomDesc">
-                    Assessment covers the departure corridor, mid-channel passage, and target shelf approach.
+                    {t('routeAssessmentDesc')}
                   </p>
                 </div>
 
@@ -1676,8 +2102,8 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                         {
                           point_number: 1,
                           leg_number: p1.leg || 1,
-                          label: `Point 1 · Leg #${p1.leg || 1} (Departure)`,
-                          segment_type: 'Departure Port Corridor',
+                          label: `${t('point')} 1 · ${t('leg')} #${p1.leg || 1} (${t('departure')})`,
+                          segment_type: t('departureCorridor'),
                           latitude: p1.latitude,
                           longitude: p1.longitude,
                           wave_height_m: p1.wave_height_m ?? 1.1,
@@ -1688,8 +2114,8 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                         {
                           point_number: 2,
                           leg_number: p2.leg || (midIdx + 1),
-                          label: `Point 2 · Leg #${p2.leg || (midIdx + 1)} (Mid-Channel)`,
-                          segment_type: 'Mid-Channel Passage (~50% Route)',
+                          label: `${t('point')} 2 · ${t('leg')} #${p2.leg || (midIdx + 1)} (${t('midChannelPassage')})`,
+                          segment_type: t('midChannelPassage'),
                           latitude: p2.latitude,
                           longitude: p2.longitude,
                           wave_height_m: p2.wave_height_m ?? 1.2,
@@ -1700,8 +2126,8 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                         {
                           point_number: 3,
                           leg_number: p3.leg || wps.length,
-                          label: `Point 3 · Leg #${p3.leg || wps.length} (Destination)`,
-                          segment_type: 'Target Shelf Approach & Arrival',
+                          label: `${t('point')} 3 · ${t('leg')} #${p3.leg || wps.length} (${t('destZone')})`,
+                          segment_type: t('shelfApproach'),
                           latitude: p3.latitude,
                           longitude: p3.longitude,
                           wave_height_m: p3.wave_height_m ?? 1.3,
@@ -1751,7 +2177,7 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                                 borderRadius: '6px',
                                 letterSpacing: '0.6px'
                               }}>
-                                POINT 0{p.point_number || pIdx + 1} · LEG #{targetLeg}
+                                {t('point').toUpperCase()} 0{p.point_number || pIdx + 1} · {t('leg').toUpperCase()} #{targetLeg}
                               </span>
                               <span
                                 style={{
@@ -1766,7 +2192,7 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                                   boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
                                 }}
                               >
-                                {p.risk_band || 'LOW'} RISK
+                                {p.risk_band === 'HIGH' ? t('highRisk') : (p.risk_band === 'CAUTION' ? t('cautionRisk') : t('lowRisk'))}
                               </span>
                             </div>
 
@@ -1812,19 +2238,19 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                               marginTop: '4px'
                             }}>
                               <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Wave Swell</div>
+                                <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>{t('waveSwellLabel')}</div>
                                 <div style={{ fontSize: '13px', fontWeight: 800, color: '#38bdf8', marginTop: '2px' }}>
                                   🌊 {p.wave_height_m != null ? `${p.wave_height_m}m` : '1.2m'}
                                 </div>
                               </div>
                               <div style={{ textAlign: 'center', borderLeft: '1px solid rgba(255, 255, 255, 0.1)', borderRight: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                                <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>Wind</div>
+                                <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>{t('wind')}</div>
                                 <div style={{ fontSize: '13px', fontWeight: 800, color: '#4ade80', marginTop: '2px' }}>
                                   💨 {p.wind_speed_kmh != null ? `${p.wind_speed_kmh}k` : '15k'}
                                 </div>
                               </div>
                               <div style={{ textAlign: 'center' }}>
-                                <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>ETA</div>
+                                <div style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>{t('eta')}</div>
                                 <div style={{ fontSize: '13px', fontWeight: 800, color: '#fbbf24', marginTop: '2px' }}>
                                   ⏱️ {p.eta_min != null ? `~${p.eta_min}m` : '0m'}
                                 </div>
@@ -1842,8 +2268,8 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                               alignItems: 'center',
                               justifyContent: 'space-between'
                             }}>
-                              <span>🔗 Matches Table <b>Leg #{targetLeg}</b></span>
-                              <span style={{ color: '#38bdf8', fontWeight: 700 }}>✓ Verified</span>
+                              <span>🔗 {t('matchesTableLeg')} <b>#{targetLeg}</b></span>
+                              <span style={{ color: '#38bdf8', fontWeight: 700 }}>✓ {t('verified')}</span>
                             </div>
                           </div>
                         )
@@ -1854,21 +2280,21 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
 
                 <div className="reasonList" style={{ marginTop: '14px' }}>
                   <div>
-                    <b>01 · Departure</b>
-                    <span>Route initiates from <b>{activeRoute.departure_name}</b> following deep-water coastal navigational corridors.</span>
+                    <b>01 · {t('departure')}</b>
+                    <span>{t('departureRouteNotice')} <b>{activeRoute.departure_name}</b>.</span>
                   </div>
                   <div>
-                    <b>02 · Corridor</b>
-                    <span>Dynamic A* routing across <b>{activeRoute.waypoint_list?.length || 4} waypoints</b>, minimizing wave resistance & avoiding shallow reefs.</span>
+                    <b>02 · {t('corridor')}</b>
+                    <span>{t('corridorAStarNotice')} <b>{activeRoute.waypoint_list?.length || 4} {t('waypointsLabel')}</b>.</span>
                   </div>
                   <div>
-                    <b>03 · Safety</b>
+                    <b>03 · {t('safety')}</b>
                     <span>
                       {isHigh 
-                        ? '⚠️ Elevated wave swell or wind shear active along route. Reduce speed and prepare backup anchorage.' 
+                        ? t('highRiskNotice')
                         : (activeRoute.restricted_geofences_avoided?.length > 0 
-                            ? `Geofence clearance confirmed. Avoided: ${activeRoute.restricted_geofences_avoided.join(', ')}.` 
-                            : 'Prohibited geofences checked. All coordinates clear of marine protected boundaries.')}
+                            ? `${t('geofenceClearConfirmed')}: ${activeRoute.restricted_geofences_avoided.join(', ')}.` 
+                            : t('geofenceAllClear'))}
                     </span>
                   </div>
                 </div>
@@ -1878,23 +2304,23 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                 <div className="navTableWrap">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '0 4px', flexWrap: 'wrap', gap: '8px' }}>
                     <span style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--text)' }}>
-                      📍 Full Route Waypoint Navigation Log & Clearance ({activeRoute.waypoint_list.length} Legs)
+                      📍 {t('waypointLogTitle')} ({activeRoute.waypoint_list.length} {t('legs')})
                     </span>
                     <span style={{ fontSize: '0.78rem', color: 'var(--muted)' }}>
-                      Highlighted rows correspond to Route Assessment Points 01, 02, 03
+                      {t('highlightedRowsDesc')}
                     </span>
                   </div>
                   <table className="navTable">
                     <thead>
                       <tr>
-                        <th>Leg</th>
-                        <th>Checkpoint</th>
-                        <th>Coordinates</th>
-                        <th>Heading</th>
-                        <th>Leg Dist</th>
-                        <th>ETA</th>
-                        <th>Sea State</th>
-                        <th>Clearance</th>
+                        <th>{t('leg')}</th>
+                        <th>{t('checkpoint')}</th>
+                        <th>{t('coordinates')}</th>
+                        <th>{t('heading')}</th>
+                        <th>{t('legDist')}</th>
+                        <th>{t('eta')}</th>
+                        <th>{t('seaStateCol')}</th>
+                        <th>{t('clearanceCol')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1906,7 +2332,7 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                         const isP2 = legNum === midLeg || (w.checkpoint === 'Point 02')
                         const isP3 = legNum === totalLegs || (w.checkpoint === 'Point 03')
                         const isCheckpoint = isP1 || isP2 || isP3
-                        const checkpointLabel = isP1 ? '📍 Point 01 · Departure' : (isP2 ? '📍 Point 02 · Mid-Channel' : (isP3 ? '📍 Point 03 · Shelf Arrival' : null))
+                        const checkpointLabel = isP1 ? `📍 ${t('checkpoint')} 01` : (isP2 ? `📍 ${t('checkpoint')} 02` : (isP3 ? `📍 ${t('checkpoint')} 03` : null))
 
                         return (
                           <tr
@@ -1931,7 +2357,7 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                                   {checkpointLabel}
                                 </span>
                               ) : (
-                                <span style={{ color: 'var(--muted)', fontSize: '11px' }}>Corridor Leg</span>
+                                <span style={{ color: 'var(--muted)', fontSize: '11px' }}>{t('corridorLeg')}</span>
                               )}
                             </td>
                             <td style={{ fontFamily: 'monospace', fontWeight: isCheckpoint ? 700 : 400 }}>
@@ -1951,7 +2377,7 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
                             </td>
                             <td>
                               <span className={`navSafeTag ${w.risk_band === 'HIGH' ? 'high' : (w.risk_band === 'CAUTION' ? 'caution' : 'clear')}`}>
-                                ✓ Pass ({w.risk_band || 'LOW'})
+                                ✓ {t('pass')} ({w.risk_band || 'LOW'})
                               </span>
                             </td>
                           </tr>
@@ -1963,24 +2389,24 @@ function Safety({ lang, navigate, activeRoute, setActiveRoute, pfzList, selected
               )}
 
               <button className="primary full" style={{ marginTop: '16px' }} onClick={() => navigate('/map')}>
-                🗺️ View Full Route on Marine Map →
+                🗺️ {t('viewFullRouteMap')} →
               </button>
             </div>
             )
           })() : (
-            <p style={{ color: 'var(--muted)' }}>Select your departure origin and destination zone to compute the safe navigational corridor.</p>
+            <p style={{ color: 'var(--muted)' }}>{t('selectRouteNotice')}</p>
           )}
         </Card>
       </div>
 
       <Card title={t('safetyChecklist')}>
         <div className="checklist">
-          <span>✓ {t('weather')} Verified</span>
-          <span>✓ {t('seaState')} Within Limits</span>
-          <span>✓ {t('boundaries')} Cleared</span>
-          <span>✓ {t('routeRisk')} Evaluated</span>
-          <span>✓ Live Telemetry Active</span>
-          <span>✓ A* Geofence Path Verified</span>
+          <span>✓ {t('weather')} {t('verified')}</span>
+          <span>✓ {t('seaState')} {t('withinLimits')}</span>
+          <span>✓ {t('boundaries')} {t('cleared')}</span>
+          <span>✓ {t('routeRisk')} {t('evaluated')}</span>
+          <span>✓ {t('liveTelemetryActive')}</span>
+          <span>✓ {t('geofencePathVerified')}</span>
         </div>
       </Card>
     </>
@@ -2481,10 +2907,10 @@ function AlertsPage({ lang, setModal, alertList, selectedPort, setSelectedPort, 
         <div>
           <span className="eyebrow">{t('alerts').toUpperCase()} • SEVERITY-SORTED INTELLIGENCE</span>
           <h2>{t('alerts')}</h2>
-          <p>Real-time marine hazard warnings and high-wave advisories prioritized by navigational severity for {currentPort.name}.</p>
+          <p>{t('alertsSubtitle')} {currentPort.name}.</p>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>Port Sector:</label>
+          <label style={{ fontWeight: 600, fontSize: '0.9rem' }}>{t('portSector')}:</label>
           <select 
             value={filterPort} 
             onChange={e => {
@@ -2493,7 +2919,7 @@ function AlertsPage({ lang, setModal, alertList, selectedPort, setSelectedPort, 
             }}
             className="selectControl"
           >
-            <option value="all">🇮🇳 All Coastline Advisories ({alertList.length})</option>
+            <option value="all">🇮🇳 {t('allCoastAdvisories')} ({alertList.length})</option>
             {PORTS.map(p => (
               <option key={p.id} value={p.id}>{p.name}</option>
             ))}
@@ -2504,7 +2930,7 @@ function AlertsPage({ lang, setModal, alertList, selectedPort, setSelectedPort, 
       {/* 1. HIGH PRIORITY WARNINGS */}
       <div className="alertPriorityGroup">
         <div className="priorityHeader high">
-          <span>🔴 HIGH PRIORITY WARNINGS ({highAlerts.length})</span>
+          <span>🔴 {t('highPriorityWarnings')} ({highAlerts.length})</span>
         </div>
         {highAlerts.length > 0 ? (
           <div className="alertList">
@@ -2512,7 +2938,7 @@ function AlertsPage({ lang, setModal, alertList, selectedPort, setSelectedPort, 
           </div>
         ) : (
           <div className="emptyPfzNotice" style={{ borderColor: 'rgba(15, 168, 137, 0.2)' }}>
-            ✓ No critical or high-risk maritime hazard warnings active for this coastal sector.
+            ✓ {t('noCriticalWarnings')}
           </div>
         )}
       </div>
@@ -2520,7 +2946,7 @@ function AlertsPage({ lang, setModal, alertList, selectedPort, setSelectedPort, 
       {/* 2. CAUTION ADVISORIES */}
       <div className="alertPriorityGroup">
         <div className="priorityHeader medium">
-          <span>🟡 CAUTION ADVISORIES ({mediumAlerts.length})</span>
+          <span>🟡 {t('cautionAdvisories')} ({mediumAlerts.length})</span>
         </div>
         {mediumAlerts.length > 0 ? (
           <div className="alertList">
@@ -2528,7 +2954,7 @@ function AlertsPage({ lang, setModal, alertList, selectedPort, setSelectedPort, 
           </div>
         ) : (
           <div className="emptyPfzNotice">
-            No moderate chop or caution advisories active for this coastal sector.
+            {t('noCautionAdvisories')}
           </div>
         )}
       </div>
@@ -2536,7 +2962,7 @@ function AlertsPage({ lang, setModal, alertList, selectedPort, setSelectedPort, 
       {/* 3. COASTAL BULLETINS & LOW RISK */}
       <div className="alertPriorityGroup">
         <div className="priorityHeader low">
-          <span>🟢 COASTAL BULLETINS & INFORMATIONAL ({lowAlerts.length})</span>
+          <span>🟢 {t('coastalBulletins')} ({lowAlerts.length})</span>
         </div>
         {lowAlerts.length > 0 ? (
           <div className="alertList">
@@ -2544,7 +2970,7 @@ function AlertsPage({ lang, setModal, alertList, selectedPort, setSelectedPort, 
           </div>
         ) : (
           <div className="emptyPfzNotice">
-            No coastal bulletins logged for this sector.
+            {t('noBulletinsLogged')}
           </div>
         )}
       </div>
@@ -2587,7 +3013,7 @@ function SettingsPage({ lang, setLang, dark, setDark }) {
         <div className="settingRow">
           <div>
             <b>{t('darkMode')}</b>
-            <p>{dark ? 'Deep ocean blue dark interface' : 'Clean coastal light interface'}</p>
+            <p>{dark ? t('darkThemeDesc') : t('lightThemeDesc')}</p>
           </div>
           <button className={'toggle ' + (dark ? 'on' : '')} onClick={() => setDark(v => !v)}><span /></button>
         </div>
@@ -2641,7 +3067,7 @@ function Profile({ lang, user, onSignOut }) {
           <div className="profileMain">
             <h2>{userName}</h2>
             <p>{userRole}</p>
-            <span className="pill">{user ? 'Active Operational Account' : t('status')}</span>
+            <span className="pill">{user ? t('activeOperationalAccount') : t('status')}</span>
           </div>
         </div>
 
@@ -2667,8 +3093,8 @@ function Profile({ lang, user, onSignOut }) {
             )}
           </div>
           <div>
-            <span>Account Security</span>
-            <b>End-to-End Encrypted Session</b>
+            <span>{t('accountSecurity')}</span>
+            <b>{t('encryptedSession')}</b>
           </div>
         </div>
       </Card>
@@ -3521,6 +3947,7 @@ function App() {
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
         onAuthSuccess={user => setCurrentUser(user)}
+        lang={lang}
       />
     </div>
   )

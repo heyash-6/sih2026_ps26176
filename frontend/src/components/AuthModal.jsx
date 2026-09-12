@@ -1,7 +1,79 @@
 import React, { useState } from 'react'
 import { signInWithEmail, signUpWithEmail } from '../services/supabaseClient'
 
-export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
+const AUTH_T = {
+  en: {
+    portalAccess: 'ORCA Portal Access',
+    portalDesc: 'Marine Ecosystem Reasoning & Decision Platform',
+    signIn: 'Sign In',
+    createAccount: 'Create Account',
+    fullName: 'Full Name',
+    emailAddress: 'Email Address',
+    password: 'Password',
+    role: 'Role / Operational Profile',
+    roleCaptain: 'Fisherman / Vessel Captain',
+    roleResearcher: 'Marine Researcher / Oceanographer',
+    roleAdmin: 'Port Authority / Fleet Manager',
+    signInBtn: 'Sign In to Workspace →',
+    registerBtn: 'Register Account →',
+    processing: 'Processing...',
+    quickAccess: 'or quick access',
+    demoCaptain: '⚓ Demo Captain',
+    demoResearcher: '🔬 Demo Researcher',
+    securityFooter: 'Protected by Encrypted Maritime Identity & Row Level Security',
+    enterBoth: 'Please enter both email and password.',
+    signedInSuccess: 'Successfully signed in!',
+    accountCreatedSuccess: 'Account created successfully! You are now logged in.'
+  },
+  hi: {
+    portalAccess: 'ORCA पोर्टल प्रवेश',
+    portalDesc: 'समुद्री पारिस्थितिकी व निर्णय प्रणाली',
+    signIn: 'साइन इन',
+    createAccount: 'खाता बनाएं',
+    fullName: 'पूरा नाम',
+    emailAddress: 'ईमेल पता',
+    password: 'पासवर्ड',
+    role: 'भूमिका / परिचालन प्रोफाइल',
+    roleCaptain: 'मछुआरा / पोत कप्तान',
+    roleResearcher: 'समुद्री शोधकर्ता / समुद्र विज्ञानी',
+    roleAdmin: 'बंदरगाह प्राधिकरण / बेड़ा प्रबंधक',
+    signInBtn: 'कार्यक्षेत्र में साइन इन करें →',
+    registerBtn: 'खाता पंजीकृत करें →',
+    processing: 'प्रक्रिया जारी है...',
+    quickAccess: 'या त्वरित प्रवेश',
+    demoCaptain: '⚓ डेमो कप्तान',
+    demoResearcher: '🔬 डेमो शोधकर्ता',
+    securityFooter: 'कूटबद्ध समुद्री पहचान व पंक्ति-स्तरीय सुरक्षा द्वारा संरक्षित',
+    enterBoth: 'कृपया ईमेल और पासवर्ड दोनों दर्ज करें।',
+    signedInSuccess: 'सफलतापूर्वक साइन इन हुआ!',
+    accountCreatedSuccess: 'खाता सफलतापूर्वक बनाया गया! आप लॉगिन हैं।'
+  },
+  mr: {
+    portalAccess: 'ORCA पोर्टल प्रवेश',
+    portalDesc: 'सागरी परिसंस्था व निर्णय प्रणाली',
+    signIn: 'साइन इन',
+    createAccount: 'खाते तयार करा',
+    fullName: 'पूर्ण नाव',
+    emailAddress: 'ईमेल पत्ता',
+    password: 'पासवर्ड',
+    role: 'भूमिका / ऑपरेशनल प्रोफाइल',
+    roleCaptain: 'मासेमार / जहाज कॅप्टन',
+    roleResearcher: 'सागरी संशोधक / समुद्रशास्त्रज्ञ',
+    roleAdmin: 'बंदर प्राधिकरण / फ्लीट व्यवस्थापक',
+    signInBtn: 'कार्यक्षेत्रात साइन इन करा →',
+    registerBtn: 'खाते नोंदणी करा →',
+    processing: 'प्रक्रिया सुरू आहे...',
+    quickAccess: 'किंवा जलद प्रवेश',
+    demoCaptain: '⚓ डेमो कॅप्टन',
+    demoResearcher: '🔬 डेमो संशोधक',
+    securityFooter: 'कूटबद्ध सागरी ओळख व रो-पातळी सुरक्षिततेने संरक्षित',
+    enterBoth: 'कृपया ईमेल आणि पासवर्ड दोन्ही टाका.',
+    signedInSuccess: 'यशस्वीरीत्या साइन इन झाले!',
+    accountCreatedSuccess: 'खाते यशस्वीरीत्या तयार केले! आपण आता लॉगिन आहात.'
+  }
+}
+
+export default function AuthModal({ isOpen, onClose, onAuthSuccess, lang = 'en' }) {
   const [tab, setTab] = useState('signin') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -11,6 +83,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
   const [errorMsg, setErrorMsg] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
 
+  const t = (k) => AUTH_T[lang]?.[k] ?? AUTH_T.en[k] ?? k
+
   if (!isOpen) return null
 
   const handleSubmit = async (e) => {
@@ -19,7 +93,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
     setSuccessMsg('')
 
     if (!email || !password) {
-      setErrorMsg('Please enter both email and password.')
+      setErrorMsg(t('enterBoth'))
       return
     }
 
@@ -28,7 +102,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
       if (tab === 'signin') {
         const res = await signInWithEmail(email, password)
         if (res.success) {
-          setSuccessMsg('Successfully signed in!')
+          setSuccessMsg(t('signedInSuccess'))
           setTimeout(() => {
             onAuthSuccess(res.user)
             onClose()
@@ -39,7 +113,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
       } else {
         const res = await signUpWithEmail(email, password, fullName, role)
         if (res.success) {
-          setSuccessMsg('Account created successfully! You are now logged in.')
+          setSuccessMsg(t('accountCreatedSuccess'))
           setTimeout(() => {
             onAuthSuccess(res.user)
             onClose()
@@ -78,8 +152,8 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         
         <div className="authHeader">
           <div className="authIcon">⚓</div>
-          <h2>ORCA Portal Access</h2>
-          <p>Marine Ecosystem Reasoning & Decision Platform</p>
+          <h2>{t('portalAccess')}</h2>
+          <p>{t('portalDesc')}</p>
         </div>
 
         <div className="authTabs">
@@ -88,14 +162,14 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
             className={`authTab ${tab === 'signin' ? 'active' : ''}`}
             onClick={() => { setTab('signin'); setErrorMsg(''); setSuccessMsg(''); }}
           >
-            Sign In
+            {t('signIn')}
           </button>
           <button 
             type="button"
             className={`authTab ${tab === 'signup' ? 'active' : ''}`}
             onClick={() => { setTab('signup'); setErrorMsg(''); setSuccessMsg(''); }}
           >
-            Create Account
+            {t('createAccount')}
           </button>
         </div>
 
@@ -105,7 +179,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
         <form onSubmit={handleSubmit} className="authForm">
           {tab === 'signup' && (
             <div className="authField">
-              <label>Full Name</label>
+              <label>{t('fullName')}</label>
               <input 
                 type="text" 
                 placeholder="e.g. Captain Devesh Madhavi" 
@@ -117,7 +191,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           )}
 
           <div className="authField">
-            <label>Email Address</label>
+            <label>{t('emailAddress')}</label>
             <input 
               type="email" 
               placeholder="name@example.com" 
@@ -128,7 +202,7 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
           </div>
 
           <div className="authField">
-            <label>Password</label>
+            <label>{t('password')}</label>
             <input 
               type="password" 
               placeholder="••••••••" 
@@ -140,35 +214,35 @@ export default function AuthModal({ isOpen, onClose, onAuthSuccess }) {
 
           {tab === 'signup' && (
             <div className="authField">
-              <label>Role / Operational Profile</label>
+              <label>{t('role')}</label>
               <select value={role} onChange={(e) => setRole(e.target.value)}>
-                <option value="user">Fisherman / Vessel Captain</option>
-                <option value="researcher">Marine Researcher / Oceanographer</option>
-                <option value="admin">Port Authority / Fleet Manager</option>
+                <option value="user">{t('roleCaptain')}</option>
+                <option value="researcher">{t('roleResearcher')}</option>
+                <option value="admin">{t('roleAdmin')}</option>
               </select>
             </div>
           )}
 
           <button type="submit" className="authSubmitBtn" disabled={loading}>
-            {loading ? 'Processing...' : (tab === 'signin' ? 'Sign In to Workspace →' : 'Register Account →')}
+            {loading ? t('processing') : (tab === 'signin' ? t('signInBtn') : t('registerBtn'))}
           </button>
         </form>
 
         <div className="authDivider">
-          <span>or quick access</span>
+          <span>{t('quickAccess')}</span>
         </div>
 
         <div className="authQuickDemo">
           <button type="button" className="authDemoBtn" onClick={() => handleDemoLogin('Captain')}>
-            ⚓ Demo Captain
+            {t('demoCaptain')}
           </button>
           <button type="button" className="authDemoBtn" onClick={() => handleDemoLogin('Researcher')}>
-            🔬 Demo Researcher
+            {t('demoResearcher')}
           </button>
         </div>
 
         <div className="authFooter">
-          <small>Protected by Encrypted Maritime Identity & Row Level Security</small>
+          <small>{t('securityFooter')}</small>
         </div>
       </div>
     </div>
