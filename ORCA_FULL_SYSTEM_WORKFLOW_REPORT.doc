@@ -1,0 +1,500 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>ORCA End-to-End System Workflow & Architecture Report - SIH 2026</title>
+<!--[if gte mso 9]>
+<xml>
+<w:WordDocument>
+<w:View>Print</w:View>
+<w:Zoom>100</w:Zoom>
+<w:DoNotOptimizeForBrowser/>
+</w:WordDocument>
+</xml>
+<![endif]-->
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 0.8in 0.8in 0.8in 0.8in;
+    mso-header-margin: 0.4in;
+    mso-footer-margin: 0.4in;
+  }
+  body {
+    font-family: 'Segoe UI', 'Calibri', 'Arial', sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    color: #1e293b;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    font-family: 'Segoe UI Semibold', 'Calibri', sans-serif;
+    font-size: 22pt;
+    color: #0369a1;
+    border-bottom: 2pt solid #0284c7;
+    padding-bottom: 5pt;
+    margin-top: 14pt;
+    margin-bottom: 6pt;
+  }
+  h2 {
+    font-family: 'Segoe UI Semibold', 'Calibri', sans-serif;
+    font-size: 15pt;
+    color: #0f172a;
+    border-bottom: 1pt solid #cbd5e1;
+    padding-bottom: 3pt;
+    margin-top: 16pt;
+    margin-bottom: 6pt;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-family: 'Segoe UI Semibold', 'Calibri', sans-serif;
+    font-size: 12pt;
+    color: #0284c7;
+    margin-top: 12pt;
+    margin-bottom: 4pt;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-family: 'Segoe UI Semibold', 'Calibri', sans-serif;
+    font-size: 10.5pt;
+    color: #334155;
+    margin-top: 8pt;
+    margin-bottom: 2pt;
+    page-break-after: avoid;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 7pt;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 8pt;
+    margin-bottom: 12pt;
+    font-size: 9.5pt;
+  }
+  th {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: left;
+    padding: 6pt 8pt;
+    border: 1pt solid #334155;
+  }
+  td {
+    padding: 5pt 8pt;
+    border: 1pt solid #cbd5e1;
+    vertical-align: top;
+  }
+  tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  .callout {
+    background-color: #f0f9ff;
+    border-left: 3.5pt solid #0284c7;
+    padding: 8pt 12pt;
+    margin-top: 8pt;
+    margin-bottom: 10pt;
+    border-radius: 2pt;
+  }
+  .callout-warning {
+    background-color: #fffbeb;
+    border-left: 3.5pt solid #f59e0b;
+    padding: 8pt 12pt;
+    margin-top: 8pt;
+    margin-bottom: 10pt;
+    border-radius: 2pt;
+  }
+  .callout-title {
+    font-weight: bold;
+    color: #0369a1;
+    margin-bottom: 3pt;
+    font-size: 10.5pt;
+  }
+  .formula-box {
+    background-color: #f1f5f9;
+    border: 1pt solid #cbd5e1;
+    padding: 8pt 12pt;
+    margin: 6pt 0;
+    font-family: 'Cambria Math', 'Georgia', serif;
+    font-size: 10.5pt;
+    color: #0f172a;
+    border-radius: 3pt;
+  }
+  code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 9pt;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 1pt 3pt;
+    border-radius: 2pt;
+    border: 1pt solid #e2e8f0;
+  }
+  .badge {
+    display: inline-block;
+    padding: 1pt 5pt;
+    font-size: 8pt;
+    font-weight: 600;
+    border-radius: 2pt;
+  }
+  .badge-blue { background-color: #e0f2fe; color: #0369a1; }
+  .badge-green { background-color: #dcfce7; color: #15803d; }
+  .badge-purple { background-color: #f3e8ff; color: #7e22ce; }
+  .meta-box {
+    background-color: #f8fafc;
+    border: 1pt solid #e2e8f0;
+    padding: 10pt 14pt;
+    margin-bottom: 14pt;
+  }
+  .workflow-step {
+    background-color: #ffffff;
+    border: 1pt solid #e2e8f0;
+    border-left: 3.5pt solid #0284c7;
+    padding: 8pt 12pt;
+    margin-bottom: 8pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="meta-box">
+  <div style="font-size: 18pt; font-weight: bold; color: #0284c7; margin-bottom: 2pt;">ORCA: Marine Ecosystem Reasoning Platform</div>
+  <div style="font-size: 12pt; font-weight: 600; color: #334155; margin-bottom: 6pt;">Comprehensive End-to-End System Workflow & Architecture Document</div>
+  <div style="font-size: 9pt; color: #64748b;">
+    <strong>Scope:</strong> Frontend (React 19) &bull; Backend (FastAPI) &bull; Database (Supabase PostgreSQL) &bull; 7-Stage Multi-Agent AI Engine<br/>
+    <strong>Hackathon:</strong> Smart India Hackathon (SIH 2026) &nbsp;|&nbsp; <strong>Problem Statement:</strong> PS-26176
+  </div>
+</div>
+
+<div class="callout">
+  <div class="callout-title">PLATFORM ARCHITECTURAL PHILOSOPHY</div>
+  <p>ORCA is an enterprise-grade, life-safety marine intelligence platform. It bridges satellite oceanography (ISRO Oceansat, MODIS), real-time buoy telemetry (INCOIS), and astronomical tidal harmonics (Survey of India) with an agentic AI copilot. <strong>Crucially, probabilistic AI models (LLMs) are strictly prohibited from calculating navigational physics or risk scores; all life-critical routing and safety evaluations are performed by 100% deterministic mathematical engines.</strong></p>
+</div>
+
+---
+
+<h2>1. High-Level System Architecture & Flow</h2>
+<p>The platform operates across four decoupled, interconnected tiers:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 18%;">Layer</th>
+      <th style="width: 25%;">Core Technology</th>
+      <th style="width: 57%;">Architectural Responsibilities</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. Client Tier (Frontend)</strong></td>
+      <td>React 19, Vite, Leaflet GIS, Vanilla CSS Design System</td>
+      <td>Renders responsive coastal intelligence HUD, Leaflet maps, high-contrast dark/light theme, GPS location resolver, tri-lingual localization (EN/HI/MR), and lifted multi-tab chat drawer.</td>
+    </tr>
+    <tr>
+      <td><strong>2. API & Gateway Tier</strong></td>
+      <td>FastAPI, Uvicorn (ASGI), Python 3.13, Pydantic V2</td>
+      <td>Asynchronous REST endpoints, static bundle hosting, CORS middleware, session memory caching, and sub-second payload routing.</td>
+    </tr>
+    <tr>
+      <td><strong>3. Multi-Agent AI Tier</strong></td>
+      <td>Hierarchical Orchestrator + 6 Specialist Engines</td>
+      <td>NLU parsing, great-circle geodesy, A* risk pathfinding, ray-casting geofencing, 5-factor risk scoring, and Gemini Flash-Lite explanation synthesis.</td>
+    </tr>
+    <tr>
+      <td><strong>4. Data & Cloud Tier</strong></td>
+      <td>Supabase PostgreSQL, PostGIS, JWT Auth</td>
+      <td>Relational tables for PFZs, coastal alerts, wave observations, tidal models, and indexed conversation history vectors.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>2. Complete End-to-End User & Data Workflow</h2>
+
+<div class="workflow-step">
+  <h4 style="color: #0369a1; margin-top: 0;">Step 1: Access Control & Compulsory Authentication Gate</h4>
+  <p><strong>Trigger:</strong> User opens the application in any web browser at <code>http://localhost:8001</code>.</p>
+  <ul>
+    <li><strong>Client Execution:</strong> <code>App.jsx</code> inspects <code>currentUser</code> state from <code>localStorage.getItem('orca_user')</code> and validates with Supabase <code>getSession()</code>.</li>
+    <li><strong>Unauthenticated Interception:</strong> If no authenticated user exists, the application locks the workspace shell and displays a non-dismissible <code>AuthModal</code> with <code>12px</code> backdrop blur, language switcher, and authentication options (Email/Password login, Signup, or instant Captain/Researcher Demo sign-in).</li>
+    <li><strong>Session Unlock:</strong> Upon successful authentication, user JWT tokens and metadata are saved to <code>localStorage</code>, unlocking full portal navigation.</li>
+  </ul>
+</div>
+
+<div class="workflow-step">
+  <h4 style="color: #0369a1; margin-top: 0;">Step 2: Automated Geolocation & Coastal Hub Resolution</h4>
+  <p><strong>Trigger:</strong> Dashboard initializes or user clicks "Allow Location".</p>
+  <ul>
+    <li><strong>Browser API:</strong> <code>navigator.geolocation.getCurrentPosition()</code> acquires GPS coordinates (e.g., Lat: 18.94, Lon: 72.83).</li>
+    <li><strong>Backend Resolution:</strong> Coordinates are sent to <code>/api/location/resolve</code>. The GIS engine calculates great-circle distance to the nearest Indian fishing harbor (e.g., Sassoon Dock, Mumbai) using <code>indian_coastal_registry.py</code>.</li>
+    <li><strong>State Synchronization:</strong> The entire portal dynamically switches to this port context: loading port-specific SST, wave heights, and tidal schedules.</li>
+  </ul>
+</div>
+
+<div class="workflow-step">
+  <h4 style="color: #0369a1; margin-top: 0;">Step 3: Multi-Source Marine Data Aggregation</h4>
+  <p><strong>Trigger:</strong> Client triggers parallel asynchronous fetches for the active port sector.</p>
+  <ul>
+    <li><code>GET /api/analytics</code>: Retrieves 7-day SST gradients, Chlorophyll-a concentration, wave height trends, and official Survey of India tidal harmonic predictions.</li>
+    <li><code>GET /api/pfz?port_id=mumbai</code>: Retrieves active satellite PFZs within 80km, ranked by confidence and depth.</li>
+    <li><code>GET /api/alerts?port_id=mumbai</code>: Fetches severity-sorted bulletins (Critical, Caution, Coastal bulletins).</li>
+  </ul>
+</div>
+
+<div class="workflow-step">
+  <h4 style="color: #0369a1; margin-top: 0;">Step 4: AI Conversational Copilot Query Execution</h4>
+  <p><strong>Trigger:</strong> Captain types or speaks a marine query (e.g., <em>"उद्या सकाळी मुंबईजवळ मासेमारीसाठी सुरक्षित क्षेत्र कोणते आहे?"</em>).</p>
+  <ul>
+    <li><strong>Stage 1 (NLU Agent):</strong> Classifies intent (<code>TRIP_PLANNING</code>), extracts language (<code>mr</code>), location (<code>Mumbai</code>), and time window (<code>Tomorrow Morning</code>).</li>
+    <li><strong>Stage 2 (Orchestrator):</strong> Dispatches tasks concurrently to Marine, Weather, and GIS agents.</li>
+    <li><strong>Stage 3 (Marine Agent):</strong> Identifies candidate zones (e.g., <code>PFZ-MUM-01</code>, 42 km offshore, SST 28.1&deg;C, Chl 1.36 mg/m&sup3;).</li>
+    <li><strong>Stage 4 (Weather Agent):</strong> Pulls forecasted wave swell (1.2m) and wind velocity (16 km/h).</li>
+    <li><strong>Stage 5 (GIS Agent):</strong> Calculates Haversine nautical distance (22.8 nm), compass bearing (248.8&deg; WSW), and runs Jordan Curve ray-casting to ensure the corridor avoids naval firing ranges and international boundaries.</li>
+    <li><strong>Stage 6 (Risk Engine):</strong> Applies deterministic 5-factor mathematical weighting: Risk Score = 17.0 (Band: <strong>LOW RISK</strong>). Checks tidal schedule to recommend high-tide departure at 04:12 AM.</li>
+    <li><strong>Stage 7 (Decision Agent):</strong> Gemini Flash-Lite synthesizes numerical evidence into pure Marathi markdown briefing with structured cards and action buttons (<em>"View Route on Map"</em>).</li>
+    <li><strong>Database Persistence:</strong> Both user query and assistant response are persisted to Supabase <code>chat_messages</code> and local cache, enabling instant multi-tab drawer recall.</li>
+  </ul>
+</div>
+
+---
+
+<h2>3. Frontend Architecture & Page Walkthrough</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 20%;">Page / Route</th>
+      <th style="width: 25%;">Primary Components</th>
+      <th style="width: 55%;">Functional Workflow & Features</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Dashboard</strong><br/><code>/</code></td>
+      <td><code>Dashboard.jsx</code>, Telemetry HUD, Metric Cards</td>
+      <td>Displays high-level operational overview: Live GPS bar, Sea State indicator, Wind velocity, SST, Active PFZ cards, and high-priority coastal warning carousels.</td>
+    </tr>
+    <tr>
+      <td><strong>Marine Map</strong><br/><code>/map</code></td>
+      <td><code>MapPage.jsx</code>, Leaflet TileLayer, GeoJSON Layer</td>
+      <td>Interactive navigational chart. Toggles layer overlays: PFZ opportunity zones, wave hazard polygons, bathymetric contours, vessel tracking, and international maritime boundaries.</td>
+    </tr>
+    <tr>
+      <td><strong>Ocean Analytics</strong><br/><code>/analytics</code></td>
+      <td><code>Analytics.jsx</code>, SVG Trend Charts, Methodology Cards</td>
+      <td>Presents 7-day historical satellite trend charts for SST, Chlorophyll-a front tracking, wave height observations, harmonic tidal predictions, and the Ocean Methodology Guide.</td>
+    </tr>
+    <tr>
+      <td><strong>Fishing Intelligence</strong><br/><code>/fishing</code></td>
+      <td><code>Fishing.jsx</code>, Multi-Day Planner, Species Cards</td>
+      <td>Evaluates multi-day fishing feasibility (Today, Tomorrow, Day After) with transparent suitability scoring (0–100), commercial species distribution (Pomfret, Mackerel, Tuna), and gear tips.</td>
+    </tr>
+    <tr>
+      <td><strong>Safety & Routes</strong><br/><code>/safety</code></td>
+      <td><code>Safety.jsx</code>, Route Calculator, Waypoint Log</td>
+      <td>Calculates A* hazard-cleared navigational passages from selected harbor to destination zone. Displays Route Assessment Points (Corridor, Mid-Channel, Shelf) with clearance verification.</td>
+    </tr>
+    <tr>
+      <td><strong>ORCA Assistant</strong><br/><code>/assistant</code></td>
+      <td><code>Assistant.jsx</code>, Drawer History, MarkdownView</td>
+      <td>Multi-turn conversational AI copilot. Supports full chat history drawer (New Chat, Switch Session, Delete Chat, Clear Messages), structured action pills, and tri-lingual execution.</td>
+    </tr>
+    <tr>
+      <td><strong>Alerts</strong><br/><code>/alerts</code></td>
+      <td><code>AlertsPage.jsx</code>, Severity Buckets</td>
+      <td>Categorizes coastal advisories into 3 priority buckets: Red (High/Critical Warnings), Yellow (Caution Advisories), and Green (Coastal Bulletins) with port sector filters.</td>
+    </tr>
+    <tr>
+      <td><strong>Profile & Settings</strong><br/><code>/profile</code>, <code>/settings</code></td>
+      <td><code>Profile.jsx</code>, <code>SettingsPage.jsx</code></td>
+      <td>Displays authenticated captain UUID, encrypted session badges, profession editor, dark/light theme toggle, and secure sign-out handler.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>4. Backend API Specifications & Data Contracts</h2>
+
+<p>The FastAPI backend exposes clean, high-performance asynchronous endpoints:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 22%;">Endpoint</th>
+      <th style="width: 10%;">Method</th>
+      <th style="width: 28%;">Request Payload / Params</th>
+      <th style="width: 40%;">Response Payload</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>/api/query</code></td>
+      <td><code>POST</code></td>
+      <td><code>{"session_id": "...", "text": "...", "language": "en|hi|mr"}</code></td>
+      <td><code>FinalDecisionOutput</code>: Structured answer, recommendation item, risk scores, waypoints, and evidence citations.</td>
+    </tr>
+    <tr>
+      <td><code>/api/analytics</code></td>
+      <td><code>GET</code></td>
+      <td><code>port_id=mumbai&period_days=7</code></td>
+      <td>SST, Chlorophyll, Wave height time-series values, deltas, and Survey of India high/low tide predictions.</td>
+    </tr>
+    <tr>
+      <td><code>/api/pfz</code></td>
+      <td><code>GET</code></td>
+      <td><code>port_id=mumbai&radius_km=80</code></td>
+      <td>List of active PFZ candidates with latitude, longitude, bearing, distance, SST, and Chlorophyll concentration.</td>
+    </tr>
+    <tr>
+      <td><code>/api/alerts</code></td>
+      <td><code>GET</code></td>
+      <td><code>port_id=mumbai</code></td>
+      <td>Active marine warnings, risk levels (LOW, MODERATE, HIGH, CRITICAL), advisory text, and validity windows.</td>
+    </tr>
+    <tr>
+      <td><code>/api/navigation/route</code></td>
+      <td><code>POST</code></td>
+      <td><code>{"origin": {"lat": ..., "lon": ...}, "destination": {...}}</code></td>
+      <td>Detailed passage plan: distance (km/nm), duration, waypoint coordinates, compass heading, and cell-by-cell risk.</td>
+    </tr>
+    <tr>
+      <td><code>/api/conversations</code></td>
+      <td><code>GET/POST</code></td>
+      <td><code>user_id=captain-uuid</code></td>
+      <td>Array of conversation session objects with IDs, titles, and creation timestamps for chat drawer synchronization.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>5. Supabase PostgreSQL Database Architecture</h2>
+
+<p>Our cloud database schema (<code>supabase_schema.sql</code>) guarantees ACID transaction guarantees and Row Level Security (RLS):</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 22%;">Table Name</th>
+      <th style="width: 28%;">Primary Keys & Foreign Keys</th>
+      <th style="width: 50%;">Stored Attributes & Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>public.users</code></td>
+      <td><code>id UUID PRIMARY KEY &rarr; auth.users(id)</code></td>
+      <td>Stores user email, role (<code>user</code>, <code>researcher</code>, <code>admin</code>), full name, and syncs automatically with Supabase Auth via triggers.</td>
+    </tr>
+    <tr>
+      <td><code>public.ocean_observations</code></td>
+      <td><code>id UUID PRIMARY KEY</code></td>
+      <td>Satellite SST (&deg;C), Chlorophyll-a (mg/m&sup3;), salinity (PSU), observation timestamp, and institutional source.</td>
+    </tr>
+    <tr>
+      <td><code>public.wave_observations</code></td>
+      <td><code>id UUID PRIMARY KEY</code></td>
+      <td>Significant wave height ($H_s$ in meters), swell period, wave direction, and buoy source (INCOIS).</td>
+    </tr>
+    <tr>
+      <td><code>public.alerts</code></td>
+      <td><code>id UUID PRIMARY KEY</code></td>
+      <td>Hazard title, severity enum (<code>LOW</code>, <code>MODERATE</code>, <code>HIGH</code>, <code>CRITICAL</code>), coordinates, and advisory text.</td>
+    </tr>
+    <tr>
+      <td><code>public.conversations</code></td>
+      <td><code>id UUID PRIMARY KEY</code></td>
+      <td>User-isolated chat sessions with titles and timestamps for multi-tab persistent conversation drawers.</td>
+    </tr>
+    <tr>
+      <td><code>public.chat_messages</code></td>
+      <td><code>id UUID PRIMARY KEY &rarr; conversations(id)</code></td>
+      <td>Individual message turns, sender (<code>user</code>/<code>orca</code>), message text, language, route flags, and structured JSON telemetry.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>6. Mathematical Formulations & Deterministic Engines</h2>
+
+<h3>6.1. Haversine Great-Circle Geodesic Distance</h3>
+<div class="formula-box">
+  &Delta;&phi; = &phi;<sub>2</sub> &minus; &phi;<sub>1</sub>, &nbsp;&nbsp; &Delta;&lambda; = &lambda;<sub>2</sub> &minus; &lambda;<sub>1</sub><br/>
+  <strong>a</strong> = sin&sup2;(&Delta;&phi; / 2) + cos(&phi;<sub>1</sub>) &times; cos(&phi;<sub>2</sub>) &times; sin&sup2;(&Delta;&lambda; / 2)<br/>
+  <strong>c</strong> = 2 &times; atan2(&radic;a, &radic;(1 &minus; a))<br/>
+  <strong>Distance (d)</strong> = R &times; c &nbsp;&nbsp; <em>(where R = 6,371.0 km)</em>
+</div>
+
+<h3>6.2. True Compass Bearing</h3>
+<div class="formula-box">
+  x = sin(&Delta;&lambda;) &times; cos(&phi;<sub>2</sub>)<br/>
+  y = cos(&phi;<sub>1</sub>) &times; sin(&phi;<sub>2</sub>) &minus; sin(&phi;<sub>1</sub>) &times; cos(&phi;<sub>2</sub>) &times; cos(&Delta;&lambda;)<br/>
+  <strong>Heading (&theta;)</strong> = (degrees(atan2(x, y)) + 360) mod 360
+</div>
+
+<h3>6.3. Deterministic 5-Factor Maritime Risk Formula (0–100)</h3>
+<div class="formula-box">
+  <strong>Risk (R) = 0.30(R<sub>wave</sub>) + 0.20(R<sub>wind</sub>) + 0.30(R<sub>hazard</sub>) + 0.10(R<sub>dist</sub>) + 0.10(R<sub>geofence</sub>)</strong><br/>
+  &bull; <strong>R<sub>wave</sub>:</strong> Wave height scale (Hs &lt; 0.8m: 10 | 0.8-1.5m: 25 | 1.5-2.2m: 55 | 2.2-3.2m: 85 | &gt;3.2m: 100)<br/>
+  &bull; <strong>R<sub>wind</sub>:</strong> Wind velocity scale (&lt;15 km/h: 10 | 15-25 km/h: 30 | 25-40 km/h: 65 | &gt;40 km/h: 100) + Squall penalty<br/>
+  &bull; <strong>R<sub>hazard</sub>:</strong> Max severity alert (LOW: 30 | MODERATE: 60 | HIGH: 85 | SEVERE: 100)<br/>
+  &bull; <strong>R<sub>dist</sub>:</strong> Normalized trip duration and distance<br/>
+  &bull; <strong>R<sub>geofence</sub>:</strong> CLEAR: 0 | NEAR BOUNDARY: 40 | INTERSECTS: 100 (Hard Block)
+</div>
+
+<div class="callout-warning">
+  <div class="callout-title">HARD SAFETY OVERRIDE RULES</div>
+  <p>If Significant Wave Height &ge; 2.4m OR Sustained Wind &ge; 42 km/h OR Critical Hazard &ge; 85:<br/>
+  <strong>Total Risk = max(R, 65.0) &rarr; Forces HIGH RISK Band and small craft advisory override.</strong></p>
+</div>
+
+<h3>6.4. Composite Fishing Suitability Index (0–100)</h3>
+<div class="formula-box">
+  <strong>Suitability (S) = 0.35(S<sub>PFZ</sub>) + 0.20(S<sub>Wave</sub>) + 0.20(S<sub>Weather</sub>) + 0.10(S<sub>Hazard</sub>) + 0.10(S<sub>Ocean</sub>) + 0.05(S<sub>Tide</sub>)</strong>
+</div>
+
+---
+
+<h2>7. Offline Resilience & Fault-Tolerance Matrix</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 25%;">Failure Scenario</th>
+      <th style="width: 25%;">Primary Component</th>
+      <th style="width: 50%;">Automated Fault-Tolerance Mechanism</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Gemini LLM API Offline / Rate Limited</strong></td>
+      <td><code>llm_client.py</code></td>
+      <td>Catches network timeout and switches automatically to an embedded local rule-based Markdown synthesis engine. Zero app crashes.</td>
+    </tr>
+    <tr>
+      <td><strong>Cloud Supabase Database Unreachable</strong></td>
+      <td><code>supabase_client.py</code> & <code>api.js</code></td>
+      <td>Fails over to browser <code>localStorage</code> and Python local coastal benchmark registry (<code>indian_coastal_registry.py</code>).</td>
+    </tr>
+    <tr>
+      <td><strong>GPS Satellite Signal Denied / Inland Location</strong></td>
+      <td><code>nlu_agent.py</code> & <code>App.jsx</code></td>
+      <td>Detects inland coordinate, displays advisory banner, and automatically routes passage from the nearest coastal fishery hub.</td>
+    </tr>
+    <tr>
+      <td><strong>GIS C-Libraries (Shapely) Missing</strong></td>
+      <td><code>gis_agent.py</code></td>
+      <td>Falls back to our pure-Python Jordan Curve ray-casting algorithm for 2D point-in-polygon boundary validation.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div style="margin-top: 25pt; border-top: 1pt solid #cbd5e1; padding-top: 8pt; font-size: 8.5pt; color: #64748b; text-align: center;">
+  <strong>ORCA Marine Intelligence Platform</strong> &bull; Complete System Workflow Specification &bull; SIH 2026
+</div>
+
+</body>
+</html>

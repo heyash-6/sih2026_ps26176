@@ -1,0 +1,398 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="utf-8">
+<title>ORCA AI Agents Technical Report - SIH 2026</title>
+<!--[if gte mso 9]>
+<xml>
+<w:WordDocument>
+<w:View>Print</w:View>
+<w:Zoom>100</w:Zoom>
+<w:DoNotOptimizeForBrowser/>
+</w:WordDocument>
+</xml>
+<![endif]-->
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 1.0in 1.0in 1.0in 1.0in;
+    mso-header-margin: 0.5in;
+    mso-footer-margin: 0.5in;
+  }
+  body {
+    font-family: 'Segoe UI', 'Calibri', 'Arial', sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #1e293b;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+  }
+  h1 {
+    font-family: 'Segoe UI Semibold', 'Calibri', sans-serif;
+    font-size: 24pt;
+    color: #0369a1;
+    border-bottom: 2pt solid #0284c7;
+    padding-bottom: 6pt;
+    margin-top: 18pt;
+    margin-bottom: 8pt;
+  }
+  h2 {
+    font-family: 'Segoe UI Semibold', 'Calibri', sans-serif;
+    font-size: 16pt;
+    color: #0f172a;
+    border-bottom: 1pt solid #cbd5e1;
+    padding-bottom: 4pt;
+    margin-top: 18pt;
+    margin-bottom: 6pt;
+    page-break-after: avoid;
+  }
+  h3 {
+    font-family: 'Segoe UI Semibold', 'Calibri', sans-serif;
+    font-size: 13pt;
+    color: #0284c7;
+    margin-top: 14pt;
+    margin-bottom: 4pt;
+    page-break-after: avoid;
+  }
+  h4 {
+    font-family: 'Segoe UI Semibold', 'Calibri', sans-serif;
+    font-size: 11pt;
+    color: #334155;
+    margin-top: 10pt;
+    margin-bottom: 2pt;
+    page-break-after: avoid;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 8pt;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 10pt;
+    margin-bottom: 14pt;
+    font-size: 10pt;
+  }
+  th {
+    background-color: #0f172a;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: left;
+    padding: 8pt 10pt;
+    border: 1pt solid #334155;
+  }
+  td {
+    padding: 7pt 10pt;
+    border: 1pt solid #cbd5e1;
+    vertical-align: top;
+  }
+  tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+  .callout {
+    background-color: #f0f9ff;
+    border-left: 4pt solid #0284c7;
+    padding: 10pt 14pt;
+    margin-top: 10pt;
+    margin-bottom: 12pt;
+    border-radius: 2pt;
+  }
+  .callout-warning {
+    background-color: #fffbeb;
+    border-left: 4pt solid #f59e0b;
+    padding: 10pt 14pt;
+    margin-top: 10pt;
+    margin-bottom: 12pt;
+    border-radius: 2pt;
+  }
+  .callout-title {
+    font-weight: bold;
+    color: #0369a1;
+    margin-bottom: 4pt;
+  }
+  .formula-box {
+    background-color: #f1f5f9;
+    border: 1pt solid #cbd5e1;
+    padding: 10pt 14pt;
+    margin: 8pt 0;
+    font-family: 'Cambria Math', 'Georgia', serif;
+    font-size: 11.5pt;
+    color: #0f172a;
+    border-radius: 4pt;
+  }
+  code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 9.5pt;
+    background-color: #f1f5f9;
+    color: #0f172a;
+    padding: 2pt 4pt;
+    border-radius: 3pt;
+    border: 1pt solid #e2e8f0;
+  }
+  pre {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 9pt;
+    background-color: #0f172a;
+    color: #f8fafc;
+    padding: 10pt 12pt;
+    border-radius: 4pt;
+    overflow-x: auto;
+    line-height: 1.45;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2pt 6pt;
+    font-size: 8.5pt;
+    font-weight: 600;
+    border-radius: 3pt;
+  }
+  .badge-blue { background-color: #e0f2fe; color: #0369a1; }
+  .badge-green { background-color: #dcfce7; color: #15803d; }
+  .badge-amber { background-color: #fef3c7; color: #b45309; }
+  .meta-box {
+    background-color: #f8fafc;
+    border: 1pt solid #e2e8f0;
+    padding: 12pt;
+    margin-bottom: 18pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="meta-box">
+  <div style="font-size: 20pt; font-weight: bold; color: #0284c7; margin-bottom: 4pt;">ORCA: Marine EcOsystem Reasoning with Collaborative Agents</div>
+  <div style="font-size: 13pt; font-weight: 600; color: #334155; margin-bottom: 8pt;">Comprehensive AI Agent Architecture, Mathematical Formulations & Multi-Agent Workflow</div>
+  <div style="font-size: 10pt; color: #64748b;">
+    <strong>Role:</strong> AI Agent Architect & Pipeline Engineer &nbsp;|&nbsp;
+    <strong>Hackathon:</strong> Smart India Hackathon (SIH) &nbsp;|&nbsp;
+    <strong>Problem Statement:</strong> PS-26176 (Conversational Marine Intelligence)
+  </div>
+</div>
+
+<div class="callout">
+  <div class="callout-title">EXECUTIVE PITCH TO THE EVALUATION JURY (30 SECONDS)</div>
+  <p><em>"Respected Judges, in operational marine navigation, <strong>a hallucinated heading, risk score, or boundary clearance can cost human lives and coastal vessels</strong>. Therefore, our architectural foundation is built on <strong>Hierarchical Agentic Orchestration with Deterministic Guardrails</strong>. We strictly decouple probabilistic language interpretation from deterministic navigational physics:</em></p>
+  <p><em>1. <strong>Probabilistic Layer (NLU & Explanation Agents):</strong> Performs natural language understanding across English, Hindi, and Marathi, and articulates transparent briefings.</em><br/>
+  <em>2. <strong>Deterministic Layer (Marine, GIS, Weather, and Risk Engines):</strong> Executes 100% auditable mathematical computations—including Haversine geodesy, ray-casting geofencing, A* risk-penalized pathfinding, and 5-factor deterministic risk matrices.</em></p>
+  <p><em><strong>The LLM is never allowed to calculate coordinates, distances, or safety scores; it only explains the mathematical proofs generated by our specialist engines.</strong>"</em></p>
+</div>
+
+<h2>1. End-to-End 7-Stage Multi-Agent Workflow</h2>
+<p>The ORCA multi-agent engine follows a strict, 7-stage directed execution pipeline that guarantees response integrity, offline resilience, and mathematical explainability:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 12%;">Stage</th>
+      <th style="width: 25%;">Agent / Engine</th>
+      <th style="width: 20%;">Type</th>
+      <th style="width: 43%;">Core Responsibility</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Stage 1</strong></td>
+      <td><strong>NLU Agent</strong><br/>(<code>nlu_agent.py</code>)</td>
+      <td><span class="badge badge-blue">Hybrid</span><br/>Regex + Gazetteer + LLM</td>
+      <td>Extracts intents, entities (harbor, target species, time window), and user language (EN/HI/MR).</td>
+    </tr>
+    <tr>
+      <td><strong>Stage 2</strong></td>
+      <td><strong>Master Orchestrator</strong><br/>(<code>orchestrator.py</code>)</td>
+      <td><span class="badge badge-green">Deterministic</span><br/>State Machine</td>
+      <td>Cross-turn session memory, clarification short-circuits, and parallel dispatch to specialists.</td>
+    </tr>
+    <tr>
+      <td><strong>Stage 3</strong></td>
+      <td><strong>Marine & PFZ Agent</strong><br/>(<code>marine_agent.py</code>)</td>
+      <td><span class="badge badge-green">Deterministic</span><br/>Spatial SQL + API</td>
+      <td>Retrieves Potential Fishing Zones (PFZs), SST thermal breaks, and Chlorophyll-a fronts.</td>
+    </tr>
+    <tr>
+      <td><strong>Stage 4</strong></td>
+      <td><strong>Weather & Hazard Agent</strong><br/>(<code>weather_hazard_agent.py</code>)</td>
+      <td><span class="badge badge-green">Deterministic</span><br/>Ocean State Client</td>
+      <td>Evaluates significant wave height (Hs), swell, wind velocity, rain, and IMD/INCOIS alerts.</td>
+    </tr>
+    <tr>
+      <td><strong>Stage 5</strong></td>
+      <td><strong>GIS & Geospatial Agent</strong><br/>(<code>gis_agent.py</code> & <code>navigator.py</code>)</td>
+      <td><span class="badge badge-green">Deterministic</span><br/>Geodesic & Pathfinding</td>
+      <td>Calculates Haversine distances, initial bearings, A* nautical routes, and IMBL geofencing.</td>
+    </tr>
+    <tr>
+      <td><strong>Stage 6</strong></td>
+      <td><strong>Deterministic Risk Engine</strong><br/>(<code>risk_engine.py</code>)</td>
+      <td><span class="badge badge-green">Deterministic</span><br/>Mathematical Matrix</td>
+      <td>Computes 5-component weighted risk (0–100) and enforces non-negotiable safety overrides.</td>
+    </tr>
+    <tr>
+      <td><strong>Stage 7</strong></td>
+      <td><strong>Decision & Explanation Agent</strong><br/>(<code>decision_agent.py</code>)</td>
+      <td><span class="badge badge-blue">Semantic</span><br/>Structured GenAI</td>
+      <td>Synthesizes numerical proofs into actionable advice in English, Hindi, or Marathi.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>2. Detailed Mathematical Formulations & Algorithms</h2>
+
+<h3>2.1. Haversine Great-Circle Geodesic Distance</h3>
+<p>Because the Earth is an oblate spheroid, planar Euclidean distance produces catastrophic nautical errors. We compute great-circle distance between departure coordinate (&phi;<sub>1</sub>, &lambda;<sub>1</sub>) and fishing zone (&phi;<sub>2</sub>, &lambda;<sub>2</sub>):</p>
+<div class="formula-box">
+  &Delta;&phi; = &phi;<sub>2</sub> &minus; &phi;<sub>1</sub>, &nbsp;&nbsp; &Delta;&lambda; = &lambda;<sub>2</sub> &minus; &lambda;<sub>1</sub><br/>
+  <strong>a</strong> = sin&sup2;(&Delta;&phi; / 2) + cos(&phi;<sub>1</sub>) &times; cos(&phi;<sub>2</sub>) &times; sin&sup2;(&Delta;&lambda; / 2)<br/>
+  <strong>c</strong> = 2 &times; atan2(&radic;a, &radic;(1 &minus; a))<br/>
+  <strong>d</strong> = R &times; c &nbsp;&nbsp; <em>(where R = 6,371.0 km Earth Mean Radius)</em>
+</div>
+
+<h3>2.2. Initial Forward Navigational Bearing</h3>
+<p>Calculates the true compass heading in degrees (0&deg;&ndash;360&deg;) for the vessel's autopilot or helm:</p>
+<div class="formula-box">
+  x = sin(&Delta;&lambda;) &times; cos(&phi;<sub>2</sub>)<br/>
+  y = cos(&phi;<sub>1</sub>) &times; sin(&phi;<sub>2</sub>) &minus; sin(&phi;<sub>1</sub>) &times; cos(&phi;<sub>2</sub>) &times; cos(&Delta;&lambda;)<br/>
+  <strong>&theta;</strong> = (degrees(atan2(x, y)) + 360) mod 360
+</div>
+
+<h3>2.3. Ray-Casting Algorithm for Maritime Boundary Geofencing</h3>
+<p>To enforce International Maritime Boundary Lines (IMBL) and Marine Protected Areas (MPAs) without requiring heavy C-library dependencies on small vessel computers, we implement the <strong>Jordan Curve Point-in-Polygon</strong> algorithm:</p>
+<div class="formula-box">
+  For a test point (x, y) and polygon vertices (p<sub>i</sub>, p<sub>i+1</sub>):<br/>
+  x<sub>inters</sub> = (y &minus; y<sub>1</sub>) &times; (x<sub>2</sub> &minus; x<sub>1</sub>) / (y<sub>2</sub> &minus; y<sub>1</sub>) + x<sub>1</sub><br/>
+  <em>If the count of ray intersections with polygon edges is odd, the coordinate strictly lies INSIDE the restricted zone.</em>
+</div>
+
+<h3>2.4. A* Risk-Aware Marine Pathfinding Algorithm</h3>
+<p>Navigating through open water must penalize physical hazards (shoals, underwater reefs, high swell corridors). Our graph navigator minimizes the cost function:</p>
+<div class="formula-box">
+  <strong>f(n) = g(n) + h(n) + RiskPenalty(n)</strong><br/>
+  &bull; <strong>g(n):</strong> Cumulative nautical distance traversed from departure port.<br/>
+  &bull; <strong>h(n):</strong> Haversine heuristic estimate from current cell n to target PFZ coordinate.<br/>
+  &bull; <strong>RiskPenalty(n):</strong> Dynamic penalty assigned to sea state cells exhibiting wave heights &gt; 2.0m or coastal hazards.
+</div>
+
+<h3>2.5. Deterministic Maritime Risk Score Model (0 to 100)</h3>
+<p>The Risk Engine evaluates 5 weighted dimensions with mathematical determinism:</p>
+<div class="formula-box">
+  <strong>Total Risk (R) = (0.30 &times; R<sub>wave</sub>) + (0.20 &times; R<sub>wind</sub>) + (0.30 &times; R<sub>hazard</sub>) + (0.10 &times; R<sub>distance</sub>) + (0.10 &times; R<sub>geofence</sub>)</strong>
+</div>
+<ul>
+  <li><strong>Wave Risk (30%):</strong> Hs &lt; 0.8m &rarr; 10; 0.8–1.5m &rarr; 25; 1.5–2.2m &rarr; 55; 2.2–3.2m &rarr; 85; &gt; 3.2m &rarr; 100.</li>
+  <li><strong>Wind & Squall Risk (20%):</strong> Base wind speed combined with precipitation penalty (Heavy squalls &gt; 5mm/hr add +25 pts).</li>
+  <li><strong>Hazard Risk (30%):</strong> Highest active INCOIS/IMD advisory level: LOW &rarr; 30, MODERATE &rarr; 60, HIGH &rarr; 85, SEVERE &rarr; 100.</li>
+  <li><strong>Distance & Duration Risk (10%):</strong> Normalized against vessel range: (Dist / 50km &times; 50) + (Duration / 12h &times; 50).</li>
+  <li><strong>Geofence Risk (10%):</strong> CLEAR &rarr; 0; NEAR BOUNDARY &rarr; 40; INTERSECTS (Hard Block) &rarr; 100.</li>
+</ul>
+
+<div class="callout-warning">
+  <div class="callout-title">MANDATORY HARD SAFETY FLOOR OVERRIDE</div>
+  <p>Regardless of favorable distance or PFZ opportunity, life safety is non-negotiable:</p>
+  <p><strong>If Significant Wave Height (Hs) &ge; 2.4m OR Sustained Wind &ge; 42 km/h OR Critical Hazard &ge; 85:</strong><br/>
+  <code>Total Risk = max(R, 65.0) &rarr; Automatically forces HIGH RISK Band and advises NO SAIL for small craft.</code></p>
+</div>
+
+<h3>2.6. Composite Fishing Suitability Index (0 to 100)</h3>
+<p>Combines commercial opportunity with oceanographic viability and navigation safety:</p>
+<div class="formula-box">
+  <strong>Suitability (S) = 0.35(S<sub>PFZ</sub>) + 0.20(S<sub>Wave</sub>) + 0.20(S<sub>Weather</sub>) + 0.10(S<sub>Hazard</sub>) + 0.10(S<sub>Ocean</sub>) + 0.05(S<sub>Tide</sub>)</strong>
+</div>
+<ul>
+  <li><strong>S<sub>PFZ</sub> (35%):</strong> Satellite confidence score reflecting SST thermal breaks and Chlorophyll-a gradients.</li>
+  <li><strong>S<sub>Wave</sub> (20%):</strong> Sea state stability score (calm sea &le; 0.9m scores 92; dangerous sea &gt; 2.4m scores 10).</li>
+  <li><strong>S<sub>Weather</sub> (20%):</strong> Wind speed (60%) + Precipitation index (40%).</li>
+  <li><strong>S<sub>Ocean</sub> (10%):</strong> Optimal SST window (26.5&deg;C–29.5&deg;C) + Chlorophyll concentration (&ge; 1.0 mg/m&sup3; scores 95).</li>
+  <li><strong>S<sub>Tide</sub> (5%):</strong> Survey of India tidal harmonic predictions for shallow bar harbor depth clearance.</li>
+</ul>
+
+---
+
+<h2>3. Python Imports Breakdown & Technical Justifications</h2>
+
+<p>Every single Python import across our agent architecture was intentionally chosen for memory efficiency, execution speed, and zero runtime failures:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 20%;">Import / Library</th>
+      <th style="width: 25%;">Agent Location</th>
+      <th style="width: 55%;">Technical Reason & Architectural Justification</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>import math</code></td>
+      <td><code>gis_agent.py</code>, <code>navigator.py</code></td>
+      <td>Provides high-performance C-optimized trigonometric routines (<code>sin</code>, <code>cos</code>, <code>atan2</code>, <code>radians</code>) required for microsecond geodesic distance and bearing calculations.</td>
+    </tr>
+    <tr>
+      <td><code>from pydantic import BaseModel, Field</code></td>
+      <td>All schemas (<code>nlu.py</code>, <code>risk.py</code>, <code>marine.py</code>)</td>
+      <td>Pydantic V2 provides compiled Rust-speed schema validation. Enforces strict type contracts between agents and prevents malformed data payloads.</td>
+    </tr>
+    <tr>
+      <td><code>from datetime import datetime, timedelta</code></td>
+      <td><code>nlu_agent.py</code>, <code>fishing_reasoning_engine.py</code></td>
+      <td>Calculates temporal horizons, converts dynamic colloquial strings (<em>"tomorrow morning"</em>, <em>"next 3 days"</em>) to ISO UTC stamps, and computes tidal windows.</td>
+    </tr>
+    <tr>
+      <td><code>import re</code></td>
+      <td><code>nlu_agent.py</code></td>
+      <td>Enables fast deterministic regular expression tokenization for harbor names, ports, and multi-lingual Indian script pattern extraction without network calls.</td>
+    </tr>
+    <tr>
+      <td><code>from shapely.geometry import Point, Polygon, shape</code></td>
+      <td><code>gis_agent.py</code></td>
+      <td>Industry-standard GEOS computational geometry library for testing spatial intersections against complex 100+ vertex maritime border polygons.</td>
+    </tr>
+    <tr>
+      <td><code>from google import genai</code></td>
+      <td><code>llm_client.py</code></td>
+      <td>Official Google GenAI SDK for interacting directly with Gemini 2.5/3.1 Flash-Lite models with support for structured JSON schema outputs.</td>
+    </tr>
+    <tr>
+      <td><code>import tenacity</code></td>
+      <td><code>llm_client.py</code></td>
+      <td>Implements deterministic exponential backoff and retry policies for external network API calls, preventing unhandled connection drops at sea.</td>
+    </tr>
+    <tr>
+      <td><code>from fastapi import FastAPI, Query</code></td>
+      <td><code>app/main.py</code></td>
+      <td>High-throughput asynchronous ASGI web server framework with automatic OpenAPI documentation and native JSON serialization.</td>
+    </tr>
+    <tr>
+      <td><code>from supabase import create_client, Client</code></td>
+      <td><code>supabase_client.py</code></td>
+      <td>Connects to cloud PostgreSQL database hosting operational marine tables, user authentication, and chat history vectors.</td>
+    </tr>
+    <tr>
+      <td><code>from pathlib import Path</code></td>
+      <td><code>navigator.py</code></td>
+      <td>Provides operating-system agnostic path resolution for GeoJSON maritime boundary datasets on Windows, Linux, and macOS servers.</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+<h2>4. Frequently Asked Questions (FAQ) for the Jury Viva</h2>
+
+<h3>Q1: "Why did you build an orchestrated multi-agent system instead of a single LLM prompt?"</h3>
+<p><strong>Answer:</strong> <em>"An all-in-one LLM prompt fails on three counts: (1) <strong>Safety:</strong> LLMs hallucinate numbers and cannot guarantee that wave heights above 2.4m will trigger a hard block; (2) <strong>Latency:</strong> Running heavy GIS coordinates through an LLM prompt increases token costs and latency to 6-8 seconds, whereas our deterministic GIS and Risk engines execute in under 15 milliseconds; (3) <strong>Reproducibility:</strong> Maritime authorities require audit trails where two identical conditions yield identical risk scores."</em></p>
+
+<h3>Q2: "How does ORCA operate when an offshore vessel loses internet connectivity?"</h3>
+<p><strong>Answer:</strong> <em>"ORCA features a 3-tier offline resilience fallback:</em><br/>
+<em>1. If the Gemini API is unreachable, <code>llm_client.py</code> catches the timeout and routes output through our local rule-based Markdown synthesis engine.</em><br/>
+<em>2. If external GIS servers are offline, <code>gis_agent.py</code> executes our native, pure-Python ray-casting algorithm.</em><br/>
+<em>3. Calibrated Indian coastal gazetteers and cached harmonic tide tables reside directly inside the local engine."</em></p>
+
+<h3>Q3: "How is multi-lingual translation kept faithful without mixing languages?"</h3>
+<p><strong>Answer:</strong> <em>"We enforce a strict single-language contract: <code>ONE USER MESSAGE &rarr; ONE DETECTED LANGUAGE &rarr; ONE COMPLETE RESPONSE IN THAT LANGUAGE</code>. Our NLU agent classifies the script, and the Decision Agent applies strict system prompts forbidding English trailing paragraphs or bilingual mixtures."</em></p>
+
+<div style="margin-top: 30pt; border-top: 1pt solid #cbd5e1; padding-top: 8pt; font-size: 9pt; color: #64748b; text-align: center;">
+  <strong>ORCA Marine Intelligence Platform</strong> &bull; SIH 2026 Submission Document &bull; Prepared by AI Agent Team
+</div>
+
+</body>
+</html>

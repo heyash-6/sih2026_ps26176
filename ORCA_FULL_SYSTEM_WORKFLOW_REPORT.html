@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ORCA Full System Workflow & Architecture Report — SIH 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #0284c7;
+    --primary-dark: #0369a1;
+    --primary-light: #e0f2fe;
+    --bg-dark: #070d19;
+    --surface: #ffffff;
+    --surface-alt: #f8fafc;
+    --border: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --accent-green: #10b981;
+    --accent-amber: #f59e0b;
+    --accent-red: #ef4444;
+  }
+
+  @media print {
+    body { font-size: 9.5pt; background: #fff !important; color: #000 !important; }
+    .no-print { display: none !important; }
+    .page-break { page-break-before: always; }
+    .container { box-shadow: none !important; border: none !important; padding: 0 !important; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: var(--text-main);
+    background: #f1f5f9;
+    line-height: 1.65;
+    padding: 30px 16px;
+  }
+
+  .container {
+    max-width: 980px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 48px 56px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px -5px rgba(0,0,0,0.08), 0 2px 6px -2px rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+  }
+
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .print-btn {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+  }
+  .print-btn:hover { background: var(--primary-dark); }
+
+  .doc-badge {
+    background: var(--primary-light);
+    color: var(--primary-dark);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+    line-height: 1.25;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-bottom: 20px;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    background: var(--surface-alt);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 30px;
+    font-size: 13px;
+  }
+
+  .meta-item strong {
+    display: block;
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+  }
+
+  h2 {
+    font-size: 19px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-top: 36px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h3 {
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--primary-dark);
+    margin-top: 22px;
+    margin-bottom: 8px;
+  }
+
+  p { margin-bottom: 12px; font-size: 14px; color: #334155; }
+
+  .callout {
+    background: #f0fdf4;
+    border-left: 4px solid var(--accent-green);
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 18px 0;
+  }
+  .callout.warning {
+    background: #fffbeb;
+    border-left-color: var(--accent-amber);
+  }
+  .callout.pitch {
+    background: #f0f9ff;
+    border-left-color: var(--primary);
+  }
+
+  .callout-title {
+    font-weight: 700;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #0369a1;
+    margin-bottom: 4px;
+  }
+  .callout.warning .callout-title { color: #b45309; }
+
+  .workflow-card {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--primary);
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+  }
+  .workflow-card h4 {
+    color: #0369a1;
+    font-size: 14.5px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .workflow-card ul { margin-left: 18px; font-size: 13.5px; color: #334155; }
+  .workflow-card li { margin-bottom: 4px; }
+
+  .formula-card {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 16px 20px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 12px 0 18px 0;
+    border: 1px solid #334155;
+    position: relative;
+    overflow-x: auto;
+  }
+  .formula-card .label {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 10px;
+    font-family: 'Inter', sans-serif;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0 20px 0;
+    font-size: 13px;
+  }
+
+  th {
+    background: #0f172a;
+    color: #ffffff;
+    font-weight: 600;
+    text-align: left;
+    padding: 9px 12px;
+    border: 1px solid #334155;
+    font-size: 12px;
+  }
+
+  td {
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    vertical-align: top;
+    color: #334155;
+  }
+
+  tr:nth-child(even) { background: var(--surface-alt); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: #f1f5f9;
+    color: #0369a1;
+    padding: 2px 5px;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag-green { background: #dcfce7; color: #15803d; }
+  .tag-blue { background: #e0f2fe; color: #0369a1; }
+  .tag-purple { background: #f3e8ff; color: #7e22ce; }
+
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header-actions no-print">
+    <span class="doc-badge">SIH 2026 Complete System Architecture Report</span>
+    <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  </div>
+
+  <h1>ORCA: Full-Stack Marine Intelligence System</h1>
+  <div class="subtitle">Complete System Workflow: Frontend (React 19), Backend (FastAPI), Database (Supabase PostgreSQL), and 7-Stage Multi-Agent AI Engine</div>
+
+  <div class="meta-grid">
+    <div class="meta-item">
+      <strong>System Scope</strong>
+      Full-Stack Marine Architecture
+    </div>
+    <div class="meta-item">
+      <strong>Frontend Tech</strong>
+      React 19 + Vite + Leaflet GIS
+    </div>
+    <div class="meta-item">
+      <strong>Backend Tech</strong>
+      FastAPI (ASGI) + Python 3.13
+    </div>
+    <div class="meta-item">
+      <strong>Cloud Database</strong>
+      Supabase PostgreSQL + RLS + Auth
+    </div>
+  </div>
+
+  <div class="callout pitch">
+    <div class="callout-title">System Overview</div>
+    <p>ORCA is an enterprise marine operational decision-support platform designed for coastal fishermen, maritime researchers, and port operators. It unifies satellite remote sensing (ISRO Oceansat, MODIS), real-time buoy telemetry (INCOIS), official astronomical tide predictions (Survey of India), and an AI agent copilot into an intuitive, tri-lingual web platform.</p>
+  </div>
+
+  <h2>1. Platform Architecture Tiers</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Tier</th>
+        <th style="width: 25%;">Core Technology</th>
+        <th style="width: 55%;">Responsibilities</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Frontend Tier</strong></td>
+        <td>React 19, Vite, Leaflet GIS, Vanilla CSS</td>
+        <td>Renders high-contrast operational dashboards, dynamic Leaflet maps, multi-tab persistent assistant drawer, live GPS detection, and localization (EN/HI/MR).</td>
+      </tr>
+      <tr>
+        <td><strong>Backend Tier</strong></td>
+        <td>FastAPI, Uvicorn, Python 3.13, Pydantic V2</td>
+        <td>Asynchronous REST API, static asset bundle hosting, session memory management, and parallel multi-agent dispatching.</td>
+      </tr>
+      <tr>
+        <td><strong>Multi-Agent AI Tier</strong></td>
+        <td>Hierarchical Orchestrator + 6 Specialist Engines</td>
+        <td>NLU parsing, great-circle geodesy, A* risk pathfinding, ray-casting geofencing, 5-factor risk scoring, and Gemini Flash-Lite explanation synthesis.</td>
+      </tr>
+      <tr>
+        <td><strong>Data Tier</strong></td>
+        <td>Supabase PostgreSQL, PostGIS, JWT Auth</td>
+        <td>Relational tables for PFZs, coastal alerts, wave observations, tidal models, and indexed conversation history vectors.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Step-by-Step System Workflow</h2>
+
+  <div class="workflow-card">
+    <h4>Step 1: Access Control & Compulsory Authentication Gate</h4>
+    <p>When a user opens the platform at <code>http://localhost:8001</code>:</p>
+    <ul>
+      <li><code>App.jsx</code> verifies <code>currentUser</code> state from <code>localStorage.getItem('orca_user')</code> and Supabase <code>getSession()</code>.</li>
+      <li>If unauthenticated, access is completely blocked. The app renders a non-dismissible <code>AuthModal</code> with <code>12px</code> backdrop blur, language selector, and demo/email login.</li>
+      <li>Signing in unlocks full portal access, while signing out locks the portal again.</li>
+    </ul>
+  </div>
+
+  <div class="workflow-card">
+    <h4>Step 2: Automated Geolocation & Coastal Hub Resolution</h4>
+    <ul>
+      <li>Browser <code>navigator.geolocation</code> acquires GPS coordinates.</li>
+      <li>Backend <code>/api/location/resolve</code> calculates great-circle distance to the nearest Indian harbor using <code>indian_coastal_registry.py</code>.</li>
+      <li>The portal context dynamically switches to that port: fetching port-specific SST, wave heights, and tidal schedules.</li>
+    </ul>
+  </div>
+
+  <div class="workflow-card">
+    <h4>Step 3: Multi-Source Marine Data Aggregation</h4>
+    <ul>
+      <li><code>GET /api/analytics</code>: Retrieves 7-day SST, Chlorophyll-a front tracking, wave trends, and official Survey of India tidal harmonic predictions.</li>
+      <li><code>GET /api/pfz?port_id=...</code>: Retrieves active satellite PFZs within 80km, ranked by confidence and depth.</li>
+      <li><code>GET /api/alerts?port_id=...</code>: Fetches severity-sorted bulletins (Critical, Caution, Coastal bulletins).</li>
+    </ul>
+  </div>
+
+  <div class="workflow-card">
+    <h4>Step 4: AI Conversational Copilot Query Execution</h4>
+    <ul>
+      <li><strong>NLU Agent:</strong> Extracts intent, entities (port, time window), and user language (English, Hindi, Marathi).</li>
+      <li><strong>Orchestrator:</strong> Dispatches tasks in parallel to Marine, Weather, and GIS agents.</li>
+      <li><strong>Marine Agent:</strong> Queries satellite PFZ candidates from Supabase or live telemetry.</li>
+      <li><strong>Weather Agent:</strong> Pulls forecasted wave swell and wind velocity.</li>
+      <li><strong>GIS Agent:</strong> Calculates Haversine distance, nautical bearing, and runs ray-casting polygon checks to avoid restricted military or international zones.</li>
+      <li><strong>Risk Engine:</strong> Applies deterministic 5-factor mathematical weighting to calculate an objective risk score (0–100) and checks tidal departures.</li>
+      <li><strong>Decision Agent:</strong> Gemini Flash-Lite formats the evidence into a pure, single-language markdown response with interactive action buttons.</li>
+      <li><strong>Database Persistence:</strong> Chat turns are saved to Supabase <code>chat_messages</code> and local cache, enabling instant drawer recall.</li>
+    </ul>
+  </div>
+
+  <h2>3. Frontend Pages & Modules Walkthrough</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">Route</th>
+        <th style="width: 25%;">Component</th>
+        <th style="width: 55%;">Features</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>/</code> (Dashboard)</td>
+        <td><code>Dashboard.jsx</code></td>
+        <td>Real-time telemetry HUD, Live GPS status, Sea State, Wind speed, Active PFZ cards, and priority alert carousels.</td>
+      </tr>
+      <tr>
+        <td><code>/map</code> (Marine Map)</td>
+        <td><code>MapPage.jsx</code></td>
+        <td>Leaflet navigational chart with layer controls: PFZs, wave hazards, bathymetric contours, and international maritime boundaries.</td>
+      </tr>
+      <tr>
+        <td><code>/analytics</code> (Analytics)</td>
+        <td><code>Analytics.jsx</code></td>
+        <td>7-day historical satellite trend charts for SST, Chlorophyll-a front tracking, wave heights, harmonic tides, and the Ocean Methodology Guide.</td>
+      </tr>
+      <tr>
+        <td><code>/fishing</code> (Fishing)</td>
+        <td><code>Fishing.jsx</code></td>
+        <td>Multi-day fishing trip planner (Today, Tomorrow, Day After) with transparent suitability scores (0–100) and species guides.</td>
+      </tr>
+      <tr>
+        <td><code>/safety</code> (Safety & Routes)</td>
+        <td><code>Safety.jsx</code></td>
+        <td>A* hazard-cleared navigational passages from harbor to destination. Displays Route Assessment Points with clearance verification.</td>
+      </tr>
+      <tr>
+        <td><code>/assistant</code> (ORCA Copilot)</td>
+        <td><code>Assistant.jsx</code></td>
+        <td>Multi-turn conversational assistant with full history drawer (New Chat, Switch Session, Delete Chat, Clear Messages) and tri-lingual execution.</td>
+      </tr>
+      <tr>
+        <td><code>/alerts</code> (Alerts)</td>
+        <td><code>AlertsPage.jsx</code></td>
+        <td>Categorizes advisories into 3 priority buckets: Red (High/Critical Warnings), Yellow (Caution Advisories), and Green (Coastal Bulletins).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>4. Database Schema (Supabase PostgreSQL)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Table</th>
+        <th style="width: 25%;">Keys</th>
+        <th style="width: 50%;">Attributes & Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>public.users</code></td>
+        <td><code>id UUID PRIMARY KEY</code></td>
+        <td>User email, role (<code>user</code>, <code>researcher</code>, <code>admin</code>), full name, synced automatically with Supabase Auth via triggers.</td>
+      </tr>
+      <tr>
+        <td><code>public.ocean_observations</code></td>
+        <td><code>id UUID PRIMARY KEY</code></td>
+        <td>Satellite SST (°C), Chlorophyll-a (mg/m³), salinity (PSU), observation timestamp, and institutional source.</td>
+      </tr>
+      <tr>
+        <td><code>public.wave_observations</code></td>
+        <td><code>id UUID PRIMARY KEY</code></td>
+        <td>Significant wave height (Hs in meters), swell period, wave direction, and buoy source.</td>
+      </tr>
+      <tr>
+        <td><code>public.alerts</code></td>
+        <td><code>id UUID PRIMARY KEY</code></td>
+        <td>Hazard title, severity enum (<code>LOW</code>, <code>MODERATE</code>, <code>HIGH</code>, <code>CRITICAL</code>), coordinates, and advisory text.</td>
+      </tr>
+      <tr>
+        <td><code>public.conversations</code></td>
+        <td><code>id UUID PRIMARY KEY</code></td>
+        <td>User-isolated chat sessions with titles and timestamps for multi-tab persistent conversation drawers.</td>
+      </tr>
+      <tr>
+        <td><code>public.chat_messages</code></td>
+        <td><code>id UUID PRIMARY KEY</code></td>
+        <td>Individual message turns, sender (<code>user</code>/<code>orca</code>), message text, language, route flags, and structured JSON telemetry.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>5. Mathematical Formulations & Algorithms</h2>
+
+  <h3>5.1. Haversine Great-Circle Geodesic Distance</h3>
+  <div class="formula-card">
+    <span class="label">Geodesic Formula</span>
+Δφ = φ₂ - φ₁  (radians)
+Δλ = λ₂ - λ₁  (radians)
+
+a = sin²(Δφ / 2) + cos(φ₁) · cos(φ₂) · sin²(Δλ / 2)
+c = 2 · atan2(√a, √(1 - a))
+Distance (d) = R · c   [where R = 6,371.0 km Earth Mean Radius]
+  </div>
+
+  <h3>5.2. Deterministic 5-Factor Maritime Risk Score (0 to 100)</h3>
+  <div class="formula-card">
+    <span class="label">Deterministic Risk Matrix</span>
+Total Risk (R) = (0.30 · R_wave) + (0.20 · R_wind) + (0.30 · R_hazard) + (0.10 · R_dist) + (0.10 · R_geofence)
+
+• R_wave:     Hs < 0.8m → 10 | 0.8-1.5m → 25 | 1.5-2.2m → 55 | 2.2-3.2m → 85 | >3.2m → 100
+• R_wind:     < 15 km/h → 10 | 15-25 km/h → 30 | 25-40 km/h → 65 | >40 km/h → 100 (+Squall penalty)
+• R_hazard:   LOW alert → 30 | MODERATE → 60 | HIGH → 85 | SEVERE / CYCLONE → 100
+• R_dist:     (Distance / 50km · 50) + (Trip Duration / 12h · 50)
+• R_geofence: CLEAR → 0 | NEAR BOUNDARY → 40 | INTERSECTS (Hard Block) → 100
+  </div>
+
+  <div class="callout warning">
+    <div class="callout-title">⚠️ Non-Negotiable Safety Override</div>
+    <p><strong>If Significant Wave Height (Hs) ≥ 2.4m OR Sustained Wind ≥ 42 km/h OR Critical Hazard ≥ 85:</strong><br>
+    <code>Total Risk = max(R, 65.0) → Automatically forces HIGH RISK Band and advises NO SAIL for small craft.</code></p>
+  </div>
+
+  <h3>5.3. Composite Fishing Suitability Index (0 to 100)</h3>
+  <div class="formula-card">
+    <span class="label">Fishing Reasoning Equation</span>
+Suitability (S) = 0.35(S_PFZ) + 0.20(S_Wave) + 0.20(S_Weather) + 0.10(S_Hazard) + 0.10(S_Ocean) + 0.05(S_Tide)
+
+• S_PFZ (35%):     Satellite remote sensing confidence (SST gradient + Chlorophyll-a break)
+• S_Wave (20%):    Wave stability factor (Calm sea ≤ 0.9m scores 92; dangerous sea > 2.4m scores 10)
+• S_Weather (20%): Wind speed (60%) + Precipitation intensity (40%)
+• S_Ocean (10%):   Optimal SST window (26.5°C–29.5°C) + Chlorophyll concentration (≥ 1.0 mg/m³)
+• S_Tide (5%):     Survey of India tidal harmonic clearance for bar harbors
+  </div>
+
+  <h2>6. Offline Resilience & Fault Tolerance Matrix</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Failure Mode</th>
+        <th style="width: 25%;">Module</th>
+        <th style="width: 50%;">Automated Fallback Mechanism</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Gemini API Unavailable / Quota Limit</strong></td>
+        <td><code>llm_client.py</code></td>
+        <td>Catches network exception and switches to local rule-based Markdown synthesis engine. Zero app crashes.</td>
+      </tr>
+      <tr>
+        <td><strong>Cloud Database Disconnected</strong></td>
+        <td><code>supabase_client.py</code></td>
+        <td>Fails over to browser <code>localStorage</code> and local Indian coastal benchmark registry (<code>indian_coastal_registry.py</code>).</td>
+      </tr>
+      <tr>
+        <td><strong>GIS C-Libraries Missing</strong></td>
+        <td><code>gis_agent.py</code></td>
+        <td>Falls back to our pure-Python Jordan Curve ray-casting algorithm for 2D point-in-polygon boundary validation.</td>
+      </tr>
+      <tr>
+        <td><strong>GPS Inactive / Inland Coordinate</strong></td>
+        <td><code>nlu_agent.py</code></td>
+        <td>Detects inland location and routes voyage from the nearest coastal hub automatically.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <strong>ORCA Marine Intelligence Platform</strong> • Smart India Hackathon (SIH 2026) • Complete System Architecture & Workflow Document
+  </div>
+</div>
+
+</body>
+</html>
