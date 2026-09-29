@@ -374,8 +374,3 @@ ORCA includes built-in geospatial data, bathymetry, and tide tables for key port
 - **Problem Statement:** PS26176 — Marine EcOsystem Reasoning with Collaborative Agents (ORCA)
 - **Data Acknowledgments:** Indian National Centre for Ocean Information Services (INCOIS), India Meteorological Department (IMD), Open-Meteo, and OpenStreetMap.
 
----
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
