@@ -10,6 +10,7 @@
 [![Supabase](https://img.shields.io/badge/Supabase-Database%20%26%20Auth-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
 [![INCOIS](https://img.shields.io/badge/INCOIS-Ocean%20Data-0077BE?style=for-the-badge)](https://incois.gov.in/)
 [![Multilingual](https://img.shields.io/badge/Languages-English%20%7C%20%E0%A4%B9%E0%A4%BF%E0%A4%A8%E0%A5%8D%E0%A4%A6%E0%A5%80%20%7C%20%E0%A4%AE%E0%A4%B0%E0%A4%BE%E0%A4%A0%E0%A5%80-orange?style=for-the-badge)](#-tri-lingual-support)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/heyash-6/sih2026_ps26176)
 
 ---
 

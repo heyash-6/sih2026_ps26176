@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: orca-marine-platform
+    runtime: python
+    region: singapore
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ORCA_MODE
+        value: live
+      - key: LLM_PROVIDER
+        value: gemini
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        value: https://byikekhtwiewlpxbuwgo.supabase.co
+      - key: SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5aWtla2h0d2lld2xweGJ1d2dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwMzM2OTksImV4cCI6MjEwNDYwOTY5OX0.R3OLDUPuPgWHHAGJsWMbgqM8vSDfjUltGeQzwyR_BAE
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5aWtla2h0d2lld2xweGJ1d2dvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4OTAzMzY5OSwiZXhwIjoyMTA0NjA5Njk5fQ.Z0caNRJw8dPkUfiSaYahVDBD_89JKkui5AhaYhs2jzM
