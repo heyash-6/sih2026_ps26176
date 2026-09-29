@@ -21,8 +21,14 @@ class Settings(BaseModel):
     
     # Supabase Database & Auth Settings
     supabase_url: str = os.getenv("SUPABASE_URL", "https://byikekhtwiewlpxbuwgo.supabase.co")
-    supabase_anon_key: str = os.getenv("SUPABASE_ANON_KEY", "")
-    supabase_service_role_key: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+    supabase_anon_key: str = os.getenv(
+        "SUPABASE_ANON_KEY",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5aWtla2h0d2lld2xweGJ1d2dvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwMzM2OTksImV4cCI6MjEwNDYwOTY5OX0.R3OLDUPuPgWHHAGJsWMbgqM8vSDfjUltGeQzwyR_BAE"
+    )
+    supabase_service_role_key: str = os.getenv(
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ5aWtla2h0d2lld2xweGJ1d2dvIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4OTAzMzY5OSwiZXhwIjoyMTA0NjA5Njk5fQ.Z0caNRJw8dPkUfiSaYahVDBD_89JKkui5AhaYhs2jzM"
+    )
 
     # Risk weights
     risk_weights: RiskWeights = RiskWeights()

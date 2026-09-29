@@ -3,9 +3,9 @@
  * Connects the React 19 Frontend with the FastAPI Multi-Agent AI Backend (:8000).
  */
 
-const API_BASE_URL = typeof window !== 'undefined' && window.__ORCA_API_URL__
+const API_BASE_URL = (typeof window !== 'undefined' && window.__ORCA_API_URL__)
   ? window.__ORCA_API_URL__
-  : 'http://localhost:8000';
+  : (import.meta.env.VITE_API_URL || (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' ? '' : 'http://localhost:8000'));
 
 /**
  * Check if the FastAPI backend is running and healthy.
